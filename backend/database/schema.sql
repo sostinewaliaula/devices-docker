@@ -64,7 +64,7 @@ CREATE TABLE assets (
   purchase_price DECIMAL(10,2),
   current_value DECIMAL(10,2),
   status ENUM('active', 'inactive', 'maintenance', 'retired') DEFAULT 'active',
-  condition ENUM('excellent', 'good', 'fair', 'poor') DEFAULT 'good',
+  asset_condition ENUM('excellent', 'good', 'fair', 'poor') DEFAULT 'good',
   location VARCHAR(255),
   assigned_to CHAR(36),
   department_id CHAR(36),
