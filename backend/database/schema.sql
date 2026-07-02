@@ -239,7 +239,7 @@ CREATE TRIGGER update_department_user_count_update
   AFTER UPDATE ON users
   FOR EACH ROW
 BEGIN
-  IF OLD.department_id IS DISTINCT FROM NEW.department_id THEN
+  IF NOT (OLD.department_id <=> NEW.department_id) THEN
     IF OLD.department_id IS NOT NULL THEN
       UPDATE departments SET user_count = user_count - 1 WHERE id = OLD.department_id;
     END IF;
@@ -277,7 +277,7 @@ CREATE TRIGGER update_department_asset_stats_update
   AFTER UPDATE ON assets
   FOR EACH ROW
 BEGIN
-  IF OLD.department_id IS DISTINCT FROM NEW.department_id THEN
+  IF NOT (OLD.department_id <=> NEW.department_id) THEN
     -- Remove from old department
     IF OLD.department_id IS NOT NULL THEN
       UPDATE departments SET 
