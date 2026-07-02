@@ -35,3 +35,9 @@ dist-ssr
 *.crt
 credentials.json
 secrets.json
+
+# Generated DB backups / uploads (contain real data, not source)
+backend/storage/backups/
+
+# Local working notes for Claude sessions (not shared/committed)
+CLAUDE.md

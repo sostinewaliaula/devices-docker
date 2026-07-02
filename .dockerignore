@@ -1,0 +1,16 @@
+node_modules
+dist
+backend
+docs
+.github
+.git
+.env
+.env.*
+!.env.example
+!env.example
+public/.htaccess
+*.md
+README.md
+mkdocs.yml
+.vscode
+.idea
