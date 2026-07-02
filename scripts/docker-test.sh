@@ -10,12 +10,27 @@ GHCR_REPO="devices-docker"
 export CI_REGISTRY_IMAGE="ghcr.io/${GHCR_OWNER}/${GHCR_REPO}"
 export TAG="${TAG:-latest}"
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-cd "$REPO_ROOT"
+# Raw GitHub base used to self-fetch the compose file + schema when this
+# script is run standalone (curl'd on its own, without a full repo checkout).
+RAW_BASE="https://raw.githubusercontent.com/${GHCR_OWNER}/${GHCR_REPO}/docker-deploy-setup"
 
 if ! command -v docker &>/dev/null; then
   echo "Docker is not installed or not on PATH." >&2
   exit 1
+fi
+
+# This script only needs docker-compose.yml + the DB bootstrap schema in the
+# current directory - it does not need a full repo checkout. Fetch whatever
+# is missing so it also works when curl'd down on its own.
+if [ ! -f docker-compose.yml ]; then
+  echo "docker-compose.yml not found - fetching from GitHub..."
+  curl -fsSL -o docker-compose.yml "${RAW_BASE}/docker-compose.yml"
+fi
+
+if [ ! -f backend/database/schema.sql ]; then
+  echo "backend/database/schema.sql not found - fetching from GitHub (needed for DB bootstrap)..."
+  mkdir -p backend/database
+  curl -fsSL -o backend/database/schema.sql "${RAW_BASE}/backend/database/schema.sql"
 fi
 
 # GHCR packages are private by default. Either make the packages public in
