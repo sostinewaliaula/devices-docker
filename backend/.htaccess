@@ -1,0 +1,15 @@
+
+RewriteEngine on
+
+RewriteOptions inherit
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home2/capitalm/api.capitalmotorsandtours.com"
+PassengerBaseURI "/"
+PassengerNodejs "/home2/capitalm/nodevenv/api.capitalmotorsandtours.com/22/bin/node"
+PassengerAppType node
+PassengerStartupFile server.js
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION BEGIN
+<IfModule Litespeed>
+</IfModule>
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION END

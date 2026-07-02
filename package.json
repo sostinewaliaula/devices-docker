@@ -1,0 +1,79 @@
+{
+  "name": "caava-group-assets-managment",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx vite",
+    "build": "npx vite build",
+    "build:prod": "cross-env NODE_ENV=production npx vite build",
+    "preview": "npx vite preview",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "backend:dev": "cd backend && npm run dev",
+    "backend:start": "cd backend && npm start",
+    "backend:install": "cd backend && npm install",
+    "migrate:setup": "node backend/scripts/setup-database.js",
+    "migrate:data": "node backend/scripts/migrate-supabase-data.js"
+  },
+  "dependencies": {
+    "@react-oauth/google": "^0.13.5",
+    "axios": "^1.12.2",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.1.0",
+    "express-validator": "^7.2.1",
+    "helmet": "^8.1.0",
+    "http-proxy-middleware": "^3.0.5",
+    "jsonwebtoken": "^9.0.2",
+    "lucide-react": "^0.441.0",
+    "morgan": "^1.10.1",
+    "mysql2": "^3.15.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-qr-code": "^2.0.15",
+    "react-router-dom": "^6.26.2",
+    "recharts": "^2.12.7"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^20.11.18",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^5.54.0",
+    "@typescript-eslint/parser": "^5.54.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "latest",
+    "cross-env": "^10.1.0",
+    "eslint": "^8.50.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.1",
+    "nodemon": "^3.1.10",
+    "postcss": "latest",
+    "tailwindcss": "3.4.17",
+    "terser": "^5.44.0",
+    "typescript": "^5.5.4",
+    "vite": "^5.2.0"
+  },
+  "description": "This document provides end-to-end setup, configuration, and operations for the system across frontend, Supabase backend, Edge Functions, and common troubleshooting.",
+  "main": "link-existing-users.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sostinewaliaula/assets-management.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sostinewaliaula/assets-management/issues"
+  },
+  "homepage": "https://github.com/sostinewaliaula/assets-management#readme"
+}

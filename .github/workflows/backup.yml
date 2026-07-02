@@ -1,0 +1,50 @@
+name: Automatic Backup
+
+on:
+  schedule:
+    # Runs every day at 2:00 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Supabase Edge Function
+        run: |
+          echo "🔄 Starting automatic backup..."
+          
+          # Make the HTTP request to your Supabase Edge Function
+          response=$(curl -s -w "\n%{http_code}" -X POST "https://myvmqncragvxfmwztnml.supabase.co/functions/v1/scheduled-backup" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            -H "Content-Type: application/json")
+          
+          # Extract the response body and status code
+          http_code=$(echo "$response" | tail -n1)
+          response_body=$(echo "$response" | head -n -1)
+          
+          echo "📊 Response Status: $http_code"
+          echo "📄 Response Body: $response_body"
+          
+          # Check if the request was successful
+          if [ "$http_code" -eq 200 ]; then
+            echo "✅ Backup completed successfully!"
+          else
+            echo "❌ Backup failed with status code: $http_code"
+            echo "Error details: $response_body"
+            exit 1
+          fi
+        env:
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      
+      - name: Notify on Success
+        if: success()
+        run: |
+          echo "🎉 Automatic backup completed successfully!"
+          echo "📧 Backup emails should have been sent to admins and IT officers."
+      
+      - name: Notify on Failure
+        if: failure()
+        run: |
+          echo "💥 Automatic backup failed!"
+          echo "Please check the logs above for error details."

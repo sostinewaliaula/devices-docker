@@ -1,0 +1,157 @@
+/* ── Brand colour overrides ──────────────────────────────────────────── */
+:root,
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color:        #D90429;
+  --md-primary-fg-color--light: #f5314e;
+  --md-primary-fg-color--dark:  #a8001e;
+  --md-primary-bg-color:        #ffffff;
+  --md-accent-fg-color:         #152F52;
+  --md-accent-fg-color--transparent: rgba(21, 47, 82, 0.1);
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color:        #D90429;
+  --md-primary-fg-color--light: #f5314e;
+  --md-primary-fg-color--dark:  #a8001e;
+  --md-primary-bg-color:        #ffffff;
+  --md-accent-fg-color:         #4a7fc1;
+  --md-default-bg-color:        #0b1220;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────── */
+.md-header {
+  background: linear-gradient(90deg, #D90429 0%, #152F52 100%);
+  box-shadow: 0 2px 8px rgba(21, 47, 82, 0.25);
+}
+
+/* ── Left sidebar nav ───────────────────────────────────────────────── */
+.md-nav__link--active,
+.md-nav__link:is(:focus, :hover) {
+  color: #D90429;
+}
+
+.md-nav__item--active > .md-nav__link {
+  color: #D90429;
+  font-weight: 600;
+}
+
+/* ── Table of contents active entry ─────────────────────────────────── */
+.md-nav--secondary .md-nav__link--active {
+  color: #D90429;
+  border-left: 2px solid #D90429;
+  padding-left: 0.5rem;
+}
+
+/* ── Search highlight ────────────────────────────────────────────────── */
+.md-search__scrollwrap .md-search-result__article mark {
+  color: #D90429;
+}
+
+/* ── Logo sizing ─────────────────────────────────────────────────────── */
+.md-header__button.md-logo img {
+  height: 2rem;
+  width: auto;
+  object-fit: contain;
+}
+
+/* ── Font ────────────────────────────────────────────────────────────── */
+:root {
+  --md-text-font: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --md-code-font: "JetBrains Mono", "Fira Code", monospace;
+}
+
+/* ── Remove "Made with Material for MkDocs" branding ────────────────── */
+.md-footer-meta {
+  display: none;
+}
+
+/* ── In-content Previous / Next navigation ──────────────────────────── */
+.content-page-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.content-page-nav__link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.9rem 1.2rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 0.5rem;
+  text-decoration: none !important;
+  max-width: 46%;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+.content-page-nav__link:hover {
+  border-color: #D90429;
+  box-shadow: 0 2px 10px rgba(217, 4, 41, 0.1);
+}
+
+.content-page-nav__link--next {
+  margin-left: auto;
+  text-align: right;
+}
+
+.content-page-nav__direction {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: #D90429;
+}
+
+.content-page-nav__title {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--md-default-fg-color);
+}
+
+/* ── Fenced code blocks ─────────────────────────────────────────────── */
+.md-typeset pre {
+  border-radius: 0.5rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.md-typeset .highlight span.filename,
+.md-typeset .highlight [data-md-language]::before {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #D90429;
+}
+
+/* ── Inline code ────────────────────────────────────────────────────── */
+.md-typeset code:not(.md-typeset pre code) {
+  background: rgba(217, 4, 41, 0.07);
+  border: 1px solid rgba(217, 4, 41, 0.15);
+  border-radius: 0.25rem;
+  color: #a8001e;
+  font-size: 0.85em;
+  padding: 0.1em 0.35em;
+}
+
+[data-md-color-scheme="slate"] .md-typeset code:not(.md-typeset pre code) {
+  background: rgba(217, 4, 41, 0.12);
+  border-color: rgba(217, 4, 41, 0.25);
+  color: #f5314e;
+}
+
+/* ── Copy button ────────────────────────────────────────────────────── */
+.md-typeset .md-clipboard {
+  color: var(--md-default-fg-color--light);
+  transition: color 0.15s;
+}
+
+.md-typeset .md-clipboard:hover {
+  color: #D90429;
+}
+
+.md-typeset .md-clipboard--success {
+  color: #2e7d32;
+}
