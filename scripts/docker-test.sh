@@ -11,10 +11,11 @@ export CI_REGISTRY_IMAGE="ghcr.io/${GHCR_OWNER}/${GHCR_REPO}"
 export TAG="${TAG:-latest}"
 
 # Host port for the frontend (nginx listens on 80 inside the container).
-# Override on hosts where 80 is already taken (e.g. aaPanel), either by
-# exporting it before running this script, or by editing HOST_HTTP_PORT
-# in .env afterwards and re-running `docker compose up -d`.
-HOST_HTTP_PORT="${HOST_HTTP_PORT:-80}"
+# Defaults to 8080 since 80 is commonly already taken by a control panel's
+# own web server (e.g. aaPanel). Override by exporting HOST_HTTP_PORT before
+# running this script, or by editing it in .env afterwards and re-running
+# `docker compose up -d`.
+HOST_HTTP_PORT="${HOST_HTTP_PORT:-8080}"
 
 # Raw GitHub base used to self-fetch the compose file + schema when this
 # script is run standalone (curl'd on its own, without a full repo checkout).
