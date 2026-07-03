@@ -336,7 +336,7 @@ apply_migrations() {
         [[ -z "$filename" || "$filename" == \#* ]] && continue
 
         ALREADY=$(docker compose exec -T db mariadb -u root -p"${DB_ROOT_PASSWORD}" -N -s "${DB_NAME}" \
-            -e "SELECT COUNT(*) FROM schema_migrations WHERE filename='${filename}';" 2>/dev/null | tr -d '\r')
+            -e "SELECT COUNT(*) FROM schema_migrations WHERE filename='${filename}';" < /dev/null 2>/dev/null | tr -d '\r')
 
         if [ "$ALREADY" = "1" ]; then
             echo -e "${BLUE}i${NC} ${filename} already applied, skipping."
@@ -350,7 +350,7 @@ apply_migrations() {
 
         if [ $? -eq 0 ]; then
             docker compose exec -T db mariadb -u root -p"${DB_ROOT_PASSWORD}" "${DB_NAME}" \
-                -e "INSERT INTO schema_migrations (filename) VALUES ('${filename}');"
+                -e "INSERT INTO schema_migrations (filename) VALUES ('${filename}');" < /dev/null
             echo -e "${GREEN}  ✓ Applied${NC}"
             APPLIED_COUNT=$((APPLIED_COUNT+1))
         else
