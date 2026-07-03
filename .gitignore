@@ -38,6 +38,7 @@ secrets.json
 
 # Generated DB backups / uploads (contain real data, not source)
 backend/storage/backups/
+/assets.sql
 
 # Local working notes for Claude sessions (not shared/committed)
 CLAUDE.md
