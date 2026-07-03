@@ -57,6 +57,12 @@ if [ ! -f .env ]; then
   DB_PASSWORD="$(gen_secret 12)"
   DB_ROOT_PASSWORD="$(gen_secret 12)"
   cat > .env <<EOF
+# Registry image reference used by docker-compose.yml. Also required for
+# plain \`docker compose\` commands run outside this script, since compose
+# only sees vars exported by this script for the duration of its own run.
+CI_REGISTRY_IMAGE=${CI_REGISTRY_IMAGE}
+TAG=${TAG}
+
 DB_CLIENT=mariadb
 DB_HOST=db
 DB_PORT=3306
@@ -82,9 +88,17 @@ RATE_LIMIT_MAX_REQUESTS=1000
 HOST_HTTP_PORT=${HOST_HTTP_PORT}
 EOF
   echo "Generated .env with random DB/JWT secrets (HOST_HTTP_PORT=${HOST_HTTP_PORT})."
-elif ! grep -q '^HOST_HTTP_PORT=' .env; then
-  echo "HOST_HTTP_PORT=${HOST_HTTP_PORT}" >> .env
-  echo "Added HOST_HTTP_PORT=${HOST_HTTP_PORT} to existing .env."
+else
+  ensure_env_var() {
+    local key="$1" value="$2"
+    if ! grep -q "^${key}=" .env; then
+      echo "${key}=${value}" >> .env
+      echo "Added ${key}=${value} to existing .env."
+    fi
+  }
+  ensure_env_var CI_REGISTRY_IMAGE "${CI_REGISTRY_IMAGE}"
+  ensure_env_var TAG "${TAG}"
+  ensure_env_var HOST_HTTP_PORT "${HOST_HTTP_PORT}"
 fi
 
 echo "Pulling images from ${CI_REGISTRY_IMAGE} (tag: ${TAG})..."
