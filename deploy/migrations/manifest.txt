@@ -1,0 +1,5 @@
+# One filename per line, applied in order by deploy/manage.sh (option
+# "Apply New Migrations"). Blank lines and lines starting with # are
+# ignored. Every migration file must be idempotent (use
+# `IF NOT EXISTS` / `IF EXISTS` guards) since it may run against
+# instances that already have the change baked into backend/database/schema.sql.

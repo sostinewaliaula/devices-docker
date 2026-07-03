@@ -510,6 +510,15 @@ CREATE TABLE IF NOT EXISTS `users` (
   CONSTRAINT `users_ibfk_1` FOREIGN KEY (`department_id`) REFERENCES `departments` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Tracks which deploy/migrations/*.sql files have been applied to this
+-- instance (see deploy/manage.sh option "Apply New Migrations"). Not
+-- pre-seeded here - the manifest is empty as of this schema snapshot.
+CREATE TABLE IF NOT EXISTS `schema_migrations` (
+  `filename` varchar(255) NOT NULL,
+  `applied_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`filename`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS=1;
 
 -- =====================================================

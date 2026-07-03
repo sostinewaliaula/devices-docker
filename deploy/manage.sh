@@ -41,7 +41,8 @@ show_menu() {
     echo -e "   8) ${RED}Restore Data${NC} (Select from saved backups)"
     echo -e "   9) ${RED}Wipe Instance Data${NC} (Reset all volumes)"
     echo -e "   10) ${YELLOW}Re-apply Schema${NC} (Fills in any missing tables)"
-    echo -e "   11) Exit"
+    echo -e "   11) ${GREEN}Apply New Migrations${NC} (Add tables/columns without touching data)"
+    echo -e "   12) Exit"
     echo -ne "\nAction [3]: "
 }
 
@@ -312,6 +313,55 @@ reapply_schema() {
     echo -e "${GREEN}✓ Table structure re-applied.${NC}"
 }
 
+apply_migrations() {
+    echo -e "\n${YELLOW}Checking for new migrations...${NC}"
+
+    DB_ROOT_PASSWORD=$(env_var DB_ROOT_PASSWORD)
+    DB_NAME=$(env_var DB_NAME)
+    DB_NAME=${DB_NAME:-assets_management}
+
+    # Ensure the tracking table exists, in case this instance predates it
+    docker compose exec -T db mariadb -u root -p"${DB_ROOT_PASSWORD}" "${DB_NAME}" -e \
+        "CREATE TABLE IF NOT EXISTS schema_migrations (filename VARCHAR(255) PRIMARY KEY, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);" 2>/dev/null
+
+    curl -fsSL -o /tmp/migrations_manifest.txt "${REPO_RAW_URL}/deploy/migrations/manifest.txt"
+
+    APPLIED_COUNT=0
+    SKIPPED_COUNT=0
+
+    while IFS= read -r filename || [ -n "$filename" ]; do
+        filename="$(echo "$filename" | tr -d '\r')"
+        [[ -z "$filename" || "$filename" == \#* ]] && continue
+
+        ALREADY=$(docker compose exec -T db mariadb -u root -p"${DB_ROOT_PASSWORD}" -N -s "${DB_NAME}" \
+            -e "SELECT COUNT(*) FROM schema_migrations WHERE filename='${filename}';" 2>/dev/null | tr -d '\r')
+
+        if [ "$ALREADY" = "1" ]; then
+            echo -e "${BLUE}i${NC} ${filename} already applied, skipping."
+            SKIPPED_COUNT=$((SKIPPED_COUNT+1))
+            continue
+        fi
+
+        echo -e "${BLUE}Applying ${filename}...${NC}"
+        curl -fsSL -o /tmp/migration_apply.sql "${REPO_RAW_URL}/deploy/migrations/${filename}"
+        docker compose exec -T db mariadb -u root -p"${DB_ROOT_PASSWORD}" "${DB_NAME}" < /tmp/migration_apply.sql
+
+        if [ $? -eq 0 ]; then
+            docker compose exec -T db mariadb -u root -p"${DB_ROOT_PASSWORD}" "${DB_NAME}" \
+                -e "INSERT INTO schema_migrations (filename) VALUES ('${filename}');"
+            echo -e "${GREEN}  ✓ Applied${NC}"
+            APPLIED_COUNT=$((APPLIED_COUNT+1))
+        else
+            echo -e "${RED}✗ Migration ${filename} failed - stopping here. Fix it and re-run this option.${NC}"
+            rm -f /tmp/migration_apply.sql /tmp/migrations_manifest.txt
+            return
+        fi
+    done < /tmp/migrations_manifest.txt
+
+    rm -f /tmp/migration_apply.sql /tmp/migrations_manifest.txt
+    echo -e "\n${GREEN}${BOLD}✓ Done.${NC} Applied: ${APPLIED_COUNT}, already up to date: ${SKIPPED_COUNT}"
+}
+
 while true; do
     show_menu
     read choice
@@ -328,7 +378,8 @@ while true; do
         8) restore_data ;;
         9) wipe_data ;;
         10) reapply_schema ;;
-        11) exit 0 ;;
+        11) apply_migrations ;;
+        12) exit 0 ;;
         *) echo -e "${RED}Invalid option, please try again.${NC}" ;;
     esac
     echo -e "\n"
