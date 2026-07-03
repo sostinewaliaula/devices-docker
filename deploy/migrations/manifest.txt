@@ -3,3 +3,4 @@
 # ignored. Every migration file must be idempotent (use
 # `IF NOT EXISTS` / `IF EXISTS` guards) since it may run against
 # instances that already have the change baked into backend/database/schema.sql.
+001_test_migration.sql
