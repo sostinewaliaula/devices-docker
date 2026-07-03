@@ -10,6 +10,12 @@ GHCR_REPO="devices-docker"
 export CI_REGISTRY_IMAGE="ghcr.io/${GHCR_OWNER}/${GHCR_REPO}"
 export TAG="${TAG:-latest}"
 
+# Host port for the frontend (nginx listens on 80 inside the container).
+# Override on hosts where 80 is already taken (e.g. aaPanel), either by
+# exporting it before running this script, or by editing HOST_HTTP_PORT
+# in .env afterwards and re-running `docker compose up -d`.
+HOST_HTTP_PORT="${HOST_HTTP_PORT:-80}"
+
 # Raw GitHub base used to self-fetch the compose file + schema when this
 # script is run standalone (curl'd on its own, without a full repo checkout).
 RAW_BASE="https://raw.githubusercontent.com/${GHCR_OWNER}/${GHCR_REPO}/docker-deploy-setup"
@@ -71,16 +77,22 @@ FRONTEND_URLS=
 
 RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=1000
+
+HOST_HTTP_PORT=${HOST_HTTP_PORT}
 EOF
-  echo "Generated .env with random DB/JWT secrets."
+  echo "Generated .env with random DB/JWT secrets (HOST_HTTP_PORT=${HOST_HTTP_PORT})."
+elif ! grep -q '^HOST_HTTP_PORT=' .env; then
+  echo "HOST_HTTP_PORT=${HOST_HTTP_PORT}" >> .env
+  echo "Added HOST_HTTP_PORT=${HOST_HTTP_PORT} to existing .env."
 fi
 
 echo "Pulling images from ${CI_REGISTRY_IMAGE} (tag: ${TAG})..."
 docker compose pull
 docker compose up -d
 
+PORT_IN_USE="$(grep '^HOST_HTTP_PORT=' .env | cut -d= -f2)"
 echo ""
 echo "Stack starting. Check status with: docker compose ps"
-echo "Frontend:   http://localhost/"
-echo "Health:     http://localhost/health"
-echo "API sample: http://localhost/api/departments"
+echo "Frontend:   http://localhost:${PORT_IN_USE}/"
+echo "Health:     http://localhost:${PORT_IN_USE}/health"
+echo "API sample: http://localhost:${PORT_IN_USE}/api/departments"
