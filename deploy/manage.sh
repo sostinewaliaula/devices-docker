@@ -299,7 +299,7 @@ wipe_data() {
 reapply_schema() {
     echo -e "${YELLOW}Re-fetching latest schema.sql and re-applying table structure only...${NC}"
     echo -e "${BLUE}i${NC} Only CREATE TABLE statements are replayed (idempotent) - seed/admin data is skipped so it won't collide with existing rows."
-    curl -fsSL -o /tmp/schema_reapply_full.sql "${REPO_RAW_URL}/backend/database/schema.sql"
+    curl -fsSL -o /tmp/schema_reapply_full.sql "${REPO_RAW_URL}/backend/database/schema.sql?cb=$(date +%s)"
 
     # Strip everything from the seed-data marker onward, keeping only DDL
     sed '/-- REFERENCE \/ SEED DATA/,$d' /tmp/schema_reapply_full.sql > /tmp/schema_reapply_ddl.sql
@@ -324,7 +324,9 @@ apply_migrations() {
     docker compose exec -T db mariadb -u root -p"${DB_ROOT_PASSWORD}" "${DB_NAME}" -e \
         "CREATE TABLE IF NOT EXISTS schema_migrations (filename VARCHAR(255) PRIMARY KEY, applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);" 2>/dev/null
 
-    curl -fsSL -o /tmp/migrations_manifest.txt "${REPO_RAW_URL}/deploy/migrations/manifest.txt"
+    # Cache-bust: raw.githubusercontent.com can serve a stale copy for a
+    # few minutes right after a push otherwise.
+    curl -fsSL -o /tmp/migrations_manifest.txt "${REPO_RAW_URL}/deploy/migrations/manifest.txt?cb=$(date +%s)"
 
     APPLIED_COUNT=0
     SKIPPED_COUNT=0
@@ -343,7 +345,7 @@ apply_migrations() {
         fi
 
         echo -e "${BLUE}Applying ${filename}...${NC}"
-        curl -fsSL -o /tmp/migration_apply.sql "${REPO_RAW_URL}/deploy/migrations/${filename}"
+        curl -fsSL -o /tmp/migration_apply.sql "${REPO_RAW_URL}/deploy/migrations/${filename}?cb=$(date +%s)"
         docker compose exec -T db mariadb -u root -p"${DB_ROOT_PASSWORD}" "${DB_NAME}" < /tmp/migration_apply.sql
 
         if [ $? -eq 0 ]; then
