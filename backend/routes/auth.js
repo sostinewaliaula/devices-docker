@@ -8,6 +8,7 @@ import emailService from '../services/emailService.js';
 import notificationService from '../services/notificationService.js';
 import auditLogger from '../utils/auditLogger.js';
 import { OAuth2Client } from 'google-auth-library';
+import { syncGoogleAvatar } from '../utils/avatar.js';
 
 const router = express.Router();
 
@@ -215,6 +216,7 @@ router.post('/register', [
         department_id: user.department_id,
         phone: user.phone,
         position: user.position,
+        avatar_updated_at: user.avatar_updated_at,
         created_at: user.created_at
       },
       token
@@ -246,7 +248,7 @@ router.post('/login', [
 
     // Get user from database including MFA status
     const userResult = await executeQuery(
-      'SELECT id, email, password_hash, name, role, department_id, phone, position, is_active, mfa_enabled, created_at, updated_at FROM users WHERE email = ?',
+      'SELECT id, email, password_hash, name, role, department_id, phone, position, is_active, mfa_enabled, avatar_updated_at, created_at, updated_at FROM users WHERE email = ?',
       [email]
     );
 
@@ -343,6 +345,7 @@ router.post('/login', [
             department_id: user.department_id,
             phone: user.phone,
             position: user.position,
+        avatar_updated_at: user.avatar_updated_at,
             created_at: user.created_at,
             updated_at: user.updated_at
           }
@@ -363,6 +366,7 @@ router.post('/login', [
           department_id: user.department_id,
           phone: user.phone,
           position: user.position,
+        avatar_updated_at: user.avatar_updated_at,
           created_at: user.created_at,
           updated_at: user.updated_at
         }
@@ -386,6 +390,7 @@ router.post('/login', [
         department_id: user.department_id,
         phone: user.phone,
         position: user.position,
+        avatar_updated_at: user.avatar_updated_at,
         created_at: user.created_at,
         updated_at: user.updated_at
       },
@@ -439,7 +444,7 @@ router.post('/verify-mfa-login', [
 
     // Get user details
     const userResult = await executeQuery(
-      'SELECT id, email, name, role, department_id, phone, position, created_at, updated_at FROM users WHERE id = ?',
+      'SELECT id, email, name, role, department_id, phone, position, avatar_updated_at, created_at, updated_at FROM users WHERE id = ?',
       [userId]
     );
 
@@ -469,6 +474,7 @@ router.post('/verify-mfa-login', [
         department_id: user.department_id,
         phone: user.phone,
         position: user.position,
+        avatar_updated_at: user.avatar_updated_at,
         created_at: user.created_at,
         updated_at: user.updated_at
       },
@@ -518,7 +524,7 @@ router.post('/mfa-factors-for-login', async (req, res) => {
 router.get('/profile', authenticateToken, async (req, res) => {
   try {
     const userResult = await executeQuery(
-      `SELECT u.id, u.email, u.name, u.role, u.department_id, u.phone, u.position, 
+      `SELECT u.id, u.email, u.name, u.role, u.department_id, u.phone, u.position, u.avatar_updated_at, 
               u.is_active, u.last_login, u.created_at, u.updated_at, d.name as department_name
        FROM users u
        LEFT JOIN departments d ON u.department_id = d.id
@@ -544,6 +550,7 @@ router.get('/profile', authenticateToken, async (req, res) => {
         department_name: user.department_name,
         phone: user.phone,
         position: user.position,
+        avatar_updated_at: user.avatar_updated_at,
         is_active: user.is_active,
         last_login: user.last_login,
         created_at: user.created_at,
@@ -642,7 +649,7 @@ router.put('/profile', [
 
     // Get updated user profile
     const userResult = await executeQuery(
-      `SELECT u.id, u.email, u.name, u.role, u.department_id, u.phone, u.position, 
+      `SELECT u.id, u.email, u.name, u.role, u.department_id, u.phone, u.position, u.avatar_updated_at, 
               u.is_active, u.last_login, u.created_at, u.updated_at, d.name as department_name
        FROM users u
        LEFT JOIN departments d ON u.department_id = d.id
@@ -672,6 +679,7 @@ router.put('/profile', [
         department_name: updatedUser.department_name,
         phone: updatedUser.phone,
         position: updatedUser.position,
+        avatar_updated_at: updatedUser.avatar_updated_at,
         is_active: updatedUser.is_active,
         last_login: updatedUser.last_login,
         created_at: updatedUser.created_at,
@@ -1230,7 +1238,7 @@ router.post('/google/token', async (req, res) => {
 
     // Check if a user with this google_id exists
     let userResult = await executeQuery(
-      'SELECT id, email, name, role, department_id, phone, position, is_active, profile_complete, avatar_url, mfa_enabled FROM users WHERE google_id = ?',
+      'SELECT id, email, name, role, department_id, phone, position, is_active, profile_complete, avatar_url, avatar_source, mfa_enabled FROM users WHERE google_id = ?',
       [googleId]
     );
 
@@ -1239,7 +1247,7 @@ router.post('/google/token', async (req, res) => {
     if (!user) {
       // Check if an account exists with this email (link it)
       const byEmail = await executeQuery(
-        'SELECT id, email, name, role, department_id, phone, position, is_active, profile_complete, avatar_url, mfa_enabled FROM users WHERE email = ?',
+        'SELECT id, email, name, role, department_id, phone, position, is_active, profile_complete, avatar_url, avatar_source, mfa_enabled FROM users WHERE email = ?',
         [email]
       );
 
@@ -1261,7 +1269,7 @@ router.post('/google/token', async (req, res) => {
         );
 
         const newUser = await executeQuery(
-          'SELECT id, email, name, role, department_id, phone, position, is_active, profile_complete, avatar_url, mfa_enabled FROM users WHERE id = ?',
+          'SELECT id, email, name, role, department_id, phone, position, is_active, profile_complete, avatar_url, avatar_source, mfa_enabled FROM users WHERE id = ?',
           [newUserId]
         );
         user = newUser.data[0];
@@ -1290,6 +1298,11 @@ router.post('/google/token', async (req, res) => {
       return res.status(401).json({ error: 'Account deactivated', message: 'Your account has been deactivated.' });
     }
 
+    // Keep the DB copy of the Google photo fresh (skipped if they uploaded their own or removed it)
+    await syncGoogleAvatar(user.id, picture, user.avatar_source);
+    const avatarRow = await executeQuery('SELECT avatar_updated_at FROM users WHERE id = ?', [user.id]);
+    user.avatar_updated_at = avatarRow.data?.[0]?.avatar_updated_at || null;
+
     // Update last login
     await executeQuery('UPDATE users SET last_login = NOW() WHERE id = ?', [user.id]);
     await auditLogger.logAuth(user.id, 'LOGIN_GOOGLE', { email: user.email }, ipAddress, userAgent);
@@ -1312,6 +1325,7 @@ router.post('/google/token', async (req, res) => {
         department_id: user.department_id,
         phone: user.phone,
         position: user.position,
+        avatar_updated_at: user.avatar_updated_at,
         avatar_url: user.avatar_url,
         is_active: user.is_active,
         profile_complete: !!user.profile_complete,
@@ -1348,7 +1362,7 @@ router.post('/google/complete-profile', authenticateToken, [
     }
 
     const updated = await executeQuery(
-      'SELECT id, email, name, role, department_id, phone, position, is_active, profile_complete, avatar_url FROM users WHERE id = ?',
+      'SELECT id, email, name, role, department_id, phone, position, is_active, profile_complete, avatar_url, avatar_updated_at FROM users WHERE id = ?',
       [userId]
     );
 
@@ -1364,6 +1378,7 @@ router.post('/google/complete-profile', authenticateToken, [
         department_id: user.department_id,
         phone: user.phone,
         position: user.position,
+        avatar_updated_at: user.avatar_updated_at,
         avatar_url: user.avatar_url,
         is_active: user.is_active,
         profile_complete: true,

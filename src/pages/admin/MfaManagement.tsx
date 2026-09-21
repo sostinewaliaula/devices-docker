@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContextNew';
 import { useNotifications } from '../../contexts/NotificationContext';
+import UserAvatar from '../../components/ui/UserAvatar';
 import { 
   ShieldCheckIcon, 
   ShieldXIcon, 
@@ -14,7 +15,7 @@ import {
   CheckCircleIcon,
   XCircleIcon,
   KeyIcon,
-  UserIcon,
+  // (UserIcon replaced by UserAvatar)
   MailIcon,
   CalendarIcon
 } from 'lucide-react';
@@ -30,6 +31,7 @@ interface UserMfaStatus {
   last_mfa_verification?: string;
   factors_count: number;
   last_login?: string;
+  avatar_updated_at?: string | null;
 }
 
 interface MfaFactor {
@@ -388,9 +390,7 @@ const MfaManagement: React.FC = () => {
                 <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center">
-                        <UserIcon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                      </div>
+                      <UserAvatar userId={user.id} name={user.name} version={user.avatar_updated_at} size="md" />
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900 dark:text-white">
                           {user.name}
@@ -468,9 +468,7 @@ const MfaManagement: React.FC = () => {
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900 rounded-full flex items-center justify-center">
-                    <UserIcon className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                  </div>
+                  <UserAvatar userId={selectedUser.id} name={selectedUser.name} version={selectedUser.avatar_updated_at} size="md" />
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                       {selectedUser.name}

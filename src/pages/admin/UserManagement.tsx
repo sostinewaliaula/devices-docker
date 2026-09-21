@@ -4,6 +4,7 @@ import { UserIcon, PlusIcon, EditIcon, TrashIcon, SearchIcon, FilterIcon, Refres
 import Logo from '../../assets/logo.png';
 import { Position, User } from '../../lib/supabase';
 import { userService, departmentService, positionService } from '../../services/apiDatabase';
+import UserAvatar from '../../components/ui/UserAvatar';
 
 interface CreateUserData {
   email: string;
@@ -779,9 +780,7 @@ const UserManagement: React.FC = () => {
                 <td className="px-4 py-4"><input type="checkbox" checked={selectedUserIds.includes(user.id)} onChange={e => handleSelectOneUser(user.id, e.target.checked)} /></td>
                 <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-200 whitespace-nowrap">
                   <div className="flex items-center">
-                    <div className={`w-10 h-10 mr-3 rounded-full flex items-center justify-center ${!user.is_active ? 'bg-red-100' : 'bg-lightred'}`}>
-                      <UserIcon className={`w-6 h-6 ${!user.is_active ? 'text-red-600' : 'text-primary'}`} />
-                    </div>
+                    <UserAvatar userId={user.id} name={user.name} version={user.avatar_updated_at} size="md" className={`mr-3 ${!user.is_active ? 'opacity-50 grayscale' : ''}`} />
                     <div className="flex flex-col">
                       <span className={!user.is_active ? 'text-gray-500 line-through' : ''}>{user.name}</span>
                       {!user.is_active && <span className="text-[10px] text-primary font-bold uppercase tracking-wider">Suspended</span>}

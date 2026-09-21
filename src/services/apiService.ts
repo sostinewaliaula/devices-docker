@@ -74,6 +74,8 @@ export interface User {
   created_at: string;
   updated_at?: string;
   avatar_url?: string;
+  /** Version of the stored avatar image (null/undefined = no photo). Used as a cache key. */
+  avatar_updated_at?: string | null;
   profile_complete?: boolean;
 }
 
@@ -322,6 +324,27 @@ export const authAPI = {
 
 // Users API
 export const usersAPI = {
+  // Avatars are stored in the DB and streamed from /users/:id/avatar (auth required, so
+  // <img src> can't be used directly — fetch as a blob and cache per user+version).
+  uploadAvatar: async (userId: string, file: Blob): Promise<{ message: string; avatar_updated_at: string | null }> => {
+    const form = new FormData();
+    form.append('avatar', file, 'avatar.' + (file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg'));
+    const response: AxiosResponse<{ message: string; avatar_updated_at: string | null }> = await api.post(`/users/${userId}/avatar`, form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
+  deleteAvatar: async (userId: string): Promise<{ message: string; avatar_updated_at: null }> => {
+    const response: AxiosResponse<{ message: string; avatar_updated_at: null }> = await api.delete(`/users/${userId}/avatar`);
+    return response.data;
+  },
+
+  getAvatarBlob: async (userId: string): Promise<Blob> => {
+    const response: AxiosResponse<Blob> = await api.get(`/users/${userId}/avatar`, { responseType: 'blob' });
+    return response.data;
+  },
+
   getAll: async (params?: {
     page?: number;
     limit?: number;

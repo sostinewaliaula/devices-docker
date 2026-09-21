@@ -22,6 +22,8 @@ interface AuthContextType {
   completeGoogleProfile: (data: { position: string; department_id: string; phone?: string }) => Promise<void>;
   logout: () => void;
   updateProfile: (userData: Partial<User>) => Promise<void>;
+  /** Call after the user uploads/removes their photo so every avatar on screen refreshes. */
+  setAvatarVersion: (version: string | null) => void;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
   resetPassword: (token: string, password: string) => Promise<void>;
@@ -257,13 +259,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Clear local storage and state
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
+      localStorage.removeItem(LAST_ACTIVITY_KEY);
       setUser(null);
     }
-      localStorage.removeItem(LAST_ACTIVITY_KEY);
   }, []);
 
-  // Update profile function
-  const updateProfile = useCallback(async (userData: Partial<User>): Promise<void> => {
   // Sign out this tab when another tab signs out (or the timeout logs it out)
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
@@ -276,6 +276,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => window.removeEventListener('storage', onStorage);
   }, []);
 
+  // Update profile function
+  const updateProfile = useCallback(async (userData: Partial<User>): Promise<void> => {
     try {
       if (!user) throw new Error('No user logged in');
 
@@ -297,6 +299,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       throw new Error(error.response?.data?.error || 'Profile update failed');
     }
   }, [user]);
+
+  // Reflect a new/removed avatar in state + storage (the image itself lives in the DB)
+  const setAvatarVersion = useCallback((version: string | null): void => {
+    setUser(prev => {
+      if (!prev) return prev;
+      const next = { ...prev, avatar_updated_at: version };
+      try { localStorage.setItem('user', JSON.stringify(next)); } catch { /* storage unavailable */ }
+      return next;
+    });
+  }, []);
 
   // Change password function
   const changePassword = useCallback(async (currentPassword: string, newPassword: string): Promise<void> => {
@@ -407,6 +419,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     completeGoogleProfile,
     logout,
     updateProfile,
+    setAvatarVersion,
     changePassword,
     forgotPassword,
     resetPassword,
@@ -421,7 +434,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     verifyEnrollTotp,
     disableTotp,
     listMfaFactors,
-  }), [user, loading, login, verifyMfaLogin, register, googleLogin, completeGoogleProfile, logout, updateProfile, changePassword, forgotPassword, resetPassword, validateResetToken, verifyResetCode, changePasswordWithCode, isAuthenticated, isAdmin, isManager, startEnrollTotp, verifyEnrollTotp, disableTotp, listMfaFactors]);
+  }), [user, loading, login, verifyMfaLogin, register, googleLogin, completeGoogleProfile, logout, updateProfile, setAvatarVersion, changePassword, forgotPassword, resetPassword, validateResetToken, verifyResetCode, changePasswordWithCode, isAuthenticated, isAdmin, isManager, startEnrollTotp, verifyEnrollTotp, disableTotp, listMfaFactors]);
 
   return (
     <AuthContext.Provider value={value}>

@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../../contexts/NotificationContext';
-import { SearchIcon, FilterIcon, CheckCircleIcon, AlertCircleIcon, ClockIcon, UserIcon, DownloadIcon, EyeIcon, EditIcon, TrashIcon, XCircleIcon, DollarSignIcon, RefreshCwIcon, ImageIcon } from 'lucide-react';
+import { SearchIcon, FilterIcon, CheckCircleIcon, AlertCircleIcon, ClockIcon, DownloadIcon, EyeIcon, EditIcon, TrashIcon, XCircleIcon, DollarSignIcon, RefreshCwIcon, ImageIcon } from 'lucide-react';
+import UserAvatar from '../../components/ui/UserAvatar';
 import { issueService, assetService, userService, departmentService, assetRequestTypeService } from '../../services/apiDatabase';
 import { Issue, Asset, User, Department } from '../../lib/supabase';
 import AssetImage from '../../components/AssetImage';
@@ -614,9 +615,7 @@ const IssueManagement: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-3">
-                          <UserIcon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                        </div>
+                        <UserAvatar userId={issue.reported_by} name={getReporterName(issue.reported_by)} version={users.find(u => u.id === issue.reported_by)?.avatar_updated_at} size="sm" className="mr-3" />
                         <span className="text-sm text-gray-900 dark:text-white">
                           {getReporterName(issue.reported_by)}
                         </span>

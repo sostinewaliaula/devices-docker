@@ -5,6 +5,7 @@ import api from '../../services/apiService';
 import AssetImage from '../../components/AssetImage';
 import { AssetRequest } from '../../lib/supabase';
 import CommentsSection from '../../components/CommentsSection';
+import UserAvatar from '../../components/ui/UserAvatar';
 import {
   SearchIcon,
   CheckCircleIcon,
@@ -18,13 +19,14 @@ import {
   CheckIcon,
   XIcon,
   PackageIcon,
-  UserIcon,
+  // (UserIcon replaced by UserAvatar)
   MessageCircleIcon,
   DollarSignIcon
 } from 'lucide-react';
 
 interface AssetRequestWithUser extends AssetRequest {
   user_name?: string;
+  user_avatar_updated_at?: string | null;
   user_email?: string;
   approved_by_name?: string;
 }
@@ -597,9 +599,7 @@ const AssetRequestsManagement: React.FC = () => {
                   </td>
                   <td className="py-4 px-6">
                     <div className="flex items-center">
-                      <div className="w-6 h-6 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center mr-2">
-                        <UserIcon className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                      </div>
+                      <UserAvatar userId={request.user_id} name={request.user_name} version={request.user_avatar_updated_at} size="sm" className="mr-2" />
                       <div>
                         <p className="font-medium text-gray-900 dark:text-gray-100">{request.user_name || 'Unknown User'}</p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">{request.user_email || ''}</p>
@@ -749,7 +749,10 @@ const AssetRequestsManagement: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Requested By</label>
-                <p className="text-gray-900 dark:text-gray-100">{selectedRequest.user_name || 'Unknown User'}</p>
+                <div className="flex items-center gap-2">
+                  <UserAvatar userId={selectedRequest.user_id} name={selectedRequest.user_name} version={selectedRequest.user_avatar_updated_at} size="sm" />
+                  <p className="text-gray-900 dark:text-gray-100">{selectedRequest.user_name || 'Unknown User'}</p>
+                </div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{selectedRequest.user_email || ''}</p>
               </div>
 

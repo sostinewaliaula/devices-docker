@@ -107,7 +107,7 @@ router.get('/team', authenticateToken, requireManager, async (req, res) => {
     }
 
     const result = await executeQuery(
-      `SELECT u.id, u.name, u.email, u.role, u.position, u.phone, 
+      `SELECT u.id, u.name, u.email, u.role, u.position, u.phone, u.avatar_updated_at,
               u.is_active, u.last_login, u.created_at
        FROM users u
        ${whereClause}

@@ -159,6 +159,7 @@ router.get('/:id/history', async (req, res) => {
       `SELECT h.*,
               u.name as user_name,
               u.email as user_email,
+              u.avatar_updated_at as user_avatar_updated_at,
               ab.name as assigned_by_name,
               d.name as department_name
        FROM asset_assignment_history h

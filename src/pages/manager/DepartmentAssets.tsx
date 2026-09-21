@@ -162,7 +162,7 @@ useEffect(() => {
       case 'Available':
         return <CheckCircleIcon className="w-5 h-5 text-secondary dark:text-brand-green" />;
       case 'Assigned':
-        return <UserIcon className="w-5 h-5 text-green-600" />;
+        return <UserIcon className="w-5 h-5 text-secondary dark:text-brand-green" />;
       case 'In Maintenance':
         return <ClockIcon className="w-5 h-5 text-brand-orange" />;
       case 'In Use':
@@ -785,8 +785,8 @@ useEffect(() => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-blue-100 rounded-full">
-              <UserIcon className="w-6 h-6 text-blue-600" />
+            <div className="p-3 mr-4 bg-secondary/10 dark:bg-accent/15 rounded-full">
+              <UserIcon className="w-6 h-6 text-secondary dark:text-accent" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Assigned</p>

@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContextNew';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useNotifications } from '../../contexts/NotificationContext';
-import { MenuIcon, BellIcon, UserIcon } from 'lucide-react';
+import { MenuIcon, BellIcon } from 'lucide-react';
 import NotificationDropdown from '../ui/NotificationDropdown';
 import ThemeToggle from '../ui/ThemeToggle';
+import UserAvatar from '../ui/UserAvatar';
 interface HeaderProps {
   toggleSidebar: () => void;
 }
@@ -81,18 +82,19 @@ const Header: React.FC<HeaderProps> = ({
                 {user?.role === 'admin' ? 'Administrator' : 'User'}
               </p>
             </div>
-            <div className="p-1 mr-2 text-gray-400 bg-gray-100 rounded-full dark:bg-gray-800">
-              <UserIcon className="w-6 h-6" />
-            </div>
+            <UserAvatar userId={user?.id} name={user?.name} version={user?.avatar_updated_at} size="md" className="mr-2" />
           </button>
           {accountOpen && (
-            <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-20">
-              <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900/40">
-                <p className="text-sm font-semibold text-gray-900 dark:text-white">{user?.name || 'Account'}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
-                <span className="inline-block mt-2 px-2 py-0.5 text-[10px] font-medium rounded-full bg-lightred text-primary">
+            <div className="absolute right-0 mt-2 w-64 bg-surface rounded-2xl shadow-xl border border-line overflow-hidden z-20">
+              <div className="flex items-center gap-3 px-4 py-3 bg-surface-2">
+                <UserAvatar userId={user?.id} name={user?.name} version={user?.avatar_updated_at} size="lg" />
+                <div className="min-w-0">
+                <p className="text-sm font-semibold text-heading">{user?.name || 'Account'}</p>
+                <p className="text-xs text-muted truncate">{user?.email}</p>
+                <span className="inline-block mt-2 px-2 py-0.5 text-[10px] font-medium rounded-full bg-secondary/10 text-secondary dark:bg-accent/15 dark:text-accent">
                   {user?.role === 'admin' ? 'Administrator' : (user?.role || 'User')}
                 </span>
+                </div>
               </div>
               <div className="py-1">
                 <Link
@@ -110,7 +112,7 @@ const Header: React.FC<HeaderProps> = ({
                   Settings
                 </Link>
               </div>
-              <div className="h-px bg-gray-200 dark:bg-gray-700" />
+              <div className="h-px bg-line" />
               <button
                 onClick={() => {
                   setAccountOpen(false);

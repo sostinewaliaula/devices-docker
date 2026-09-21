@@ -14,6 +14,7 @@ import {
   DownloadIcon
 } from 'lucide-react';
 import { userService, departmentService } from '../../services/apiDatabase';
+import UserAvatar from '../../components/ui/UserAvatar';
 import { User, Department } from '../../lib/supabase';
 import Logo from '../../assets/logo.png';
 
@@ -534,8 +535,8 @@ const TeamMembers: React.FC = () => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-blue-100 rounded-full">
-              <UserIcon className="w-6 h-6 text-blue-600" />
+            <div className="p-3 mr-4 bg-secondary/10 dark:bg-accent/15 rounded-full">
+              <UserIcon className="w-6 h-6 text-secondary dark:text-accent" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Active Members</p>
@@ -581,9 +582,7 @@ const TeamMembers: React.FC = () => {
               <div key={member.id} className="p-6 border border-gray-200 dark:border-gray-600 rounded-xl hover:shadow-lg transition-shadow bg-white dark:bg-gray-800">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center">
-                    <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-semibold">
-                      {member.name.charAt(0).toUpperCase()}
-                    </div>
+                    <UserAvatar userId={member.id} name={member.name} version={member.avatar_updated_at} size="md" className="!w-12 !h-12" />
                     <div className="ml-4">
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{member.name}</h3>
                       <p className="text-sm text-gray-500 dark:text-gray-400">{member.position || 'No position'}</p>

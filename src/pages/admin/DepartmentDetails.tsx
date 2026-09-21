@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { departmentService, userService, assetService } from '../../services/apiDatabase';
+import UserAvatar from '../../components/ui/UserAvatar';
 import { Department, User, Asset } from '../../lib/supabase';
 import {
   BuildingIcon,
@@ -442,7 +443,7 @@ const DepartmentDetails: React.FC = () => {
               </div>
               <div className="p-4 bg-lightred dark:bg-gray-800 dark:border dark:border-gray-700 rounded-xl hover:shadow-md dark:hover:shadow-lg transition-shadow duration-200">
                 <div className="flex items-center mb-2">
-                  <UserIcon className="w-5 h-5 mr-2 text-primary dark:text-green-400" />
+                  <UserIcon className="w-5 h-5 mr-2 text-primary dark:text-brand-green" />
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Manager</span>
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-300">{departmentManager?.name || department.manager || 'No manager assigned'}</p>
@@ -474,9 +475,7 @@ const DepartmentDetails: React.FC = () => {
                   <div key={user.id} className="p-4 bg-lightred dark:bg-gray-800 rounded-xl">
                     <div className="flex items-start justify-between">
                       <div className="flex items-center">
-                        <div className="p-2 mr-4 text-gray-400 dark:text-gray-500 dark:text-gray-500 bg-lightred dark:bg-gray-800 rounded-full">
-                          <UserIcon className="w-8 h-8" />
-                        </div>
+                        <UserAvatar userId={user.id} name={user.name} version={user.avatar_updated_at} size="md" className="mr-4 !w-12 !h-12" />
                         <div>
                           <h3 className="text-sm font-medium text-gray-800 dark:text-gray-200">{user.name}</h3>
                           <div className="flex items-center mt-1 space-x-4">
@@ -602,9 +601,7 @@ const DepartmentDetails: React.FC = () => {
             <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
               <h2 className="mb-4 text-xl font-bold text-primary">Department Manager</h2>
               <div className="flex items-center p-4 bg-lightred dark:bg-gray-800 rounded-xl">
-                <div className="p-2 mr-4 text-gray-400 dark:text-gray-500 dark:text-gray-500 bg-lightred dark:bg-gray-800 rounded-full">
-                  <UserIcon className="w-8 h-8" />
-                </div>
+                <UserAvatar userId={departmentManager.id} name={departmentManager.name} version={departmentManager.avatar_updated_at} size="md" className="mr-4 !w-12 !h-12" />
                 <div>
                   <h3 className="text-sm font-medium text-gray-800 dark:text-gray-200">{departmentManager.name}</h3>
                   <p className="text-xs text-gray-600 dark:text-gray-300 dark:text-gray-300">{departmentManager.email}</p>
@@ -710,9 +707,7 @@ const DepartmentDetails: React.FC = () => {
                   {filteredUsers.map(user => (
                     <div key={user.id} className="flex items-center justify-between p-4 bg-lightred dark:bg-gray-800 rounded-xl">
                       <div className="flex items-center">
-                        <div className="p-2 mr-4 text-gray-400 dark:text-gray-500 dark:text-gray-500 bg-lightred dark:bg-gray-800 rounded-full">
-                          <UserIcon className="w-6 h-6" />
-                        </div>
+                        <UserAvatar userId={user.id} name={user.name} version={user.avatar_updated_at} size="md" className="mr-4" />
                         <div>
                           <h4 className="text-sm font-medium text-gray-800 dark:text-gray-200">{user.name}</h4>
                           <p className="text-xs text-gray-600 dark:text-gray-300 dark:text-gray-300">{user.email}</p>
