@@ -70,7 +70,7 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({ file, onPreview }) => {
             <a
                 href="#"
                 onClick={handleClick}
-                className={`block rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-500 transition-colors ${file.file_type?.includes('image') ? 'aspect-video' : 'p-3 flex items-center'
+                className={`block rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:border-secondary dark:hover:border-accent transition-colors ${file.file_type?.includes('image') ? 'aspect-video' : 'p-3 flex items-center'
                     }`}
             >
                 {file.file_type?.includes('image') ? (
@@ -94,8 +94,8 @@ const AttachmentItem: React.FC<AttachmentItemProps> = ({ file, onPreview }) => {
                     </>
                 ) : (
                     <div className="flex items-center w-full">
-                        <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg mr-3">
-                            <TagIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        <div className="p-2 bg-secondary/10 dark:bg-accent/15 rounded-lg mr-3">
+                            <TagIcon className="w-5 h-5 text-secondary dark:text-accent" />
                         </div>
                         <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate" title={file.file_name}>

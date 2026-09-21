@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContextNew';
-import { authAPI, Department } from '../../services/apiService';
+import { authAPI, usersAPI, Department } from '../../services/apiService';
 import { useNotifications } from '../../contexts/NotificationContext';
-import { UserIcon, SettingsIcon, Edit2Icon, SaveIcon, XIcon, CheckCircleIcon, EyeIcon, EyeOffIcon, XCircleIcon } from 'lucide-react';
+import { CameraIcon, SettingsIcon, Edit2Icon, SaveIcon, XIcon, CheckCircleIcon, EyeIcon, EyeOffIcon, XCircleIcon } from 'lucide-react';
+import UserAvatar from '../../components/ui/UserAvatar';
+import { resizeToSquare } from '../../utils/imageResize';
 
 const Profile: React.FC = () => {
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, setAvatarVersion } = useAuth();
   const { addToast } = useNotifications();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -19,6 +21,10 @@ const Profile: React.FC = () => {
   const [positions, setPositions] = useState<{ id: string; name: string }[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(false);
+  const [avatarBusy, setAvatarBusy] = useState(false);
+  // Was referenced (cancel/submit handlers) but never declared, which threw at runtime
+  const [, setError] = useState<string | null>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
   const [positionsLoading, setPositionsLoading] = useState(false);
   const [departmentsLoading, setDepartmentsLoading] = useState(false);
 
@@ -108,6 +114,38 @@ const Profile: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Photo upload: crop to a square, shrink to ~256px in the browser, then save it to the DB
+  const handleAvatarChosen = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ''; // allow picking the same file again
+    if (!file || !user) return;
+    setAvatarBusy(true);
+    try {
+      const blob = await resizeToSquare(file);
+      const result = await usersAPI.uploadAvatar(user.id, blob);
+      setAvatarVersion(result.avatar_updated_at);
+      addToast({ title: 'Photo updated', message: 'Your profile photo has been saved.', type: 'success', duration: 3000 });
+    } catch (err: any) {
+      addToast({ title: 'Could not update photo', message: err.response?.data?.message || err.message || 'Please try again.', type: 'error', duration: 5000 });
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
+
+  const handleAvatarRemove = async () => {
+    if (!user) return;
+    setAvatarBusy(true);
+    try {
+      await usersAPI.deleteAvatar(user.id);
+      setAvatarVersion(null);
+      addToast({ title: 'Photo removed', message: 'Your profile photo has been removed.', type: 'success', duration: 3000 });
+    } catch (err: any) {
+      addToast({ title: 'Could not remove photo', message: err.response?.data?.message || err.message || 'Please try again.', type: 'error', duration: 5000 });
+    } finally {
+      setAvatarBusy(false);
+    }
   };
 
   const handleEditToggle = () => {
@@ -215,8 +253,31 @@ const Profile: React.FC = () => {
 
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-card p-6 border border-gray-100 dark:border-gray-800">
         <div className="flex items-center mb-8">
-          <div className="p-4 mr-6 rounded-2xl bg-gray-100 dark:bg-gray-800 text-gray-500 shadow-sm">
-            <UserIcon className="w-12 h-12" />
+          <div className="relative mr-6 shrink-0">
+            <UserAvatar
+              userId={user.id}
+              name={user.name}
+              version={user.avatar_updated_at}
+              size="xl"
+              className={`ring-4 ring-surface shadow-sm ${avatarBusy ? 'opacity-60' : ''}`}
+            />
+            <button
+              type="button"
+              onClick={() => avatarInputRef.current?.click()}
+              disabled={avatarBusy}
+              aria-label="Change profile photo"
+              title="Change profile photo"
+              className="absolute -bottom-1 -right-1 p-2 rounded-full bg-action text-on-action shadow-md hover:opacity-90 disabled:opacity-50"
+            >
+              <CameraIcon className="w-4 h-4" />
+            </button>
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={handleAvatarChosen}
+            />
           </div>
           <div className="flex-1">
             <div className="flex items-center flex-wrap gap-2 mb-1">
@@ -228,6 +289,16 @@ const Profile: React.FC = () => {
               </span>
             </div>
             <p className="text-gray-500 dark:text-gray-400 font-medium">{user.email}</p>
+            {user.avatar_updated_at && (
+              <button
+                type="button"
+                onClick={handleAvatarRemove}
+                disabled={avatarBusy}
+                className="mt-1 text-xs text-muted hover:text-primary hover:underline disabled:opacity-50"
+              >
+                Remove photo
+              </button>
+            )}
           </div>
         </div>
 
@@ -398,19 +469,19 @@ const Profile: React.FC = () => {
             </div>
             {/* Requirements indicator */}
             <ul className="mt-2 space-y-1 text-xs">
-              <li className={`flex items-center ${passwordChecks.len ? 'text-green-600' : 'text-gray-500'}`}>
+              <li className={`flex items-center ${passwordChecks.len ? 'text-secondary dark:text-brand-green' : 'text-gray-500'}`}>
                 {passwordChecks.len ? <CheckCircleIcon className="w-4 h-4 mr-1" /> : <XCircleIcon className="w-4 h-4 mr-1" />} At least 8 characters
               </li>
-              <li className={`flex items-center ${passwordChecks.upper ? 'text-green-600' : 'text-gray-500'}`}>
+              <li className={`flex items-center ${passwordChecks.upper ? 'text-secondary dark:text-brand-green' : 'text-gray-500'}`}>
                 {passwordChecks.upper ? <CheckCircleIcon className="w-4 h-4 mr-1" /> : <XCircleIcon className="w-4 h-4 mr-1" />} Contains an uppercase letter
               </li>
-              <li className={`flex items-center ${passwordChecks.lower ? 'text-green-600' : 'text-gray-500'}`}>
+              <li className={`flex items-center ${passwordChecks.lower ? 'text-secondary dark:text-brand-green' : 'text-gray-500'}`}>
                 {passwordChecks.lower ? <CheckCircleIcon className="w-4 h-4 mr-1" /> : <XCircleIcon className="w-4 h-4 mr-1" />} Contains a lowercase letter
               </li>
-              <li className={`flex items-center ${passwordChecks.num ? 'text-green-600' : 'text-gray-500'}`}>
+              <li className={`flex items-center ${passwordChecks.num ? 'text-secondary dark:text-brand-green' : 'text-gray-500'}`}>
                 {passwordChecks.num ? <CheckCircleIcon className="w-4 h-4 mr-1" /> : <XCircleIcon className="w-4 h-4 mr-1" />} Contains a number
               </li>
-              <li className={`flex items-center ${passwordChecks.special ? 'text-green-600' : 'text-gray-500'}`}>
+              <li className={`flex items-center ${passwordChecks.special ? 'text-secondary dark:text-brand-green' : 'text-gray-500'}`}>
                 {passwordChecks.special ? <CheckCircleIcon className="w-4 h-4 mr-1" /> : <XCircleIcon className="w-4 h-4 mr-1" />} Contains a special character
               </li>
             </ul>
@@ -432,7 +503,7 @@ const Profile: React.FC = () => {
               </button>
             </div>
             {confirmPassword && (
-              <div className={`mt-2 text-xs flex items-center ${passwordChecks.match ? 'text-green-600' : 'text-red-600'}`}>
+              <div className={`mt-2 text-xs flex items-center ${passwordChecks.match ? 'text-secondary dark:text-brand-green' : 'text-primary'}`}>
                 {passwordChecks.match ? <CheckCircleIcon className="w-4 h-4 mr-1" /> : <XCircleIcon className="w-4 h-4 mr-1" />}
                 {passwordChecks.match ? 'Passwords match' : 'Passwords do not match'}
               </div>

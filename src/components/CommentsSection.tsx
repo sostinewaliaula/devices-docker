@@ -292,7 +292,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
                   <button
                     onClick={() => updateComment(comment.id)}
                     disabled={!editText.trim() || updatingComment}
-                    className="px-3 py-1 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3 py-1 bg-brand-green text-secondary text-sm rounded-lg hover:bg-brand-green/80 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {updatingComment ? (
                       <>
@@ -328,14 +328,14 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
             <div className="flex space-x-1 ml-2">
               <button
                 onClick={() => startEdit(comment)}
-                className="p-1 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400"
+                className="p-1 text-gray-400 hover:opacity-80"
                 title="Edit comment"
               >
                 <EditIcon className="w-4 h-4" />
               </button>
               <button
                 onClick={() => handleDeleteClick(comment.id)}
-                className="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400"
+                className="p-1 text-gray-400 hover:text-primary/80 dark:hover:text-accent/80"
                 title="Delete comment"
               >
                 <TrashIcon className="w-4 h-4" />
@@ -348,7 +348,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
           <div className="mt-3">
             <button
               onClick={() => startReply(comment.id)}
-              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+              className="text-sm text-secondary dark:text-accent hover:opacity-80"
             >
               Reply
             </button>

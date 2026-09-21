@@ -69,41 +69,41 @@ const UserAssetRequests: React.FC = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'approved':
-        return <CheckCircleIcon className="w-5 h-5 text-green-500" />;
+        return <CheckCircleIcon className="w-5 h-5 text-secondary dark:text-brand-green" />;
       case 'rejected':
-        return <XCircleIcon className="w-5 h-5 text-red-500" />;
+        return <XCircleIcon className="w-5 h-5 text-primary" />;
       case 'fulfilled':
-        return <CheckCircleIcon className="w-5 h-5 text-blue-500" />;
+        return <CheckCircleIcon className="w-5 h-5 text-secondary dark:text-accent" />;
       case 'pending':
       default:
-        return <ClockIcon className="w-5 h-5 text-yellow-500" />;
+        return <ClockIcon className="w-5 h-5 text-brand-orange" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'approved':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+        return 'bg-brand-green/25 text-secondary dark:bg-brand-green/20 dark:text-brand-green';
       case 'rejected':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+        return 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-accent';
       case 'fulfilled':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+        return 'bg-secondary/10 text-secondary dark:bg-accent/15 dark:text-accent';
       case 'pending':
       default:
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+        return 'bg-brand-orange/15 text-secondary dark:bg-brand-orange/20 dark:text-brand-orange';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'urgent':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+        return 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-accent';
       case 'high':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300';
+        return 'bg-brand-orange/15 text-secondary dark:bg-brand-orange/20 dark:text-brand-orange';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+        return 'bg-brand-orange/15 text-secondary dark:bg-brand-orange/20 dark:text-brand-orange';
       case 'low':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+        return 'bg-brand-green/25 text-secondary dark:bg-brand-green/20 dark:text-brand-green';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
     }
@@ -297,7 +297,7 @@ const UserAssetRequests: React.FC = () => {
                       <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
                         Admin Notes:
                       </h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 bg-secondary/10 dark:bg-accent/15 rounded-lg p-3">
                         {request.notes}
                       </p>
                     </div>
@@ -306,7 +306,7 @@ const UserAssetRequests: React.FC = () => {
                   <div className="flex items-center space-x-4">
                     <button
                       onClick={() => handleViewComments(request)}
-                      className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                      className="flex items-center space-x-2 text-secondary dark:text-accent hover:opacity-80 transition-colors"
                     >
                       <MessageCircleIcon className="w-4 h-4" />
                       <span className="text-sm font-medium">View Comments</span>
@@ -316,14 +316,14 @@ const UserAssetRequests: React.FC = () => {
                       <>
                         <button
                           onClick={() => handleEditRequest(request)}
-                          className="flex items-center space-x-2 text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 transition-colors"
+                          className="flex items-center space-x-2 text-secondary dark:text-brand-green hover:opacity-80 transition-colors"
                         >
                           <EditIcon className="w-4 h-4" />
                           <span className="text-sm font-medium">Edit</span>
                         </button>
                         <button
                           onClick={() => handleDeleteRequest(request)}
-                          className="flex items-center space-x-2 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors"
+                          className="flex items-center space-x-2 text-primary dark:text-accent hover:text-primary/80 dark:hover:text-accent/80 transition-colors"
                         >
                           <TrashIcon className="w-4 h-4" />
                           <span className="text-sm font-medium">Delete</span>

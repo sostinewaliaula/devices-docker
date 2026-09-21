@@ -49,6 +49,7 @@ export interface AssetAssignmentHistoryEntry {
   asset_serial?: string | null
   user_name?: string | null
   user_email?: string | null
+  user_avatar_updated_at?: string | null
   assigned_by: string | null
   assigned_by_name?: string | null
   department_id: string | null
@@ -157,6 +158,8 @@ export interface User {
   phone: string | null
   position: string | null
   is_active: boolean
+  /** Version of the stored avatar image; null/undefined = no photo */
+  avatar_updated_at?: string | null
   created_at: string
   updated_at: string
 }

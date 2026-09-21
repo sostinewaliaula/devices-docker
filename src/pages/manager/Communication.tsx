@@ -150,11 +150,11 @@ const Communication: React.FC = () => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'High':
-        return 'bg-red-100 text-red-800';
+        return 'bg-primary/10 dark:bg-primary/20 text-primary';
       case 'Medium':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange';
       case 'Low':
-        return 'bg-green-100 text-green-800';
+        return 'bg-brand-green/25 dark:bg-brand-green/20 text-secondary dark:text-brand-green';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -163,11 +163,11 @@ const Communication: React.FC = () => {
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'message':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-secondary/10 dark:bg-accent/15 text-secondary dark:text-accent';
       case 'announcement':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-secondary/10 dark:bg-accent/15 text-secondary dark:text-accent';
       case 'alert':
-        return 'bg-orange-100 text-orange-800';
+        return 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -430,8 +430,8 @@ const Communication: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-blue-100 rounded-full">
-              <MessageSquareIcon className="w-6 h-6 text-blue-600" />
+            <div className="p-3 mr-4 bg-secondary/10 dark:bg-accent/15 rounded-full">
+              <MessageSquareIcon className="w-6 h-6 text-secondary dark:text-accent" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Team Members</p>
@@ -441,8 +441,8 @@ const Communication: React.FC = () => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-yellow-100 rounded-full">
-              <BellIcon className="w-6 h-6 text-yellow-600" />
+            <div className="p-3 mr-4 bg-brand-orange/15 dark:bg-brand-orange/20 rounded-full">
+              <BellIcon className="w-6 h-6 text-brand-orange" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Unread Notifications</p>
@@ -452,8 +452,8 @@ const Communication: React.FC = () => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-green-100 rounded-full">
-              <MessageSquareIcon className="w-6 h-6 text-green-600" />
+            <div className="p-3 mr-4 bg-brand-green/25 dark:bg-brand-green/20 rounded-full">
+              <MessageSquareIcon className="w-6 h-6 text-secondary dark:text-brand-green" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Messages Sent</p>
@@ -463,8 +463,8 @@ const Communication: React.FC = () => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-purple-100 rounded-full">
-              <BellIcon className="w-6 h-6 text-purple-600" />
+            <div className="p-3 mr-4 bg-secondary/10 dark:bg-accent/15 rounded-full">
+              <BellIcon className="w-6 h-6 text-secondary dark:text-accent" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Notifications</p>
@@ -530,10 +530,10 @@ const Communication: React.FC = () => {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <div className={`p-2 rounded-full ${
-                        notification.type === 'error' ? 'bg-red-100' :
-                        notification.type === 'warning' ? 'bg-yellow-100' :
-                        notification.type === 'success' ? 'bg-green-100' :
-                        'bg-blue-100'
+                        notification.type === 'error' ? 'bg-primary/10 dark:bg-primary/20' :
+                        notification.type === 'warning' ? 'bg-brand-orange/15 dark:bg-brand-orange/20' :
+                        notification.type === 'success' ? 'bg-brand-green/25 dark:bg-brand-green/20' :
+                        'bg-secondary/10 dark:bg-accent/15'
                       }`}>
                         {getTypeIcon(notification.type)}
                       </div>
@@ -553,10 +553,10 @@ const Communication: React.FC = () => {
                         <span>{formatDate(notification.created_at)}</span>
                       </div>
                       <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        notification.type === 'error' ? 'bg-red-100 text-red-800' :
-                        notification.type === 'warning' ? 'bg-yellow-100 text-yellow-800' :
-                        notification.type === 'success' ? 'bg-green-100 text-green-800' :
-                        'bg-blue-100 text-blue-800'
+                        notification.type === 'error' ? 'bg-primary/10 dark:bg-primary/20 text-primary' :
+                        notification.type === 'warning' ? 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange' :
+                        notification.type === 'success' ? 'bg-brand-green/25 dark:bg-brand-green/20 text-secondary dark:text-brand-green' :
+                        'bg-secondary/10 dark:bg-accent/15 text-secondary dark:text-accent'
                       }`}>
                         {notification.type}
                       </span>
@@ -565,9 +565,9 @@ const Communication: React.FC = () => {
                   
                   <div className="ml-4">
                     {(notification as any).read_at ? (
-                      <CheckCircleIcon className="w-5 h-5 text-green-600" />
+                      <CheckCircleIcon className="w-5 h-5 text-secondary dark:text-brand-green" />
                     ) : (
-                      <ClockIcon className="w-5 h-5 text-yellow-600" />
+                      <ClockIcon className="w-5 h-5 text-brand-orange" />
                     )}
                   </div>
                 </div>
@@ -595,9 +595,9 @@ const Communication: React.FC = () => {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <div className={`p-2 rounded-full ${
-                        message.type === 'alert' ? 'bg-orange-100' :
-                        message.type === 'announcement' ? 'bg-purple-100' :
-                        'bg-blue-100'
+                        message.type === 'alert' ? 'bg-brand-orange/15 dark:bg-brand-orange/20' :
+                        message.type === 'announcement' ? 'bg-secondary/10 dark:bg-accent/15' :
+                        'bg-secondary/10 dark:bg-accent/15'
                       }`}>
                         {getTypeIcon(message.type)}
                       </div>
@@ -798,8 +798,8 @@ const Communication: React.FC = () => {
                 </select>
               </div>
 
-              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <p className="text-sm text-blue-700 dark:text-blue-300">
+              <div className="p-3 bg-secondary/10 dark:bg-accent/15 rounded-lg">
+                <p className="text-sm text-secondary dark:text-accent">
                   This announcement will be sent to all {teamMembers.length} team members.
                 </p>
               </div>

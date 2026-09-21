@@ -154,7 +154,7 @@ const WeeklyNotifications: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-[40vh]">
         <div className="text-center">
-          <AlertCircleIcon className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <AlertCircleIcon className="w-12 h-12 text-primary mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200 mb-2">Access Denied</h2>
           <p className="text-gray-500">You need admin privileges to manage weekly notifications.</p>
         </div>
@@ -281,7 +281,7 @@ const WeeklyNotifications: React.FC = () => {
               })}
             </div>
             {schedule.days.length === 0 && (
-              <p className="text-sm text-amber-600 dark:text-amber-400 mt-3 flex items-center">
+              <p className="text-sm text-brand-orange mt-3 flex items-center">
                 <AlertCircleIcon className="w-4 h-4 mr-1" />
                 Please select at least one day
               </p>
@@ -384,7 +384,7 @@ const WeeklyNotifications: React.FC = () => {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600 dark:text-gray-400">Notifications</span>
                 {schedule.enabled ? (
-                  <span className="flex items-center text-green-600 dark:text-green-400">
+                  <span className="flex items-center text-secondary dark:text-brand-green">
                     <CheckCircleIcon className="w-4 h-4 mr-1" />
                     Enabled
                   </span>
@@ -411,7 +411,7 @@ const WeeklyNotifications: React.FC = () => {
           </div>
 
           {/* Information Card */}
-          <div className="p-6 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-2xl border border-primary/20">
+          <div className="p-6 bg-accent/50 rounded-2xl border border-primary/20">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">About Weekly Notifications</h3>
             <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
               <p>

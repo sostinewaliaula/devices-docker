@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../../contexts/NotificationContext';
-import { SearchIcon, FilterIcon, CheckCircleIcon, AlertCircleIcon, ClockIcon, UserIcon, DownloadIcon, EyeIcon, EditIcon, TrashIcon, XCircleIcon, DollarSignIcon, RefreshCwIcon, ImageIcon } from 'lucide-react';
+import { SearchIcon, FilterIcon, CheckCircleIcon, AlertCircleIcon, ClockIcon, DownloadIcon, EyeIcon, EditIcon, TrashIcon, XCircleIcon, DollarSignIcon, RefreshCwIcon, ImageIcon } from 'lucide-react';
+import UserAvatar from '../../components/ui/UserAvatar';
 import { issueService, assetService, userService, departmentService, assetRequestTypeService } from '../../services/apiDatabase';
 import { Issue, Asset, User, Department } from '../../lib/supabase';
 import AssetImage from '../../components/AssetImage';
@@ -249,11 +250,11 @@ const IssueManagement: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'open':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+        return 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-accent';
       case 'in_progress':
       case 'pending_user_action':
       case 'pending_parts':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+        return 'bg-brand-orange/15 text-secondary dark:bg-brand-orange/20 dark:text-brand-orange';
       case 'resolved':
       case 'closed':
         return 'bg-lightred text-primary';
@@ -269,9 +270,9 @@ const IssueManagement: React.FC = () => {
       case 'Medium':
         return 'bg-lightblue text-secondary';
       case 'High':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+        return 'bg-brand-orange/15 text-secondary dark:bg-brand-orange/20 dark:text-brand-orange';
       case 'Critical':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+        return 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-accent';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
@@ -368,8 +369,8 @@ const IssueManagement: React.FC = () => {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-red-100 rounded-full">
-              <AlertCircleIcon className="w-6 h-6 text-red-600" />
+            <div className="p-3 mr-4 bg-primary/10 dark:bg-primary/20 rounded-full">
+              <AlertCircleIcon className="w-6 h-6 text-primary" />
             </div>
             <div>
               <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">Open Issues</p>
@@ -379,8 +380,8 @@ const IssueManagement: React.FC = () => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-yellow-100 rounded-full">
-              <ClockIcon className="w-6 h-6 text-yellow-600" />
+            <div className="p-3 mr-4 bg-brand-orange/15 dark:bg-brand-orange/20 rounded-full">
+              <ClockIcon className="w-6 h-6 text-brand-orange" />
             </div>
             <div>
               <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">In Progress</p>
@@ -413,8 +414,8 @@ const IssueManagement: React.FC = () => {
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card md:col-span-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className="p-3 mr-4 bg-blue-100 rounded-full">
-                <DollarSignIcon className="w-6 h-6 text-blue-600" />
+              <div className="p-3 mr-4 bg-secondary/10 dark:bg-accent/15 rounded-full">
+                <DollarSignIcon className="w-6 h-6 text-secondary dark:text-accent" />
               </div>
               <div>
                 <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">Total Estimated Cost</p>
@@ -614,9 +615,7 @@ const IssueManagement: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center mr-3">
-                          <UserIcon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                        </div>
+                        <UserAvatar userId={issue.reported_by} name={getReporterName(issue.reported_by)} version={users.find(u => u.id === issue.reported_by)?.avatar_updated_at} size="sm" className="mr-3" />
                         <span className="text-sm text-gray-900 dark:text-white">
                           {getReporterName(issue.reported_by)}
                         </span>
@@ -643,7 +642,7 @@ const IssueManagement: React.FC = () => {
                             e.stopPropagation();
                             handleEditClick(issue);
                           }}
-                          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center space-x-1"
+                          className="text-secondary hover:opacity-80 dark:text-accent flex items-center space-x-1"
                           title="Edit Issue"
                         >
                           <EditIcon className="h-4 w-4" />
@@ -654,7 +653,7 @@ const IssueManagement: React.FC = () => {
                             e.stopPropagation();
                             handleDeleteClick(issue);
                           }}
-                          className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 flex items-center space-x-1"
+                          className="text-primary hover:text-primary/80 dark:text-accent dark:hover:text-accent/80 flex items-center space-x-1"
                           title="Delete Issue"
                         >
                           <TrashIcon className="h-4 w-4" />
@@ -888,12 +887,12 @@ const IssueManagement: React.FC = () => {
       {showDeleteModal && deletingIssue && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
           <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-card overflow-hidden">
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800 bg-red-50 dark:bg-red-900/20">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800 bg-primary/10 dark:bg-primary/20">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-red-100 dark:bg-red-900/50 rounded-lg">
-                  <TrashIcon className="w-6 h-6 text-red-600 dark:text-red-400" />
+                <div className="p-2 bg-primary/10 dark:bg-primary/20 rounded-lg">
+                  <TrashIcon className="w-6 h-6 text-primary dark:text-accent" />
                 </div>
-                <h3 className="text-xl font-bold text-red-600 dark:text-red-400">Delete Issue</h3>
+                <h3 className="text-xl font-bold text-primary dark:text-accent">Delete Issue</h3>
               </div>
               <button
                 onClick={() => {
@@ -936,7 +935,7 @@ const IssueManagement: React.FC = () => {
               <button
                 type="button"
                 onClick={handleDeleteConfirm}
-                className="px-6 py-2.5 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors"
+                className="px-6 py-2.5 text-sm font-medium text-white bg-primary rounded-xl hover:bg-primary/90 transition-colors"
               >
                 Delete Issue
               </button>

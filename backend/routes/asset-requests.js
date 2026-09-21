@@ -65,7 +65,7 @@ router.get('/', async (req, res) => {
 
     const requestsResult = await executeQuery(
       `SELECT ar.*, 
-              u.name as user_name, u.email as user_email,
+              u.name as user_name, u.email as user_email, u.avatar_updated_at as user_avatar_updated_at,
               approver.name as approved_by_name
        FROM asset_requests ar
        LEFT JOIN users u ON ar.user_id = u.id
@@ -146,7 +146,7 @@ router.get('/:id', async (req, res) => {
 
     const requestResult = await executeQuery(
       `SELECT ar.*, 
-              u.name as user_name, u.email as user_email,
+              u.name as user_name, u.email as user_email, u.avatar_updated_at as user_avatar_updated_at,
               approver.name as approved_by_name
        FROM asset_requests ar
        LEFT JOIN users u ON ar.user_id = u.id
@@ -237,7 +237,7 @@ router.post('/', [
     // Get the created asset request using the generated UUID
     const requestResult = await executeQuery(
       `SELECT ar.*, 
-              u.name as user_name, u.email as user_email
+              u.name as user_name, u.email as user_email, u.avatar_updated_at as user_avatar_updated_at
        FROM asset_requests ar
        LEFT JOIN users u ON ar.user_id = u.id
        WHERE ar.id = ?`,
@@ -497,7 +497,7 @@ router.put('/:id/user', [
     // Get updated asset request
     const requestResult = await executeQuery(
       `SELECT ar.*, 
-              u.name as user_name, u.email as user_email
+              u.name as user_name, u.email as user_email, u.avatar_updated_at as user_avatar_updated_at
        FROM asset_requests ar
        LEFT JOIN users u ON ar.user_id = u.id
        WHERE ar.id = ?`,
@@ -619,7 +619,7 @@ router.put('/:id', [
     // Get updated asset request
     const requestResult = await executeQuery(
       `SELECT ar.*, 
-              u.name as user_name, u.email as user_email,
+              u.name as user_name, u.email as user_email, u.avatar_updated_at as user_avatar_updated_at,
               approver.name as approved_by_name
        FROM asset_requests ar
        LEFT JOIN users u ON ar.user_id = u.id

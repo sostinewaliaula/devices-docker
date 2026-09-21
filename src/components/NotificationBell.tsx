@@ -19,11 +19,11 @@ const NotificationBell: React.FC = () => {
     <div className="relative">
       <button
         onClick={toggleDropdown}
-        className="relative p-2 text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
+        className="relative p-2 text-muted hover:text-heading transition-colors"
       >
         <BellIcon className="w-6 h-6" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -38,7 +38,7 @@ const NotificationBell: React.FC = () => {
           />
           
           {/* Dropdown */}
-          <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
+          <div className="absolute right-0 mt-2 w-80 bg-surface rounded-2xl shadow-card border border-line z-50">
             <NotificationDropdown onClose={closeDropdown} />
           </div>
         </>

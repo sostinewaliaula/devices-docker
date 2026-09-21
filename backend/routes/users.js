@@ -6,6 +6,8 @@ import notificationService from '../services/notificationService.js';
 import { requireAdmin, requireManager, authenticateToken } from '../middleware/auth.js';
 import auditLogger from '../utils/auditLogger.js';
 import { sanitizePagination } from '../utils/pagination.js';
+import multer from 'multer';
+import { MAX_AVATAR_BYTES, sniffImageType, saveAvatar, clearAvatar } from '../utils/avatar.js';
 
 const router = express.Router();
 
@@ -60,7 +62,7 @@ router.get('/', async (req, res) => {
 
     // Get users with department info
     const finalParams = [...params];
-    const sqlQuery = `SELECT u.id, u.email, u.name, u.role, u.department_id, u.phone, u.position, 
+    const sqlQuery = `SELECT u.id, u.email, u.name, u.role, u.department_id, u.phone, u.position, u.avatar_updated_at, 
               u.is_active, u.last_login, u.created_at, d.name as department_name
        FROM users u
        LEFT JOIN departments d ON u.department_id = d.id
@@ -337,7 +339,7 @@ router.get('/:id/history', requireAdmin, async (req, res) => {
       : { success: true, data: [] };
 
     res.json({
-      user: userResult.data[0],
+      user: (({ password_hash, avatar_data, ...safe }) => safe)(userResult.data[0]),
       assignments: assignmentsResult.success ? assignmentsResult.data : [],
       reportedIssues: reportedIssuesResult.success ? reportedIssuesResult.data : [],
       assignedIssues: assignedIssuesResult.success ? assignedIssuesResult.data : [],
@@ -353,13 +355,99 @@ router.get('/:id/history', requireAdmin, async (req, res) => {
   }
 });
 
+// ─── Avatars ────────────────────────────────────────────────────────────────
+// Images are stored in the users table (see utils/avatar.js). Anyone signed in can
+// view an avatar; only the user themselves or an admin can change or remove one.
+const avatarUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: MAX_AVATAR_BYTES }
+}).single('avatar');
+
+const canManageAvatar = (req, id) => req.user?.id === id || req.user?.role === 'admin';
+
+router.get('/:id/avatar', async (req, res) => {
+  try {
+    const result = await executeQuery(
+      'SELECT avatar_data, avatar_type, avatar_updated_at FROM users WHERE id = ?',
+      [req.params.id]
+    );
+    const row = result.success ? result.data[0] : null;
+    if (!row || !row.avatar_data) {
+      return res.status(404).json({ error: 'No avatar' });
+    }
+    const etag = `"${new Date(row.avatar_updated_at || 0).getTime()}"`;
+    res.set({
+      'Content-Type': row.avatar_type || 'image/jpeg',
+      'Cache-Control': 'private, max-age=86400',
+      'X-Content-Type-Options': 'nosniff',
+      ETag: etag
+    });
+    if (req.headers['if-none-match'] === etag) return res.status(304).end();
+    res.send(row.avatar_data);
+  } catch (error) {
+    console.error('Get avatar error:', error);
+    res.status(500).json({ error: 'Failed to load avatar' });
+  }
+});
+
+router.post('/:id/avatar', (req, res) => {
+  const { id } = req.params;
+  if (!canManageAvatar(req, id)) {
+    return res.status(403).json({ error: 'Access denied', message: 'You can only change your own photo' });
+  }
+  avatarUpload(req, res, async (err) => {
+    if (err) {
+      const tooBig = err.code === 'LIMIT_FILE_SIZE';
+      return res.status(tooBig ? 413 : 400).json({
+        error: tooBig ? 'Image too large' : 'Upload failed',
+        message: tooBig ? `Please choose an image under ${MAX_AVATAR_BYTES / (1024 * 1024)} MB` : err.message
+      });
+    }
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: 'No image provided', message: 'Attach an image in the "avatar" field' });
+      }
+      const type = sniffImageType(req.file.buffer);
+      if (!type) {
+        return res.status(400).json({ error: 'Unsupported image', message: 'Use a JPEG, PNG or WebP image' });
+      }
+      const existing = await executeQuery('SELECT id FROM users WHERE id = ?', [id]);
+      if (!existing.success || existing.data.length === 0) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      const saved = await saveAvatar(id, req.file.buffer, type, 'upload');
+      if (!saved.success) throw new Error(saved.error || 'Failed to save avatar');
+      const row = await executeQuery('SELECT avatar_updated_at FROM users WHERE id = ?', [id]);
+      res.json({ message: 'Photo updated', avatar_updated_at: row.data?.[0]?.avatar_updated_at || null });
+    } catch (error) {
+      console.error('Upload avatar error:', error);
+      res.status(500).json({ error: 'Failed to save photo' });
+    }
+  });
+});
+
+router.delete('/:id/avatar', async (req, res) => {
+  const { id } = req.params;
+  if (!canManageAvatar(req, id)) {
+    return res.status(403).json({ error: 'Access denied', message: 'You can only change your own photo' });
+  }
+  try {
+    const cleared = await clearAvatar(id);
+    if (!cleared.success) throw new Error(cleared.error || 'Failed to remove avatar');
+    res.json({ message: 'Photo removed', avatar_updated_at: null });
+  } catch (error) {
+    console.error('Delete avatar error:', error);
+    res.status(500).json({ error: 'Failed to remove photo' });
+  }
+});
+
 // Get user by ID
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
     const userResult = await executeQuery(
-      `SELECT u.id, u.email, u.name, u.role, u.department_id, u.phone, u.position, 
+      `SELECT u.id, u.email, u.name, u.role, u.department_id, u.phone, u.position, u.avatar_updated_at, 
               u.is_active, u.last_login, u.created_at, u.updated_at, d.name as department_name
        FROM users u
        LEFT JOIN departments d ON u.department_id = d.id
@@ -448,7 +536,7 @@ router.post('/', [
 
     // Get the created user using the generated UUID
     const userResult = await executeQuery(
-      `SELECT u.id, u.email, u.name, u.role, u.department_id, u.phone, u.position, 
+      `SELECT u.id, u.email, u.name, u.role, u.department_id, u.phone, u.position, u.avatar_updated_at, 
               u.is_active, u.created_at, d.name as department_name
        FROM users u
        LEFT JOIN departments d ON u.department_id = d.id
@@ -626,7 +714,7 @@ router.put('/:id', [
 
     // Get updated user
     const userResult = await executeQuery(
-      `SELECT u.id, u.email, u.name, u.role, u.department_id, u.phone, u.position, 
+      `SELECT u.id, u.email, u.name, u.role, u.department_id, u.phone, u.position, u.avatar_updated_at, 
               u.is_active, u.last_login, u.created_at, u.updated_at, d.name as department_name
        FROM users u
        LEFT JOIN departments d ON u.department_id = d.id
@@ -808,7 +896,6 @@ router.put('/:id/password', [
           'Your password was changed',
           {
             badge: 'WARNING',
-            badgeColor: '#f59e0b',
             title: 'Password Changed',
             greetingName: name || '',
             message: 'Your password was changed successfully. If you did not initiate this change, please contact support immediately.',

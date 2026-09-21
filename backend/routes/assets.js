@@ -159,6 +159,7 @@ router.get('/:id/history', async (req, res) => {
       `SELECT h.*,
               u.name as user_name,
               u.email as user_email,
+              u.avatar_updated_at as user_avatar_updated_at,
               ab.name as assigned_by_name,
               d.name as department_name
        FROM asset_assignment_history h
@@ -1051,7 +1052,6 @@ router.put('/:id', upload.single('image'), [
               'Asset Assigned',
               {
                 badge: 'INFO',
-                badgeColor: '#0ea5e9',
                 title: 'Asset Assigned',
                 greetingName: updatedAsset.assigned_user_name || '',
                 message: `You have been assigned the asset "${updatedAsset.name}" (SN: ${updatedAsset.serial_number}).`,
@@ -1083,7 +1083,6 @@ router.put('/:id', upload.single('image'), [
                   'Asset Assignment Update',
                   {
                     badge: 'INFO',
-                    badgeColor: '#0ea5e9',
                     title: 'Asset Assignment Update',
                     greetingName: mgr.name || '',
                     message: `Asset "${updatedAsset.name}" has been assigned${updatedAsset.assigned_user_name ? ` to ${updatedAsset.assigned_user_name}` : ''}.`,

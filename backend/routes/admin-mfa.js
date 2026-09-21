@@ -30,6 +30,7 @@ router.get('/mfa-status', async (req, res) => {
         u.mfa_enrolled_at,
         u.last_mfa_verification,
         u.last_login,
+        u.avatar_updated_at,
         d.name as department_name,
         COALESCE(factor_counts.factors_count, 0) as factors_count
       FROM users u

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useNotifications } from '../../contexts/NotificationContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { MonitorIcon, AlertCircleIcon, UserIcon, BuildingIcon, ArrowRightIcon, CheckCircleIcon, ArchiveIcon, ClockIcon, TicketIcon } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { assetService, issueService, userService, departmentService, assetRequestTypeService } from '../../services/apiDatabase';
@@ -8,6 +9,8 @@ import { Asset, Issue, User, Department, AssetRequestType } from '../../lib/supa
 import AssetImage from '../../components/AssetImage';
 const AdminDashboard: React.FC = () => {
   const { addToast } = useNotifications();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark' || (theme === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [issues, setIssues] = useState<Issue[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -107,10 +110,10 @@ const AdminDashboard: React.FC = () => {
       case 'In Progress':
       case 'Pending User Action':
       case 'Pending Parts':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange';
       case 'Disposed':
       case 'Open':
-        return 'bg-red-100 text-red-800';
+        return 'bg-primary/10 dark:bg-primary/20 text-primary';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -142,7 +145,12 @@ const AdminDashboard: React.FC = () => {
     );
   };
   // Colors for charts
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658', '#8dd1e1'];
+  const COLORS = isDark
+    ? ['#F7E7C6', '#E59730', '#D90429', '#D9E021', '#8FA3C0', '#F2C879', '#EE6B80', '#EAF06A']
+    : ['#152F52', '#E59730', '#D90429', '#D9E021', '#4A6A96', '#C9A25E', '#EE6B80', '#A9AF10'];
+  const axisColor = isDark ? '#C0CBDA' : '#46566F';
+  const gridColor = isDark ? '#2E3F5A' : '#DCE3ED';
+  const primaryBar = isDark ? '#F7E7C6' : '#152F52';
   const getOpenIssueCount = (issuesList: Issue[]) => {
     const closedStatuses = ['resolved', 'closed', 'completed', 'cancelled', 'canceled'];
     return (issuesList || []).filter(issue => {
@@ -193,8 +201,8 @@ const AdminDashboard: React.FC = () => {
       {/* Open Issues Card */}
       <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
         <div className="flex items-center">
-          <div className="p-3 mr-4 bg-red-100 rounded-full">
-            <AlertCircleIcon className="w-6 h-6 text-red-600" />
+          <div className="p-3 mr-4 bg-primary/10 dark:bg-primary/20 rounded-full">
+            <AlertCircleIcon className="w-6 h-6 text-primary" />
           </div>
           <div>
             <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">Open Issues</p>
@@ -235,11 +243,11 @@ const AdminDashboard: React.FC = () => {
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
-              <Pie data={assetsByStatus} cx="50%" cy="50%" labelLine={false} label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`} outerRadius={80} fill="#8884d8" dataKey="value">
+              <Pie data={assetsByStatus} cx="50%" cy="50%" labelLine={false} label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`} outerRadius={80} fill="#152F52" dataKey="value">
                 {assetsByStatus.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
               </Pie>
               <Tooltip formatter={value => [`${value} assets`, null]} />
-              <Legend />
+              <Legend wrapperStyle={{ color: axisColor }} />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -250,12 +258,12 @@ const AdminDashboard: React.FC = () => {
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={assetsByDepartment} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
+              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+              <XAxis dataKey="name" tick={{ fill: axisColor }} stroke={gridColor} />
+              <YAxis  tick={{ fill: axisColor }} stroke={gridColor} />
               <Tooltip />
-              <Legend />
-              <Bar dataKey="value" name="Assets" fill="#0088FE" />
+              <Legend wrapperStyle={{ color: axisColor }} />
+              <Bar dataKey="value" name="Assets" fill={primaryBar} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -269,11 +277,11 @@ const AdminDashboard: React.FC = () => {
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
-              <Pie data={issuesByStatus} cx="50%" cy="50%" labelLine={false} label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`} outerRadius={80} fill="#8884d8" dataKey="value">
+              <Pie data={issuesByStatus} cx="50%" cy="50%" labelLine={false} label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`} outerRadius={80} fill="#152F52" dataKey="value">
                 {issuesByStatus.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
               </Pie>
               <Tooltip formatter={value => [`${value} issues`, null]} />
-              <Legend />
+              <Legend wrapperStyle={{ color: axisColor }} />
             </PieChart>
           </ResponsiveContainer>
         </div>
@@ -284,12 +292,12 @@ const AdminDashboard: React.FC = () => {
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart layout="vertical" data={assetsByType.slice(0, 8)} margin={{ top: 5, right: 30, left: 60, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis type="number" />
-              <YAxis dataKey="name" type="category" />
+              <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+              <XAxis type="number" tick={{ fill: axisColor }} stroke={gridColor} />
+              <YAxis dataKey="name" type="category" tick={{ fill: axisColor }} stroke={gridColor} />
               <Tooltip />
-              <Legend />
-              <Bar dataKey="value" name="Count" fill="#00C49F" />
+              <Legend wrapperStyle={{ color: axisColor }} />
+              <Bar dataKey="value" name="Count" fill="#E59730" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -321,8 +329,8 @@ const AdminDashboard: React.FC = () => {
                       <span className="ml-2 text-xs text-gray-500 dark:text-gray-400 truncate">{getAssetName(issue.asset_id)}</span>
                     </div>
                   </div>
-                  <div className={`p-1.5 ml-2 rounded-full ${issue.status === 'Open' ? 'bg-red-100' : issue.status === 'In Progress' ? 'bg-yellow-100' : issue.status === 'Resolved' || issue.status === 'Closed' ? 'bg-lightred' : 'bg-gray-100'}`}>
-                    {issue.status === 'Open' ? <AlertCircleIcon className="w-4 h-4 text-red-600" /> : issue.status === 'In Progress' ? <ClockIcon className="w-4 h-4 text-yellow-600" /> : issue.status === 'Resolved' || issue.status === 'Closed' ? <CheckCircleIcon className="w-4 h-4 text-primary" /> : <ArchiveIcon className="w-4 h-4 text-gray-600" />}
+                  <div className={`p-1.5 ml-2 rounded-full ${issue.status === 'Open' ? 'bg-primary/10 dark:bg-primary/20' : issue.status === 'In Progress' ? 'bg-brand-orange/15 dark:bg-brand-orange/20' : issue.status === 'Resolved' || issue.status === 'Closed' ? 'bg-lightred' : 'bg-gray-100'}`}>
+                    {issue.status === 'Open' ? <AlertCircleIcon className="w-4 h-4 text-primary" /> : issue.status === 'In Progress' ? <ClockIcon className="w-4 h-4 text-brand-orange" /> : issue.status === 'Resolved' || issue.status === 'Closed' ? <CheckCircleIcon className="w-4 h-4 text-primary" /> : <ArchiveIcon className="w-4 h-4 text-gray-600" />}
                   </div>
                 </div>
               </div>

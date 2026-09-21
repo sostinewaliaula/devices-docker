@@ -2,6 +2,7 @@ import nodemailer from 'nodemailer';
 import { executeQuery } from '../config/database.js';
 import fs from 'fs';
 import path from 'path';
+import { wrapEmail, badge as themeBadge, callout, button, paragraph, muted, kindFor } from '../utils/emailTheme.js';
 
 class EmailService {
   constructor() {
@@ -100,7 +101,6 @@ class EmailService {
         subject,
         {
           badge: 'INFO',
-          badgeColor: '#0ea5e9',
           title: 'Password Reset Code',
           greetingName: name || '',
           message: messageHtml,
@@ -145,7 +145,10 @@ class EmailService {
   // Render a modern branded HTML email
   renderBrandedEmail({
     badge = 'INFO',
-    badgeColor = '#0ea5e9',
+    // badgeColor is accepted for backwards compatibility but ignored: the badge
+    // colour now comes from the company palette, derived from the badge label.
+    // eslint-disable-next-line no-unused-vars
+    badgeColor = undefined,
     title = '',
     greetingName = '',
     message = '',
@@ -155,44 +158,18 @@ class EmailService {
     logoCid = undefined,
   }) {
     const safe = (s) => (s || '').toString();
-    const logoUrl = process.env.EMAIL_LOGO_URL || '';
-    return `
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${safe(title)}</title>
-  <style>
-    .container { max-width: 720px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 24px rgba(2,6,23,0.08); }
-    .header { background: linear-gradient(135deg, #5b7ddd 0%, #6a50d8 100%); padding: 28px 32px; color: #fff; }
-    .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 24px; }
-    .subtitle { opacity: 0.9; font-size: 14px; margin-top: 4px; }
-    .body { padding: 28px 32px; color: #0f172a; }
-    .badge { display: inline-block; padding: 6px 12px; border-radius: 999px; font-weight: 600; font-size: 12px; color: #0f172a; background: #e2f2ff; border: 1px solid #bae6fd; }
-    .title { margin: 16px 0 8px; font-size: 22px; font-weight: 800; }
-    .greeting { color: #334155; margin-bottom: 12px; }
-    .card { border-left: 4px solid ${badgeColor}; background: #f8fafc; padding: 16px; border-radius: 8px; }
-    .cta { margin-top: 20px; }
-    .button { display: inline-block; padding: 12px 18px; background: #4f46e5; color: #fff; text-decoration: none; border-radius: 10px; font-weight: 700; }
-    .muted { color: #64748b; font-size: 12px; margin-top: 16px; }
-    .footer { color: #94a3b8; font-size: 12px; text-align: center; margin-top: 24px; padding-bottom: 16px; }
-  </style>
-</head>
-<body style="background:#f1f5f9;padding:24px;">
-  <div class="container">
-    <div class="body">
-      <div class="badge" style="background:${badgeColor}1a;border-color:${badgeColor}55;color:#0f172a;">${safe(badge)}</div>
-      <div class="title">${safe(title)}</div>
-      ${greetingName ? `<div class="greeting">Hello ${safe(greetingName)},</div>` : ''}
-      <div class="card">${safe(message)}</div>
-      <div class="cta"><a class="button" href="${safe(ctaUrl)}" target="_blank" rel="noopener">${safe(ctaText)}</a></div>
-      <div class="muted">This is an automated notification from the ${safe(brandName)} Assets Management System.</div>
-      <div class="footer">© ${new Date().getFullYear()} ${safe(brandName)}. All rights reserved.</div>
-    </div>
-  </div>
-</body>
-</html>`;
+    const bodyHtml = `
+      <div style="margin:0 0 4px;">${themeBadge(safe(badge), kindFor(safe(badge)))}</div>
+      ${greetingName ? paragraph(`Hello ${safe(greetingName)},`, { margin: '12px 0 12px' }) : ''}
+      ${callout(safe(message))}
+      ${button(safe(ctaText), safe(ctaUrl))}
+      ${muted(`This is an automated notification from the ${safe(brandName)} Assets Management System.`, { margin: '16px 0 0' })}`;
+    return wrapEmail({
+      title: safe(title),
+      preheader: safe(title),
+      bodyHtml,
+      footerHtml: `<p style="margin:0;">© ${new Date().getFullYear()} ${safe(brandName)}. All rights reserved.</p>`,
+    });
   }
 
   async sendBrandedNotificationEmail(to, subject, options) {

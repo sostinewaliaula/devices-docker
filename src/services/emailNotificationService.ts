@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { EMAIL_PALETTE, EMAIL_THEME } from '../config/emailConfig';
 
 export interface EmailNotificationData {
   userId: string;
@@ -166,54 +167,97 @@ export class EmailNotificationService {
   private createEmailTemplate(data: EmailNotificationData): EmailTemplate {
     const baseSubject = `[Caava Group] ${data.title}`;
     
-    const htmlBody = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${data.title}</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px 8px 0 0; }
-          .content { background: #f8f9fa; padding: 20px; border-radius: 0 0 8px 8px; }
-          .notification-type { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
-          .type-success { background: #d4edda; color: #155724; }
-          .type-error { background: #f8d7da; color: #721c24; }
-          .type-warning { background: #fff3cd; color: #856404; }
-          .type-info { background: #d1ecf1; color: #0c5460; }
-          .footer { text-align: center; margin-top: 20px; padding: 20px; color: #6c757d; font-size: 12px; }
-          .button { display: inline-block; padding: 10px 20px; background: #667eea; color: white; text-decoration: none; border-radius: 5px; margin-top: 15px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <img src="https://i.ibb.co/jZfnmhdg/logo.png" alt="Caava Group" style="height: 40px;" />
-            <h1 style="margin: 10px 0 0 0; font-size: 24px;">Caava Group</h1>
-            <p style="margin: 5px 0 0 0; opacity: 0.9;">Devices Management System</p>
-          </div>
-          <div class="content">
-            <span class="notification-type type-${data.type}">${data.type}</span>
-            <h2 style="color: #333; margin: 20px 0 10px 0;">${data.title}</h2>
-            <p style="margin: 0 0 15px 0; color: #666;">Hello ${data.userName},</p>
-            <div style="background: white; padding: 15px; border-radius: 5px; border-left: 4px solid #667eea;">
-              <p style="margin: 0; line-height: 1.6;">${data.message}</p>
-            </div>
-            <a href="${window.location.origin}/notifications" class="button">View All Notifications</a>
-            <p style="margin: 15px 0 0 0; font-size: 12px; color: #6c757d;">
-              This is an automated notification from the Caava Group Devices Management System.
-            </p>
-          </div>
-          <div class="footer">
-            <p>© ${new Date().getFullYear()} Caava Group. All rights reserved.</p>
-            <p>If you have any questions, please contact your system administrator.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    // Solid company palette, light + dark (see src/config/emailConfig.ts).
+    // Light colours are inline (works everywhere); the <style> block flips them
+    // with !important inside prefers-color-scheme: dark. Gmail ignores that media
+    // query and auto-inverts instead, so every coloured block also carries an
+    // explicit bgcolor/background-color.
+    const L = EMAIL_THEME.light;
+    const D = EMAIL_THEME.dark;
+    const badgeColors: Record<EmailNotificationData['type'], { bg: string; fg: string }> = {
+      success: { bg: EMAIL_PALETTE.green, fg: EMAIL_PALETTE.navy },
+      error: { bg: EMAIL_PALETTE.red, fg: EMAIL_PALETTE.white },
+      warning: { bg: EMAIL_PALETTE.orange, fg: EMAIL_PALETTE.navy },
+      info: { bg: EMAIL_PALETTE.navy, fg: EMAIL_PALETTE.white },
+    };
+    const badge = badgeColors[data.type] || badgeColors.info;
+    const font = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+    const notificationsUrl = `${window.location.origin}/notifications`;
+
+    const htmlBody = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <title>${data.title}</title>
+  <style type="text/css">
+    :root { color-scheme: light dark; supported-color-schemes: light dark; }
+    table { border-collapse: collapse; }
+    @media (prefers-color-scheme: dark) {
+      .em-page { background-color: ${D.page} !important; }
+      .em-card { background-color: ${D.card} !important; border-color: ${D.border} !important; }
+      .em-header { background-color: ${D.header} !important; color: ${D.headerText} !important; border-top-color: ${D.headerBorder} !important; }
+      .em-title, .em-subtitle { color: ${D.headerText} !important; }
+      .em-body { background-color: ${D.card} !important; color: ${D.text} !important; }
+      .em-text { color: ${D.text} !important; }
+      .em-muted { color: ${D.muted} !important; }
+      .em-h { color: ${D.heading} !important; }
+      .em-callout { background-color: ${D.calloutBg} !important; color: ${D.calloutText} !important; }
+      .em-btn-td { background-color: ${D.btnBg} !important; }
+      .em-btn { background-color: ${D.btnBg} !important; color: ${D.btnText} !important; }
+      .em-badge-info { background-color: ${EMAIL_PALETTE.gold} !important; color: ${EMAIL_PALETTE.navy} !important; }
+      .em-footer { background-color: ${D.footerBg} !important; color: ${D.muted} !important; border-color: ${D.border} !important; }
+    }
+    [data-ogsb] .em-page { background-color: ${D.page} !important; }
+    [data-ogsb] .em-card, [data-ogsb] .em-body { background-color: ${D.card} !important; }
+    [data-ogsb] .em-header { background-color: ${D.header} !important; }
+    [data-ogsb] .em-callout { background-color: ${D.calloutBg} !important; }
+    [data-ogsb] .em-btn-td, [data-ogsb] .em-btn { background-color: ${D.btnBg} !important; }
+    [data-ogsb] .em-footer { background-color: ${D.footerBg} !important; }
+    [data-ogsc] .em-title, [data-ogsc] .em-subtitle { color: ${D.headerText} !important; }
+    [data-ogsc] .em-text, [data-ogsc] .em-body { color: ${D.text} !important; }
+    [data-ogsc] .em-muted, [data-ogsc] .em-footer { color: ${D.muted} !important; }
+    [data-ogsc] .em-h { color: ${D.heading} !important; }
+    [data-ogsc] .em-callout { color: ${D.calloutText} !important; }
+    [data-ogsc] .em-btn { color: ${D.btnText} !important; }
+  </style>
+</head>
+<body class="em-page" bgcolor="${L.page}" style="margin:0;padding:0;background-color:${L.page};font-family:${font};">
+<table role="presentation" class="em-page" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${L.page}" style="background-color:${L.page};">
+<tr><td align="center" style="padding:24px 12px;">
+  <table role="presentation" class="em-card" width="600" cellpadding="0" cellspacing="0" border="0" bgcolor="${L.card}" style="width:100%;max-width:600px;background-color:${L.card};border:1px solid ${L.border};border-radius:10px;">
+    <tr><td class="em-header" bgcolor="${L.header}" style="padding:24px 32px;background-color:${L.header};color:${L.headerText};border-top:3px solid ${L.headerBorder};border-radius:10px 10px 0 0;font-family:${font};">
+      <img src="https://i.ibb.co/jZfnmhdg/logo.png" alt="Caava Group" style="display:block;height:40px;border:0;">
+      <h1 class="em-title" style="margin:10px 0 0 0;font-size:24px;line-height:1.3;font-weight:800;color:${L.headerText};">Caava Group</h1>
+      <p class="em-subtitle" style="margin:5px 0 0 0;font-size:14px;color:${L.headerText};">Devices Management System</p>
+    </td></tr>
+    <tr><td class="em-body" bgcolor="${L.card}" style="padding:28px 32px;background-color:${L.card};color:${L.text};font-family:${font};font-size:15px;line-height:1.6;">
+      <span class="em-badge-${data.type}" style="display:inline-block;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700;text-transform:uppercase;background-color:${badge.bg};color:${badge.fg};">${data.type}</span>
+      <h2 class="em-h" style="margin:20px 0 10px 0;font-size:20px;color:${L.heading};">${data.title}</h2>
+      <p class="em-text" style="margin:0 0 15px 0;color:${L.text};">Hello ${data.userName},</p>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+        <td class="em-callout" bgcolor="${L.calloutBg}" style="padding:14px 16px;background-color:${L.calloutBg};color:${L.calloutText};border-left:4px solid ${EMAIL_PALETTE.orange};border-radius:4px;line-height:1.6;">${data.message}</td>
+      </tr></table>
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:18px 0 0 0;"><tr>
+        <td class="em-btn-td" bgcolor="${L.btnBg}" style="background-color:${L.btnBg};border-radius:6px;">
+          <a class="em-btn" href="${notificationsUrl}" target="_blank" rel="noopener" style="display:inline-block;padding:12px 24px;font-size:15px;font-weight:700;color:${L.btnText};background-color:${L.btnBg};text-decoration:none;border-radius:6px;">View All Notifications</a>
+        </td>
+      </tr></table>
+      <p class="em-muted" style="margin:15px 0 0 0;font-size:12px;color:${L.muted};">
+        This is an automated notification from the Caava Group Devices Management System.
+      </p>
+    </td></tr>
+    <tr><td class="em-footer" bgcolor="${L.footerBg}" align="center" style="padding:20px 32px;background-color:${L.footerBg};color:${L.muted};border-top:1px solid ${L.border};border-radius:0 0 10px 10px;font-family:${font};font-size:12px;line-height:1.5;text-align:center;">
+      <p style="margin:0 0 6px;">© ${new Date().getFullYear()} Caava Group. All rights reserved.</p>
+      <p style="margin:0;">If you have any questions, please contact your system administrator.</p>
+    </td></tr>
+  </table>
+</td></tr>
+</table>
+</body>
+</html>`;
 
     const textBody = `
 Caava Group - Devices Management System

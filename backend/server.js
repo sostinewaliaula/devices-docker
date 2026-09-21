@@ -23,6 +23,7 @@ import notificationPreferencesRoutes from './routes/notification-preferences.js'
 import mfaRoutes from './routes/mfa.js';
 import adminMfaRoutes from './routes/admin-mfa.js';
 import mfaPolicyRoutes from './routes/mfa-policies.js';
+import { backupEmail } from './utils/emailTheme.js';
 import exportRoutes from './routes/exports.js';
 import weeklyNotificationRoutes from './routes/weekly-notifications.js';
 import budgetRoutes from './routes/budget.js';
@@ -584,76 +585,27 @@ async function setupBackupCrons() {
       const subject = `[${systemName}] Scheduled Backup - ${name}`;
       const text = `DATABASE BACKUP NOTIFICATION\n\nSystem: ${systemName}\nDatabase: ${dbName}\nBackup Type: ${backupType}\n\nBackup Details:\n- Backup Name: ${name}\n- File Name: ${filename}\n- File Size: ${fileSizeMB} MB (${fileSizeKB} KB)\n- Tables Backed Up: ${tableCount}\n- Total Records: ${totalRecords}\n- Created At: ${formattedDate} (${emailTimezone})\n- Timestamp: ${now.toISOString()}\n\nThis backup was automatically created by the scheduled backup system.\n\nThe backup JSON file is attached to this email.`;
 
-      const html = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 20px; border-radius: 8px 8px 0 0;">
-            <h2 style="color: white; margin: 0;">📦 Scheduled Backup Notification</h2>
-          </div>
-          <div style="background: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; border-top: none;">
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr>
-                <td style="padding: 8px 0; font-weight: bold; color: #374151; width: 150px;">System:</td>
-                <td style="padding: 8px 0; color: #6b7280;">${systemName}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; font-weight: bold; color: #374151;">Database:</td>
-                <td style="padding: 8px 0; color: #6b7280;">${dbName}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; font-weight: bold; color: #374151;">Backup Type:</td>
-                <td style="padding: 8px 0; color: #6b7280;">${backupType}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; font-weight: bold; color: #374151;">Backup Name:</td>
-                <td style="padding: 8px 0; color: #6b7280;">${name}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; font-weight: bold; color: #374151;">File Name:</td>
-                <td style="padding: 8px 0; color: #6b7280; font-family: monospace;">${filename}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; font-weight: bold; color: #374151;">File Size:</td>
-                <td style="padding: 8px 0; color: #6b7280;">${fileSizeMB} MB (${fileSizeKB} KB)</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; font-weight: bold; color: #374151;">Tables Backed Up:</td>
-                <td style="padding: 8px 0; color: #6b7280;">${tableCount}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; font-weight: bold; color: #374151;">Total Records:</td>
-                <td style="padding: 8px 0; color: #6b7280;">${totalRecords.toLocaleString()}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; font-weight: bold; color: #374151;">Created At:</td>
-                <td style="padding: 8px 0; color: #6b7280;">${formattedDate}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; font-weight: bold; color: #374151;">Timezone:</td>
-                <td style="padding: 8px 0; color: #6b7280;">${emailTimezone}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; font-weight: bold; color: #374151;">Timestamp (ISO):</td>
-                <td style="padding: 8px 0; color: #6b7280; font-family: monospace; font-size: 12px;">${now.toISOString()}</td>
-              </tr>
-            </table>
-            <div style="margin-top: 20px; padding: 12px; background: #d1fae5; border-left: 4px solid #10b981; border-radius: 4px;">
-              <p style="margin: 0; color: #065f46; font-size: 14px;">
-                <strong>✅ Automated:</strong> This backup was automatically created by the scheduled backup system.
-              </p>
-            </div>
-            <div style="margin-top: 20px; padding: 12px; background: #dbeafe; border-left: 4px solid #3b82f6; border-radius: 4px;">
-              <p style="margin: 0; color: #1e40af; font-size: 14px;">
-                <strong>📎 Attachment:</strong> The backup JSON file is attached to this email.
-              </p>
-            </div>
-          </div>
-          <div style="background: #f3f4f6; padding: 15px; text-align: center; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
-            <p style="margin: 0; color: #6b7280; font-size: 12px;">
-              This is an automated backup notification from ${systemName}
-            </p>
-          </div>
-        </div>
-      `;
+      const html = backupEmail({
+        title: '📦 Scheduled Backup Notification',
+        systemName,
+        rows: [
+          ['System:', systemName],
+          ['Database:', dbName],
+          ['Backup Type:', backupType],
+          ['Backup Name:', name],
+          ['File Name:', filename, { mono: true }],
+          ['File Size:', `${fileSizeMB} MB (${fileSizeKB} KB)`],
+          ['Tables Backed Up:', tableCount],
+          ['Total Records:', totalRecords.toLocaleString()],
+          ['Created At:', formattedDate],
+          ['Timezone:', emailTimezone],
+          ['Timestamp (ISO):', now.toISOString(), { mono: true, small: true }],
+        ],
+        notes: [
+          '<strong>✅ Automated:</strong> This backup was automatically created by the scheduled backup system.',
+          '<strong>📎 Attachment:</strong> The backup JSON file is attached to this email.',
+        ],
+      });
 
       for (const email of recipientEmails) {
         try {

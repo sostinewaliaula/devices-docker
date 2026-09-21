@@ -78,7 +78,7 @@ const AssetHistoryDetail: React.FC = () => {
   if (!assetId) {
     return (
       <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
-        <p className="text-red-500">Asset identifier is missing.</p>
+        <p className="text-primary">Asset identifier is missing.</p>
       </div>
     );
   }

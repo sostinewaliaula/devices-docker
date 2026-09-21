@@ -4,6 +4,7 @@ import { useNotifications } from '../../contexts/NotificationContext';
 import { PlusIcon, EditIcon, TrashIcon, RefreshCwIcon, CheckCircleIcon, XCircleIcon, SearchIcon, FilterIcon, UploadIcon, DownloadIcon, HistoryIcon, AlertCircleIcon, XIcon, CheckIcon, ImageIcon } from 'lucide-react';
 import AssetImage from '../../components/AssetImage';
 import { Asset, Department, User, AssetHistoryPayload, AssetAssignmentHistoryEntry, AssetIssueEventEntry, AssetType, DropdownOption } from '../../lib/supabase';
+import UserAvatar from '../../components/ui/UserAvatar';
 import { assetService, departmentService, userService, assetRequestTypeService, assetTypeService, notificationService, dropdownOptionsService } from '../../services/apiDatabase';
 import { auditService } from '../../services/apiDatabase';
 import Logo from '../../assets/logo.png';
@@ -922,9 +923,9 @@ const AssetManagement: React.FC = () => {
       case 'inactive':
         return 'bg-gray-100 text-gray-800';
       case 'maintenance':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange';
       case 'retired':
-        return 'bg-red-100 text-red-800';
+        return 'bg-primary/10 dark:bg-primary/20 text-primary';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -1121,7 +1122,7 @@ const AssetManagement: React.FC = () => {
         {selectedAssetIds.length > 0 && (
           <div className="mt-4 flex items-center space-x-4">
             <span className="text-sm">{selectedAssetIds.length} selected</span>
-            <button onClick={handleBulkDelete} className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm">Delete Selected</button>
+            <button onClick={handleBulkDelete} className="px-3 py-1 bg-primary text-white rounded hover:bg-primary/90 text-sm">Delete Selected</button>
           </div>
         )}
       </div>
@@ -1162,7 +1163,7 @@ const AssetManagement: React.FC = () => {
                 <span className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(asset.status)}`}>{statusLabels[asset.status] || asset.status}</span>
               </td>
               <td className="px-6 py-4">{getDepartmentName(asset.department_id)}</td>
-              <td className="px-6 py-4">{asset.assigned_to ? <div className="flex items-center"><div className="p-1 mr-2 text-gray-400 bg-lightred rounded-full dark:bg-gray-800"><svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd"></path></svg></div><span>{getUserName(asset.assigned_to)}</span></div> : <span className="text-gray-400">Unassigned</span>}</td>
+              <td className="px-6 py-4">{asset.assigned_to ? <div className="flex items-center"><UserAvatar userId={asset.assigned_to} name={getUserName(asset.assigned_to)} version={users.find(u => u.id === asset.assigned_to)?.avatar_updated_at} size="sm" className="mr-2" /><span>{getUserName(asset.assigned_to)}</span></div> : <span className="text-gray-400">Unassigned</span>}</td>
               <td className="px-6 py-4" onClick={e => e.stopPropagation()}>
                 <div className="flex space-x-2">
                   <Link to={`/assets/${asset.id}`} className="p-1 text-secondary rounded hover:bg-lightblue dark:hover:bg-gray-800" title="View Details" onClick={e => e.stopPropagation()}><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg></Link>
@@ -1201,8 +1202,8 @@ const AssetManagement: React.FC = () => {
                       }
                     }
                     setShowEditAssetModal(true);
-                  }} className="p-1 text-yellow-600 rounded hover:bg-yellow-100 dark:hover:bg-gray-800" title="Edit Asset"><EditIcon className="w-5 h-5" /></button>
-                  <button onClick={e => { e.stopPropagation(); setSelectedAsset(asset); setShowDeleteModal(true); }} className="p-1 text-red-600 rounded hover:bg-red-100 dark:hover:bg-gray-800" title="Delete Asset"><TrashIcon className="w-5 h-5" /></button>
+                  }} className="p-1 text-brand-orange rounded hover:bg-brand-orange/25 dark:hover:bg-gray-800" title="Edit Asset"><EditIcon className="w-5 h-5" /></button>
+                  <button onClick={e => { e.stopPropagation(); setSelectedAsset(asset); setShowDeleteModal(true); }} className="p-1 text-primary rounded hover:bg-primary/10 dark:hover:bg-gray-800" title="Delete Asset"><TrashIcon className="w-5 h-5" /></button>
                 </div>
               </td>
             </tr>)}
@@ -1274,7 +1275,7 @@ const AssetManagement: React.FC = () => {
                         <div key={assignment.id} className="border border-gray-200 dark:border-gray-700 rounded-2xl p-4 bg-gray-50 dark:bg-gray-800/50">
                           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                             <div>
-                              <p className="text-lg font-semibold text-gray-900 dark:text-gray-100">{assignment.user_name || 'Unassigned'}</p>
+                              <div className="flex items-center gap-2"><UserAvatar userId={assignment.user_id} name={assignment.user_name} version={assignment.user_avatar_updated_at} size="sm" /><p className="text-lg font-semibold text-gray-900 dark:text-gray-100">{assignment.user_name || 'Unassigned'}</p></div>
                               <p className="text-xs text-gray-500">{formatDateRange(assignment.assigned_at, assignment.returned_at)}</p>
                             </div>
                             <span className={`px-3 py-1 text-xs font-semibold rounded-full ${assignment.returned_at ? 'bg-gray-200 text-gray-700' : 'bg-lightred text-primary'}`}>
@@ -1533,7 +1534,7 @@ const AssetManagement: React.FC = () => {
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   {selectedTypeConfig.parameters_schema.map(param => (
                     <div key={param.name}>
-                        <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">{param.name} {param.required && <span className="text-red-500">*</span>}</label>
+                        <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">{param.name} {param.required && <span className="text-primary">*</span>}</label>
                         {param.type === 'global_dropdown' ? (
                           <select
                             value={newAsset.custom_attributes?.[param.name] || ''}
@@ -1793,7 +1794,7 @@ const AssetManagement: React.FC = () => {
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   {selectedTypeConfig.parameters_schema.map(param => (
                     <div key={param.name}>
-                        <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">{param.name} {param.required && <span className="text-red-500">*</span>}</label>
+                        <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">{param.name} {param.required && <span className="text-primary">*</span>}</label>
                         {param.type === 'global_dropdown' ? (
                           <select
                             value={editingAsset.custom_attributes?.[param.name] || ''}
@@ -1909,7 +1910,7 @@ const AssetManagement: React.FC = () => {
           }} className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
             Cancel
           </button>
-          <button onClick={handleDeleteAsset} className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700">
+          <button onClick={handleDeleteAsset} className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary/90">
             Delete Asset
           </button>
         </div>
@@ -1920,8 +1921,8 @@ const AssetManagement: React.FC = () => {
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
         <div className="w-full max-w-md p-6 mx-4 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-              <svg className="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 dark:bg-primary/20">
+              <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
             </div>
             <h3 className="mt-4 text-lg font-medium text-gray-900">Delete Assets</h3>
             <p className="mt-2 text-sm text-gray-500">
@@ -1931,7 +1932,7 @@ const AssetManagement: React.FC = () => {
           <div className="mt-6 flex space-x-3">
             <button
               onClick={confirmBulkDelete}
-              className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700"
+              className="flex-1 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary/90"
             >
               Delete
             </button>

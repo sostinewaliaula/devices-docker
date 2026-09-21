@@ -3,9 +3,8 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContextNew';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useNotifications } from '../../contexts/NotificationContext';
-import { LockIcon, ArrowLeftIcon, CheckCircleIcon } from 'lucide-react';
-import logo from '../../assets/logo.png';
-import ThemeToggle from '../../components/ui/ThemeToggle';
+import { LockIcon, ArrowLeftIcon, CheckCircleIcon, EyeIcon, EyeOffIcon } from 'lucide-react';
+import AuthLayout, { AuthAlert, AuthBadge, AuthSpinner, PasswordRequirements, authStyles } from '../../components/auth/AuthLayout';
 
 const ChangePassword: React.FC = () => {
   const [password, setPassword] = useState('');
@@ -103,167 +102,117 @@ const ChangePassword: React.FC = () => {
 
   if (isSuccess) {
     return (
-      <div className="flex items-center min-h-screen p-6 bg-lightred dark:bg-gray-950">
-        <div className="w-full max-w-md mx-auto">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
-            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircleIcon className="w-8 h-8 text-green-600 dark:text-green-400" />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              Password Changed!
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
-              Your password has been changed successfully. Redirecting to login...
-            </p>
-            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-          </div>
+      <AuthLayout
+        title="Password Changed!"
+        subtitle="Your password has been changed successfully. Redirecting to login..."
+        icon={
+          <AuthBadge tone="success">
+            <CheckCircleIcon className="w-7 h-7" />
+          </AuthBadge>
+        }
+      >
+        <div className="flex justify-center">
+          <AuthSpinner />
         </div>
-      </div>
+      </AuthLayout>
     );
   }
 
+  const requirementItems = [
+    { label: 'At least 8 characters', met: passwordChecks.len },
+    { label: 'One uppercase letter', met: passwordChecks.upper },
+    { label: 'One lowercase letter', met: passwordChecks.lower },
+    { label: 'One number', met: passwordChecks.num },
+    { label: 'One special character', met: passwordChecks.special },
+    { label: 'Passwords match', met: passwordChecks.match },
+  ];
+
+  const eyeBtn = 'absolute right-3.5 top-1/2 -translate-y-1/2 text-muted hover:text-primary';
+
   return (
-    <div className="flex items-center min-h-screen p-6 bg-lightred dark:bg-gray-950">
-      <div className="w-full max-w-md mx-auto">
-        {/* Theme Toggle */}
-        <div className="flex justify-end mb-6">
-          <ThemeToggle />
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
-          <div className="text-center mb-8">
-            {/* Logo */}
-            <div className="mb-6">
-              <img
-                src={logo}
-                alt="Caava Group Logo"
-                className="h-16 w-auto mx-auto"
-              />
-            </div>
-
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-              <LockIcon className="w-8 h-8 text-primary" />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              Change Password
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300">
-              Enter your new password below
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                New Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
-                  placeholder="Enter new password"
-                  disabled={isLoading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                >
-                  {showPassword ? '👁️' : '👁️‍🗨️'}
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Confirm Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
-                  placeholder="Confirm new password"
-                  disabled={isLoading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                >
-                  {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
-                </button>
-              </div>
-            </div>
-
-            {/* Password Requirements */}
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Password Requirements:</p>
-              <div className="space-y-1 text-sm">
-                <div className={`flex items-center ${passwordChecks.len ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
-                  <span className="w-4 h-4 mr-2">{passwordChecks.len ? '✓' : '○'}</span>
-                  At least 8 characters
-                </div>
-                <div className={`flex items-center ${passwordChecks.upper ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
-                  <span className="w-4 h-4 mr-2">{passwordChecks.upper ? '✓' : '○'}</span>
-                  One uppercase letter
-                </div>
-                <div className={`flex items-center ${passwordChecks.lower ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
-                  <span className="w-4 h-4 mr-2">{passwordChecks.lower ? '✓' : '○'}</span>
-                  One lowercase letter
-                </div>
-                <div className={`flex items-center ${passwordChecks.num ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
-                  <span className="w-4 h-4 mr-2">{passwordChecks.num ? '✓' : '○'}</span>
-                  One number
-                </div>
-                <div className={`flex items-center ${passwordChecks.special ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
-                  <span className="w-4 h-4 mr-2">{passwordChecks.special ? '✓' : '○'}</span>
-                  One special character
-                </div>
-                <div className={`flex items-center ${passwordChecks.match ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
-                  <span className="w-4 h-4 mr-2">{passwordChecks.match ? '✓' : '○'}</span>
-                  Passwords match
-                </div>
-              </div>
-            </div>
-
-            {error && (
-              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
-                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-              </div>
-            )}
-
+    <AuthLayout
+      title="Change Password"
+      subtitle="Enter your new password below"
+      icon={
+        <AuthBadge>
+          <LockIcon className="w-7 h-7" />
+        </AuthBadge>
+      }
+      footer={
+        <Link to="/login" className={`inline-flex items-center justify-center ${authStyles.link}`}>
+          <ArrowLeftIcon className="w-4 h-4 mr-2" />
+          Back to Login
+        </Link>
+      }
+    >
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label className={`${authStyles.label} mb-1`}>New Password</label>
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={`${authStyles.input} pl-4 pr-12`}
+              placeholder="Enter new password"
+              disabled={isLoading}
+            />
             <button
-              type="submit"
-              disabled={isLoading || !passwordChecks.len || !passwordChecks.upper || !passwordChecks.lower || !passwordChecks.num || !passwordChecks.special || !passwordChecks.match}
-              className="w-full py-3 px-4 bg-gradient-to-r from-primary to-secondary text-white font-medium rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className={eyeBtn}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
-              {isLoading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Changing Password...
-                </>
-              ) : (
-                'Change Password'
-              )}
+              {showPassword ? <EyeOffIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
             </button>
-          </form>
-
-          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <Link
-              to="/login"
-              className="flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-            >
-              <ArrowLeftIcon className="w-4 h-4 mr-2" />
-              Back to Login
-            </Link>
           </div>
         </div>
-      </div>
-    </div>
+
+        <div>
+          <label className={`${authStyles.label} mb-1`}>Confirm Password</label>
+          <div className="relative">
+            <input
+              type={showConfirmPassword ? 'text' : 'password'}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className={`${authStyles.input} pl-4 pr-12`}
+              placeholder="Confirm new password"
+              disabled={isLoading}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className={eyeBtn}
+              aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+            >
+              {showConfirmPassword ? <EyeOffIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <p className="mb-2 text-sm font-medium text-heading">Password Requirements</p>
+          <PasswordRequirements items={requirementItems} />
+        </div>
+
+        {error && <AuthAlert>{error}</AuthAlert>}
+
+        <button
+          type="submit"
+          disabled={isLoading || !passwordChecks.len || !passwordChecks.upper || !passwordChecks.lower || !passwordChecks.num || !passwordChecks.special || !passwordChecks.match}
+          className={authStyles.button}
+        >
+          {isLoading ? (
+            <>
+              <div className="w-5 h-5 mr-2 border-2 rounded-full animate-spin border-on-action/40 border-t-on-action"></div>
+              Changing Password...
+            </>
+          ) : (
+            'Change Password'
+          )}
+        </button>
+      </form>
+    </AuthLayout>
   );
 };
 

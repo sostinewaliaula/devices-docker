@@ -30,27 +30,27 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     switch (type) {
       case 'danger':
         return {
-          icon: 'text-red-500',
-          confirmButton: 'bg-red-600 hover:bg-red-700 text-white',
-          iconBg: 'bg-red-100 dark:bg-red-900/20'
+          icon: 'text-primary',
+          confirmButton: 'bg-primary hover:bg-primary/90 text-white',
+          iconBg: 'bg-primary/10 dark:bg-primary/20'
         };
       case 'warning':
         return {
-          icon: 'text-yellow-500',
-          confirmButton: 'bg-yellow-600 hover:bg-yellow-700 text-white',
-          iconBg: 'bg-yellow-100 dark:bg-yellow-900/20'
+          icon: 'text-brand-orange',
+          confirmButton: 'bg-brand-orange hover:bg-brand-orange/90 text-secondary',
+          iconBg: 'bg-brand-orange/15 dark:bg-brand-orange/20'
         };
       case 'info':
         return {
-          icon: 'text-blue-500',
-          confirmButton: 'bg-blue-600 hover:bg-blue-700 text-white',
-          iconBg: 'bg-blue-100 dark:bg-blue-900/20'
+          icon: 'text-secondary dark:text-accent',
+          confirmButton: 'bg-action hover:opacity-90 text-on-action',
+          iconBg: 'bg-secondary/10 dark:bg-accent/15'
         };
       default:
         return {
-          icon: 'text-yellow-500',
-          confirmButton: 'bg-yellow-600 hover:bg-yellow-700 text-white',
-          iconBg: 'bg-yellow-100 dark:bg-yellow-900/20'
+          icon: 'text-brand-orange',
+          confirmButton: 'bg-brand-orange hover:bg-brand-orange/90 text-secondary',
+          iconBg: 'bg-brand-orange/15 dark:bg-brand-orange/20'
         };
     }
   };

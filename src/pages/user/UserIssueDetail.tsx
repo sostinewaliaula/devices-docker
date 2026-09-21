@@ -254,12 +254,12 @@ const UserIssueDetail: React.FC = () => {
 
     switch (status) {
       case 'open':
-        return <AlertCircleIcon className="w-5 h-5 text-red-500" />;
+        return <AlertCircleIcon className="w-5 h-5 text-primary" />;
       case 'in_progress':
-        return <ClockIcon className="w-5 h-5 text-yellow-500" />;
+        return <ClockIcon className="w-5 h-5 text-brand-orange" />;
       case 'resolved':
       case 'closed':
-        return <CheckCircleIcon className="w-5 h-5 text-green-500" />;
+        return <CheckCircleIcon className="w-5 h-5 text-secondary dark:text-brand-green" />;
       default:
         return <AlertCircleIcon className="w-5 h-5 text-gray-500" />;
     }
@@ -270,12 +270,12 @@ const UserIssueDetail: React.FC = () => {
 
     switch (status) {
       case 'open':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+        return 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-accent';
       case 'in_progress':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+        return 'bg-brand-orange/15 text-secondary dark:bg-brand-orange/20 dark:text-brand-orange';
       case 'resolved':
       case 'closed':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+        return 'bg-brand-green/25 text-secondary dark:bg-brand-green/20 dark:text-brand-green';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
@@ -286,13 +286,13 @@ const UserIssueDetail: React.FC = () => {
 
     switch (priority) {
       case 'Critical':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+        return 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-accent';
       case 'High':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+        return 'bg-brand-orange/15 text-secondary dark:bg-brand-orange/20 dark:text-brand-orange';
       case 'Medium':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+        return 'bg-brand-orange/15 text-secondary dark:bg-brand-orange/20 dark:text-brand-orange';
       case 'Low':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+        return 'bg-brand-green/25 text-secondary dark:bg-brand-green/20 dark:text-brand-green';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
@@ -384,7 +384,7 @@ const UserIssueDetail: React.FC = () => {
                   <div className="flex items-center space-x-4 ml-4">
                     <button
                       onClick={handleEditIssue}
-                      className="flex items-center space-x-2 text-green-500 hover:text-green-400 transition-colors"
+                      className="flex items-center space-x-2 text-secondary dark:text-brand-green hover:opacity-80 transition-colors"
                       title="Edit Issue"
                     >
                       <EditIcon className="w-4 h-4" />
@@ -392,7 +392,7 @@ const UserIssueDetail: React.FC = () => {
                     </button>
                     <button
                       onClick={confirmDelete}
-                      className="flex items-center space-x-2 text-red-500 hover:text-red-400 transition-colors"
+                      className="flex items-center space-x-2 text-primary hover:text-primary/80 transition-colors"
                       title="Delete Issue"
                     >
                       <TrashIcon className="w-4 h-4" />
@@ -424,7 +424,7 @@ const UserIssueDetail: React.FC = () => {
                     <AlertCircleIcon className="w-5 h-5" />
                     <Link
                       to={`/assets/${asset.id}`}
-                      className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                      className="flex items-center space-x-2 text-secondary dark:text-accent hover:opacity-80 transition-colors"
                     >
                       <div className="w-8 h-8 rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center border border-gray-200 dark:border-gray-800">
                         <AssetImage
@@ -455,7 +455,7 @@ const UserIssueDetail: React.FC = () => {
             {issue.resolution && (
               <div className="mb-6">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Resolution</h3>
-                <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+                <div className="bg-brand-green/25 dark:bg-brand-green/20 rounded-lg p-4">
                   <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
                     {issue.resolution}
                   </p>
@@ -696,8 +696,8 @@ const UserIssueDetail: React.FC = () => {
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-card max-w-md w-full">
               <div className="p-6">
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mr-4">
-                    <TrashIcon className="w-6 h-6 text-red-600 dark:text-red-400" />
+                  <div className="w-12 h-12 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center mr-4">
+                    <TrashIcon className="w-6 h-6 text-primary dark:text-accent" />
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Delete Issue</h3>
@@ -719,7 +719,7 @@ const UserIssueDetail: React.FC = () => {
                   <button
                     onClick={handleDeleteIssue}
                     disabled={deleting}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
                   >
                     {deleting ? (
                       <>

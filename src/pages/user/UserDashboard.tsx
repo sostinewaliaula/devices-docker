@@ -275,10 +275,10 @@ const UserDashboard: React.FC = () => {
       case 'in progress':
       case 'pending user action':
       case 'pending parts':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange';
       case 'disposed':
       case 'open':
-        return 'bg-red-100 text-red-800';
+        return 'bg-primary/10 dark:bg-primary/20 text-primary';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -343,8 +343,8 @@ const UserDashboard: React.FC = () => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-red-100 rounded-full">
-              <AlertCircleIcon className="w-6 h-6 text-red-600" />
+            <div className="p-3 mr-4 bg-primary/10 dark:bg-primary/20 rounded-full">
+              <AlertCircleIcon className="w-6 h-6 text-primary" />
             </div>
             <div>
               <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">Open Issues</p>
@@ -354,8 +354,8 @@ const UserDashboard: React.FC = () => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-yellow-100 rounded-full">
-              <ClockIcon className="w-6 h-6 text-yellow-600" />
+            <div className="p-3 mr-4 bg-brand-orange/15 dark:bg-brand-orange/20 rounded-full">
+              <ClockIcon className="w-6 h-6 text-brand-orange" />
             </div>
             <div>
               <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">In Progress</p>
@@ -447,7 +447,7 @@ const UserDashboard: React.FC = () => {
                 <tr key={issue.id} className="bg-white dark:bg-gray-900 border-b dark:border-gray-800 hover:bg-lightblue/50 dark:hover:bg-gray-800/60">
                   <td className="px-6 py-4 font-medium text-gray-900 dark:text-gray-200 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className={`p-1 mr-3 rounded-full ${issue.priority === 'Critical' ? 'bg-red-100 text-red-600' : issue.priority === 'High' ? 'bg-orange-100 text-orange-600' : issue.priority === 'Medium' ? 'bg-yellow-100 text-yellow-600' : 'bg-lightred text-primary'}`}>
+                      <div className={`p-1 mr-3 rounded-full ${issue.priority === 'Critical' ? 'bg-primary/10 dark:bg-primary/20 text-primary' : issue.priority === 'High' ? 'bg-brand-orange/15 dark:bg-brand-orange/20 text-brand-orange' : issue.priority === 'Medium' ? 'bg-brand-orange/15 dark:bg-brand-orange/20 text-brand-orange' : 'bg-lightred text-primary'}`}>
                         <InfoIcon className="w-4 h-4" />
                       </div>
                       <span>{issue.title}</span>
@@ -598,7 +598,7 @@ const UserDashboard: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => removeAttachment(index)}
-                          className="p-1 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+                          className="p-1 text-gray-400 hover:text-primary/80 transition-colors rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
                         >
                           <XIcon className="w-4 h-4" />
                         </button>
@@ -609,7 +609,7 @@ const UserDashboard: React.FC = () => {
               </div>
               <div className="flex justify-end space-x-3 border-t border-gray-200 dark:border-gray-800 pt-4">
                 <button type="button" onClick={() => setShowReportIssueModal(false)} className="px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">Cancel</button>
-                <button type="submit" disabled={isSubmittingIssue} className="px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-primary to-secondary rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+                <button type="submit" disabled={isSubmittingIssue} className="px-6 py-3 text-sm font-medium text-white bg-primary rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
                   {isSubmittingIssue ? 'Submitting...' : 'Submit Issue'}
                 </button>
               </div>

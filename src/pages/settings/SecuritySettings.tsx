@@ -148,20 +148,20 @@ const SecuritySettings: React.FC = () => {
           <h3 className="font-semibold text-primary mb-2">Your MFA Factors</h3>
           <div className="mb-3 flex gap-2">
             <button onClick={async ()=> setFactors(await listMfaFactors())} className="px-3 py-1 text-xs border rounded-xl">Refresh</button>
-            <button onClick={disableAllTotp} className="px-3 py-1 text-xs border rounded-xl text-red-600">Disable All TOTP</button>
+            <button onClick={disableAllTotp} className="px-3 py-1 text-xs border rounded-xl text-primary">Disable All TOTP</button>
           </div>
           <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
             {factors.map(f => (
               <li key={f.id} className="flex items-center justify-between">
                 <span>{(f.friendlyName || f.type)} — {f.status || 'pending'}</span>
-                {f.type === 'totp' && <button onClick={() => disableById(f.id)} className="text-red-600 text-xs">Disable</button>}
+                {f.type === 'totp' && <button onClick={() => disableById(f.id)} className="text-primary text-xs">Disable</button>}
               </li>
             ))}
           </ul>
         </div>
       )}
 
-      {error && <div className="mt-4 text-red-600 text-sm">{error}</div>}
+      {error && <div className="mt-4 text-primary text-sm">{error}</div>}
     </div>
   );
 };

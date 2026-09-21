@@ -151,8 +151,8 @@ const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar }) => {
 
   const linkClass = (path: string) =>
     `flex items-center px-3 sm:px-4 py-3 text-sm font-medium rounded-xl transition-colors duration-150 ${isActive(path)
-      ? 'bg-gradient-to-r from-primary to-secondary text-white font-bold shadow-button'
-      : 'text-gray-700 dark:text-gray-200 hover:bg-lightred hover:text-primary dark:hover:text-primary'
+      ? 'bg-action text-on-action font-bold shadow-sm'
+      : 'text-content hover:bg-surface-2 hover:text-heading'
     }`;
 
   const renderSection = (section: NavSection) => {
@@ -162,7 +162,7 @@ const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar }) => {
       <div key={section.id} className="mb-2">
         <button
           onClick={() => toggleSection(section.id)}
-          className="w-full flex items-center justify-between px-2 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400"
+          className="w-full flex items-center justify-between px-2 py-2 text-xs font-semibold text-muted"
         >
           <span>{section.title}</span>
           <ChevronDown
@@ -186,7 +186,7 @@ const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar }) => {
       </div>
     );
   };
-  return <div className="flex flex-col h-full py-2 text-gray-800 dark:text-gray-200">
+  return <div className="flex flex-col h-full py-2 text-content">
     <div className="px-4 pb-2">
       <Link to="/" className="flex flex-col items-start" onClick={toggleSidebar}> {/* Changed closeSidebar to toggleSidebar */}
         <div className="flex flex-col items-start justify-center h-auto">
@@ -195,7 +195,7 @@ const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar }) => {
             <div className="flex items-center justify-start">
               <span className="text-xl font-bold text-primary truncate" title={siteName.split(' ')[0]}>{siteName.split(' ')[0]}</span>
               {siteName.split(' ').slice(1).join(' ') && (
-                <span className="ml-1 text-xl font-bold text-secondary truncate" title={siteName.split(' ').slice(1).join(' ')}>
+                <span className="ml-1 text-xl font-bold text-secondary dark:text-white truncate" title={siteName.split(' ').slice(1).join(' ')}>
                   {siteName.split(' ').slice(1).join(' ')}
                 </span>
               )}
@@ -220,7 +220,7 @@ const Sidebar: React.FC<SidebarProps> = ({ toggleSidebar }) => {
         setTimeout(() => {
           window.location.href = '/login';
         }, 1000);
-      }} className="mt-auto flex items-center px-4 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors w-full">
+      }} className="mt-auto flex items-center px-4 py-3 text-sm font-medium text-primary dark:text-heading hover:bg-lightred rounded-xl transition-colors w-full">
         <LogOutIcon size={20} className="mr-3" />
         Logout
       </button>

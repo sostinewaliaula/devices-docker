@@ -325,11 +325,11 @@ const UserIssues: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'open':
-        return 'bg-red-100 text-red-800';
+        return 'bg-primary/10 dark:bg-primary/20 text-primary';
       case 'in_progress':
       case 'pending_user_action':
       case 'pending_parts':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange';
       case 'resolved':
       case 'closed':
         return 'bg-lightred text-primary';
@@ -344,9 +344,9 @@ const UserIssues: React.FC = () => {
       case 'Medium':
         return 'bg-lightblue text-secondary';
       case 'High':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange';
       case 'Critical':
-        return 'bg-red-100 text-red-800';
+        return 'bg-primary/10 dark:bg-primary/20 text-primary';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -375,8 +375,8 @@ const UserIssues: React.FC = () => {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
           <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
             <div className="flex items-center">
-              <div className="p-3 mr-4 bg-red-100 rounded-full">
-                <AlertCircleIcon className="w-6 h-6 text-red-600" />
+              <div className="p-3 mr-4 bg-primary/10 dark:bg-primary/20 rounded-full">
+                <AlertCircleIcon className="w-6 h-6 text-primary" />
               </div>
               <div>
                 <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">Open Issues</p>
@@ -386,8 +386,8 @@ const UserIssues: React.FC = () => {
           </div>
           <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
             <div className="flex items-center">
-              <div className="p-3 mr-4 bg-yellow-100 rounded-full">
-                <ClockIcon className="w-6 h-6 text-yellow-600" />
+              <div className="p-3 mr-4 bg-brand-orange/15 dark:bg-brand-orange/20 rounded-full">
+                <ClockIcon className="w-6 h-6 text-brand-orange" />
               </div>
               <div>
                 <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">In Progress</p>
@@ -467,7 +467,7 @@ const UserIssues: React.FC = () => {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-3">
-                        <div className={`p-1 rounded-full ${issue.priority === 'Critical' ? 'bg-red-100 text-red-600' : issue.priority === 'High' ? 'bg-orange-100 text-orange-600' : issue.priority === 'Medium' ? 'bg-yellow-100 text-yellow-600' : 'bg-lightred text-primary'}`}>
+                        <div className={`p-1 rounded-full ${issue.priority === 'Critical' ? 'bg-primary/10 dark:bg-primary/20 text-primary' : issue.priority === 'High' ? 'bg-brand-orange/15 dark:bg-brand-orange/20 text-brand-orange' : issue.priority === 'Medium' ? 'bg-brand-orange/15 dark:bg-brand-orange/20 text-brand-orange' : 'bg-lightred text-primary'}`}>
                           <InfoIcon className="w-4 h-4" />
                         </div>
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -512,7 +512,7 @@ const UserIssues: React.FC = () => {
                           <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
                             Related Asset:
                           </h4>
-                          <Link to={`/user/assets/${issue.assetId}`} className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors">
+                          <Link to={`/user/assets/${issue.assetId}`} className="flex items-center space-x-2 text-secondary dark:text-accent hover:opacity-80 transition-colors">
                             <div className="w-8 h-8 rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center border border-gray-200 dark:border-gray-800">
                               <AssetImage
                                 asset={assets.find(a => a.id === issue.assetId)}
@@ -533,7 +533,7 @@ const UserIssues: React.FC = () => {
                             <div className="flex items-center space-x-4">
                               <button
                                 onClick={() => handleEditIssue(issue)}
-                                className="flex items-center space-x-2 text-green-500 hover:text-green-400 transition-colors"
+                                className="flex items-center space-x-2 text-secondary dark:text-brand-green hover:opacity-80 transition-colors"
                                 title="Edit Issue"
                               >
                                 <EditIcon className="w-4 h-4" />
@@ -541,7 +541,7 @@ const UserIssues: React.FC = () => {
                               </button>
                               <button
                                 onClick={() => confirmDelete(issue.id)}
-                                className="flex items-center space-x-2 text-red-500 hover:text-red-400 transition-colors"
+                                className="flex items-center space-x-2 text-primary hover:text-primary/80 transition-colors"
                                 title="Delete Issue"
                               >
                                 <TrashIcon className="w-4 h-4" />
@@ -559,7 +559,7 @@ const UserIssues: React.FC = () => {
                           )}
                           <Link
                             to={`/user/issues/${issue.id}`}
-                            className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                            className="flex items-center space-x-2 text-secondary dark:text-accent hover:opacity-80 transition-colors"
                           >
                             <InfoIcon className="w-4 h-4" />
                             <span>View Details</span>
@@ -672,7 +672,7 @@ const UserIssues: React.FC = () => {
                       {attachments.map((file, index) => (
                         <div key={index} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                           <span className="text-sm text-gray-600 dark:text-gray-300 truncate">{file.name}</span>
-                          <button type="button" onClick={() => removeAttachment(index)} className="text-red-500 hover:text-red-700">
+                          <button type="button" onClick={() => removeAttachment(index)} className="text-primary hover:text-primary/80">
                             <XCircleIcon className="w-4 h-4" />
                           </button>
                         </div>
@@ -682,7 +682,7 @@ const UserIssues: React.FC = () => {
                 </div>
                 <div className="flex justify-end space-x-3 border-t border-gray-200 dark:border-gray-800 pt-4">
                   <button type="button" onClick={() => setShowReportIssueModal(false)} className="px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">Cancel</button>
-                  <button type="submit" disabled={isSubmittingIssue} className="px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-primary to-secondary rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
+                  <button type="submit" disabled={isSubmittingIssue} className="px-6 py-3 text-sm font-medium text-white bg-primary rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed">
                     {isSubmittingIssue ? 'Submitting...' : 'Submit Issue'}
                   </button>
                 </div>
@@ -836,8 +836,8 @@ const UserIssues: React.FC = () => {
             <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-card max-w-md w-full">
               <div className="p-6">
                 <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mr-4">
-                    <TrashIcon className="w-6 h-6 text-red-600 dark:text-red-400" />
+                  <div className="w-12 h-12 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center mr-4">
+                    <TrashIcon className="w-6 h-6 text-primary dark:text-accent" />
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Delete Issue</h3>
@@ -859,7 +859,7 @@ const UserIssues: React.FC = () => {
                   <button
                     onClick={() => handleDeleteIssue(showDeleteConfirm)}
                     disabled={deletingIssue === showDeleteConfirm}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
+                    className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center"
                   >
                     {deletingIssue === showDeleteConfirm ? (
                       <>

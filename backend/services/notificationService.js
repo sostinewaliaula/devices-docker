@@ -1,6 +1,26 @@
 import emailService from './emailService.js';
 import { executeQuery } from '../config/database.js';
 import { sanitizePagination } from '../utils/pagination.js';
+import {
+  wrapEmail, paragraph, muted, heading, link, button, badge, detailTable, callout, panel,
+  sectionTitle, td, dataTable, statCards, kindFor, LIGHT
+} from '../utils/emailTheme.js';
+
+// Status / priority -> palette badge kinds (solid company colours, see utils/emailTheme.js)
+const STATUS_KIND = { submitted: 'info', pending: 'warning', approved: 'success', rejected: 'danger', fulfilled: 'success' };
+const STATUS_TEXT = {
+  'submitted': 'Submitted',
+  'pending': 'Pending Review',
+  'approved': 'Approved',
+  'rejected': 'Rejected',
+  'fulfilled': 'Fulfilled'
+};
+const PRIORITY_KIND = { critical: 'danger', high: 'warning', medium: 'info', low: 'success' };
+const PRIORITY_TEXT = { critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low' };
+
+const systemFooter = (system = 'Asset Management System') =>
+  `<p style="margin:0 0 6px;">This is an automated notification from the ${system}.</p>
+      <p style="margin:0;">Please do not reply to this email.</p>`;
 
 class NotificationService {
   constructor() {
@@ -281,79 +301,23 @@ class NotificationService {
 
   // Generate HTML email for status change
   generateStatusChangeEmailHtml(userName, assetName, newStatus, adminName, reason) {
-    const statusColors = {
-      'submitted': '#3b82f6',
-      'pending': '#f59e0b',
-      'approved': '#10b981',
-      'rejected': '#ef4444',
-      'fulfilled': '#3b82f6'
-    };
-
-    const statusText = {
-      'submitted': 'Submitted',
-      'pending': 'Pending Review',
-      'approved': 'Approved',
-      'rejected': 'Rejected',
-      'fulfilled': 'Fulfilled'
-    };
-
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>Device Request Update</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-          .status-badge { 
-            display: inline-block; 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            color: white; 
-            font-weight: bold;
-            background-color: ${statusColors[newStatus]};
-          }
-          .content { background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; }
-          .footer { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #6b7280; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>Device Request Update</h1>
-            <p>Hello ${userName},</p>
-          </div>
-          
-          <div class="content">
-            <p>Your device request has been updated:</p>
-            
-            <h2>Request Details</h2>
-            <ul>
-              <li><strong>Asset:</strong> ${assetName}</li>
-              <li><strong>Status:</strong> <span class="status-badge">${statusText[newStatus]}</span></li>
-              ${adminName ? `<li><strong>Updated by:</strong> ${adminName}</li>` : ''}
-            </ul>
-            
-            ${reason ? `
-            <h3>Original Request</h3>
-            <p style="background: #f8f9fa; padding: 15px; border-radius: 4px; border-left: 4px solid #3b82f6;">
-              ${reason}
-            </p>
-            ` : ''}
-            
-            <p>You can view the full details and add comments in your dashboard.</p>
-          </div>
-          
-          <div class="footer">
-            <p>This is an automated notification from the Asset Management System.</p>
-            <p>Please do not reply to this email.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    return wrapEmail({
+      title: 'Device Request Update',
+      preheader: `Your request for ${assetName} is now ${STATUS_TEXT[newStatus]}`,
+      bodyHtml: [
+        paragraph(`Hello ${userName},`),
+        paragraph('Your device request has been updated:'),
+        heading('Request Details'),
+        detailTable([
+          ['Asset:', assetName],
+          ['Status:', badge(STATUS_TEXT[newStatus], STATUS_KIND[newStatus])],
+          adminName && ['Updated by:', adminName],
+        ]),
+        reason ? heading('Original Request', 3) + callout(reason) : '',
+        paragraph('You can view the full details and add comments in your dashboard.'),
+      ].join(''),
+      footerHtml: systemFooter(),
+    });
   }
 
   // Generate text email for status change
@@ -392,45 +356,17 @@ Please do not reply to this email.
 
   // Generate HTML email for comment
   generateCommentEmailHtml(userName, assetName, commenterName, comment) {
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>New Comment on Asset Request</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-          .comment { background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #3b82f6; margin: 15px 0; }
-          .footer { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #6b7280; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>New Comment on Asset Request</h1>
-            <p>Hello ${userName},</p>
-          </div>
-          
-          <div class="content">
-            <p><strong>${commenterName}</strong> added a comment to your request for <strong>${assetName}</strong>:</p>
-            
-            <div class="comment">
-              ${comment}
-            </div>
-            
-            <p>You can view the full conversation and add your own comments in your dashboard.</p>
-          </div>
-          
-          <div class="footer">
-            <p>This is an automated notification from the Asset Management System.</p>
-            <p>Please do not reply to this email.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    return wrapEmail({
+      title: 'New Comment on Asset Request',
+      preheader: `${commenterName} commented on your request for ${assetName}`,
+      bodyHtml: [
+        paragraph(`Hello ${userName},`),
+        paragraph(`<strong>${commenterName}</strong> added a comment to your request for <strong>${assetName}</strong>:`),
+        callout(comment),
+        paragraph('You can view the full conversation and add your own comments in your dashboard.'),
+      ].join(''),
+      footerHtml: systemFooter(),
+    });
   }
 
   // Generate text email for comment
@@ -453,79 +389,23 @@ Please do not reply to this email.
 
   // Generate HTML email for user status change
   generateUserStatusChangeEmailHtml(userName, assetName, newStatus, adminName, reason) {
-    const statusColors = {
-      'submitted': '#3b82f6',
-      'pending': '#f59e0b',
-      'approved': '#10b981',
-      'rejected': '#ef4444',
-      'fulfilled': '#3b82f6'
-    };
-
-    const statusText = {
-      'submitted': 'Submitted',
-      'pending': 'Pending Review',
-      'approved': 'Approved',
-      'rejected': 'Rejected',
-      'fulfilled': 'Fulfilled'
-    };
-
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>Your Asset Request Update</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-          .status-badge { 
-            display: inline-block; 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            color: white; 
-            font-weight: bold;
-            background-color: ${statusColors[newStatus]};
-          }
-          .content { background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; }
-          .footer { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #6b7280; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>Your Asset Request Update</h1>
-            <p>Hello ${userName},</p>
-          </div>
-          
-          <div class="content">
-            <p>Your asset request has been updated:</p>
-            
-            <h2>Request Details</h2>
-            <ul>
-              <li><strong>Asset:</strong> ${assetName}</li>
-              <li><strong>Status:</strong> <span class="status-badge">${statusText[newStatus]}</span></li>
-              ${adminName ? `<li><strong>Updated by:</strong> ${adminName}</li>` : ''}
-            </ul>
-            
-            ${reason ? `
-            <h3>Your Original Request</h3>
-            <p style="background: #f8f9fa; padding: 15px; border-radius: 4px; border-left: 4px solid #3b82f6;">
-              ${reason}
-            </p>
-            ` : ''}
-            
-            <p>You can view the full details and add comments in your dashboard.</p>
-          </div>
-          
-          <div class="footer">
-            <p>This is an automated notification from the Asset Management System.</p>
-            <p>Please do not reply to this email.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    return wrapEmail({
+      title: 'Your Asset Request Update',
+      preheader: `Your request for ${assetName} is now ${STATUS_TEXT[newStatus]}`,
+      bodyHtml: [
+        paragraph(`Hello ${userName},`),
+        paragraph('Your asset request has been updated:'),
+        heading('Request Details'),
+        detailTable([
+          ['Asset:', assetName],
+          ['Status:', badge(STATUS_TEXT[newStatus], STATUS_KIND[newStatus])],
+          adminName && ['Updated by:', adminName],
+        ]),
+        reason ? heading('Your Original Request', 3) + callout(reason) : '',
+        paragraph('You can view the full details and add comments in your dashboard.'),
+      ].join(''),
+      footerHtml: systemFooter(),
+    });
   }
 
   // Generate text email for user status change
@@ -564,80 +444,24 @@ Please do not reply to this email.
 
   // Generate HTML email for manager status change
   generateManagerStatusChangeEmailHtml(managerName, requesterName, assetName, newStatus, adminName, reason) {
-    const statusColors = {
-      'submitted': '#3b82f6',
-      'pending': '#f59e0b',
-      'approved': '#10b981',
-      'rejected': '#ef4444',
-      'fulfilled': '#3b82f6'
-    };
-
-    const statusText = {
-      'submitted': 'Submitted',
-      'pending': 'Pending Review',
-      'approved': 'Approved',
-      'rejected': 'Rejected',
-      'fulfilled': 'Fulfilled'
-    };
-
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>Team Member's Asset Request Update</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-          .status-badge { 
-            display: inline-block; 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            color: white; 
-            font-weight: bold;
-            background-color: ${statusColors[newStatus]};
-          }
-          .content { background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; }
-          .footer { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #6b7280; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>Team Member's Asset Request Update</h1>
-            <p>Hello ${managerName},</p>
-          </div>
-          
-          <div class="content">
-            <p>A team member's asset request has been updated:</p>
-            
-            <h2>Request Details</h2>
-            <ul>
-              <li><strong>Requester:</strong> ${requesterName}</li>
-              <li><strong>Asset:</strong> ${assetName}</li>
-              <li><strong>Status:</strong> <span class="status-badge">${statusText[newStatus]}</span></li>
-              ${adminName ? `<li><strong>Updated by:</strong> ${adminName}</li>` : ''}
-            </ul>
-            
-            ${reason ? `
-            <h3>Original Request</h3>
-            <p style="background: #f8f9fa; padding: 15px; border-radius: 4px; border-left: 4px solid #3b82f6;">
-              ${reason}
-            </p>
-            ` : ''}
-            
-            <p>You can view the full details and add comments in your dashboard.</p>
-          </div>
-          
-          <div class="footer">
-            <p>This is an automated notification from the Asset Management System.</p>
-            <p>Please do not reply to this email.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    return wrapEmail({
+      title: "Team Member's Asset Request Update",
+      preheader: `${requesterName}'s request for ${assetName} is now ${STATUS_TEXT[newStatus]}`,
+      bodyHtml: [
+        paragraph(`Hello ${managerName},`),
+        paragraph("A team member's asset request has been updated:"),
+        heading('Request Details'),
+        detailTable([
+          ['Requester:', requesterName],
+          ['Asset:', assetName],
+          ['Status:', badge(STATUS_TEXT[newStatus], STATUS_KIND[newStatus])],
+          adminName && ['Updated by:', adminName],
+        ]),
+        reason ? heading('Original Request', 3) + callout(reason) : '',
+        paragraph('You can view the full details and add comments in your dashboard.'),
+      ].join(''),
+      footerHtml: systemFooter(),
+    });
   }
 
   // Generate text email for manager status change
@@ -677,80 +501,24 @@ Please do not reply to this email.
 
   // Generate HTML email for admin status change
   generateAdminStatusChangeEmailHtml(adminName, requesterName, assetName, newStatus, updatedBy, reason) {
-    const statusColors = {
-      'submitted': '#3b82f6',
-      'pending': '#f59e0b',
-      'approved': '#10b981',
-      'rejected': '#ef4444',
-      'fulfilled': '#3b82f6'
-    };
-
-    const statusText = {
-      'submitted': 'Submitted',
-      'pending': 'Pending Review',
-      'approved': 'Approved',
-      'rejected': 'Rejected',
-      'fulfilled': 'Fulfilled'
-    };
-
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>Asset Request Update</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-          .status-badge { 
-            display: inline-block; 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            color: white; 
-            font-weight: bold;
-            background-color: ${statusColors[newStatus]};
-          }
-          .content { background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; }
-          .footer { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #6b7280; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>Asset Request Update</h1>
-            <p>Hello ${adminName},</p>
-          </div>
-          
-          <div class="content">
-            <p>An asset request has been updated:</p>
-            
-            <h2>Request Details</h2>
-            <ul>
-              <li><strong>Requester:</strong> ${requesterName}</li>
-              <li><strong>Asset:</strong> ${assetName}</li>
-              <li><strong>Status:</strong> <span class="status-badge">${statusText[newStatus]}</span></li>
-              ${updatedBy ? `<li><strong>Updated by:</strong> ${updatedBy}</li>` : ''}
-            </ul>
-            
-            ${reason ? `
-            <h3>Original Request</h3>
-            <p style="background: #f8f9fa; padding: 15px; border-radius: 4px; border-left: 4px solid #3b82f6;">
-              ${reason}
-            </p>
-            ` : ''}
-            
-            <p>You can view the full details and add comments in your dashboard.</p>
-          </div>
-          
-          <div class="footer">
-            <p>This is an automated notification from the Asset Management System.</p>
-            <p>Please do not reply to this email.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    return wrapEmail({
+      title: 'Asset Request Update',
+      preheader: `${requesterName}'s request for ${assetName} is now ${STATUS_TEXT[newStatus]}`,
+      bodyHtml: [
+        paragraph(`Hello ${adminName},`),
+        paragraph('An asset request has been updated:'),
+        heading('Request Details'),
+        detailTable([
+          ['Requester:', requesterName],
+          ['Asset:', assetName],
+          ['Status:', badge(STATUS_TEXT[newStatus], STATUS_KIND[newStatus])],
+          updatedBy && ['Updated by:', updatedBy],
+        ]),
+        reason ? heading('Original Request', 3) + callout(reason) : '',
+        paragraph('You can view the full details and add comments in your dashboard.'),
+      ].join(''),
+      footerHtml: systemFooter(),
+    });
   }
 
   // Generate text email for admin status change
@@ -790,64 +558,24 @@ Please do not reply to this email.
 
   // Generate HTML email for admin new request
   generateAdminNewRequestEmailHtml(adminName, requesterName, assetName, assetType, reason) {
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>New Asset Request Submitted</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-          .status-badge { 
-            display: inline-block; 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            color: white; 
-            font-weight: bold;
-            background-color: #3b82f6;
-          }
-          .content { background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; }
-          .footer { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #6b7280; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>New Asset Request Submitted</h1>
-            <p>Hello ${adminName},</p>
-          </div>
-          
-          <div class="content">
-            <p>A new asset request has been submitted and requires your attention:</p>
-            
-            <h2>Request Details</h2>
-            <ul>
-              <li><strong>Requester:</strong> ${requesterName}</li>
-              <li><strong>Asset:</strong> ${assetName}</li>
-              <li><strong>Type:</strong> ${assetType}</li>
-              <li><strong>Status:</strong> <span class="status-badge">Submitted</span></li>
-            </ul>
-            
-            ${reason ? `
-            <h3>Request Details</h3>
-            <p style="background: #f8f9fa; padding: 15px; border-radius: 4px; border-left: 4px solid #3b82f6;">
-              ${reason}
-            </p>
-            ` : ''}
-            
-            <p>Please review and take appropriate action on this request in your dashboard.</p>
-          </div>
-          
-          <div class="footer">
-            <p>This is an automated notification from the Asset Management System.</p>
-            <p>Please do not reply to this email.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    return wrapEmail({
+      title: 'New Asset Request Submitted',
+      preheader: `${requesterName} requested ${assetName}`,
+      bodyHtml: [
+        paragraph(`Hello ${adminName},`),
+        paragraph('A new asset request has been submitted and requires your attention:'),
+        heading('Request Details'),
+        detailTable([
+          ['Requester:', requesterName],
+          ['Asset:', assetName],
+          ['Type:', assetType],
+          ['Status:', badge('Submitted', 'info')],
+        ]),
+        reason ? heading('Request Details', 3) + callout(reason) : '',
+        paragraph('Please review and take appropriate action on this request in your dashboard.'),
+      ].join(''),
+      footerHtml: systemFooter(),
+    });
   }
 
   // Generate text email for admin new request
@@ -879,63 +607,23 @@ Please do not reply to this email.
 
   // Generate HTML email for user new request
   generateUserNewRequestEmailHtml(userName, assetName, assetType, reason) {
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>Your Device Request Has Been Submitted</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-          .status-badge { 
-            display: inline-block; 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            color: white; 
-            font-weight: bold;
-            background-color: #3b82f6;
-          }
-          .content { background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; }
-          .footer { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #6b7280; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>Your Device Request Has Been Submitted</h1>
-            <p>Hello ${userName},</p>
-          </div>
-          
-          <div class="content">
-            <p>Your device request has been successfully submitted and is now under review:</p>
-            
-            <h2>Request Details</h2>
-            <ul>
-              <li><strong>Device:</strong> ${assetName}</li>
-              <li><strong>Type:</strong> ${assetType}</li>
-              <li><strong>Status:</strong> <span class="status-badge">Submitted</span></li>
-            </ul>
-            
-            ${reason ? `
-            <h3>Your Request Details</h3>
-            <p style="background: #f8f9fa; padding: 15px; border-radius: 4px; border-left: 4px solid #3b82f6;">
-              ${reason}
-            </p>
-            ` : ''}
-            
-            <p>You will be notified once your request is reviewed and a decision is made. You can track the progress in your dashboard.</p>
-          </div>
-          
-          <div class="footer">
-            <p>This is an automated notification from the Asset Management System.</p>
-            <p>Please do not reply to this email.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    return wrapEmail({
+      title: 'Your Device Request Has Been Submitted',
+      preheader: `Your request for ${assetName} is under review`,
+      bodyHtml: [
+        paragraph(`Hello ${userName},`),
+        paragraph('Your device request has been successfully submitted and is now under review:'),
+        heading('Request Details'),
+        detailTable([
+          ['Device:', assetName],
+          ['Type:', assetType],
+          ['Status:', badge('Submitted', 'info')],
+        ]),
+        reason ? heading('Your Request Details', 3) + callout(reason) : '',
+        paragraph('You will be notified once your request is reviewed and a decision is made. You can track the progress in your dashboard.'),
+      ].join(''),
+      footerHtml: systemFooter(),
+    });
   }
 
   // Generate text email for user new request
@@ -966,64 +654,24 @@ Please do not reply to this email.
 
   // Generate HTML email for manager new request
   generateManagerNewRequestEmailHtml(managerName, requesterName, assetName, assetType, reason) {
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>Team Member Submitted New Device Request</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-          .status-badge { 
-            display: inline-block; 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            color: white; 
-            font-weight: bold;
-            background-color: #3b82f6;
-          }
-          .content { background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; }
-          .footer { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #6b7280; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>Team Member Submitted New Device Request</h1>
-            <p>Hello ${managerName},</p>
-          </div>
-          
-          <div class="content">
-            <p>A team member from your department has submitted a new device request:</p>
-            
-            <h2>Request Details</h2>
-            <ul>
-              <li><strong>Requester:</strong> ${requesterName}</li>
-              <li><strong>Device:</strong> ${assetName}</li>
-              <li><strong>Type:</strong> ${assetType}</li>
-              <li><strong>Status:</strong> <span class="status-badge">Submitted</span></li>
-            </ul>
-            
-            ${reason ? `
-            <h3>Request Details</h3>
-            <p style="background: #f8f9fa; padding: 15px; border-radius: 4px; border-left: 4px solid #3b82f6;">
-              ${reason}
-            </p>
-            ` : ''}
-            
-            <p>You can review this request and provide input in your dashboard. The request will be processed by the admin team.</p>
-          </div>
-          
-          <div class="footer">
-            <p>This is an automated notification from the Devices Management System.</p>
-            <p>Please do not reply to this email.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    return wrapEmail({
+      title: 'Team Member Submitted New Device Request',
+      preheader: `${requesterName} requested ${assetName}`,
+      bodyHtml: [
+        paragraph(`Hello ${managerName},`),
+        paragraph('A team member from your department has submitted a new device request:'),
+        heading('Request Details'),
+        detailTable([
+          ['Requester:', requesterName],
+          ['Device:', assetName],
+          ['Type:', assetType],
+          ['Status:', badge('Submitted', 'info')],
+        ]),
+        reason ? heading('Request Details', 3) + callout(reason) : '',
+        paragraph('You can review this request and provide input in your dashboard. The request will be processed by the admin team.'),
+      ].join(''),
+      footerHtml: systemFooter('Devices Management System'),
+    });
   }
 
   // Generate text email for manager new request
@@ -1055,75 +703,24 @@ Please do not reply to this email.
 
   // Generate HTML email for user issue creation
   generateUserIssueCreationEmailHtml(userName, title, description, priority, category) {
-    const priorityColors = {
-      'critical': '#ef4444',
-      'high': '#f59e0b',
-      'medium': '#3b82f6',
-      'low': '#10b981'
-    };
-
-    const priorityText = {
-      'critical': 'Critical',
-      'high': 'High',
-      'medium': 'Medium',
-      'low': 'Low'
-    };
-
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>Issue Reported Successfully</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-          .priority-badge { 
-            display: inline-block; 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            color: white; 
-            font-weight: bold;
-            background-color: ${priorityColors[priority]};
-          }
-          .content { background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; }
-          .footer { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #6b7280; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>Issue Reported Successfully</h1>
-            <p>Hello ${userName},</p>
-          </div>
-          
-          <div class="content">
-            <p>Your issue has been successfully reported and is being reviewed:</p>
-            
-            <h2>Issue Details</h2>
-            <ul>
-              <li><strong>Title:</strong> ${title}</li>
-              <li><strong>Priority:</strong> <span class="priority-badge">${priorityText[priority]}</span></li>
-              ${category ? `<li><strong>Category:</strong> ${category}</li>` : ''}
-            </ul>
-            
-            <h3>Description</h3>
-            <p style="background: #f8f9fa; padding: 15px; border-radius: 4px; border-left: 4px solid #3b82f6;">
-              ${description}
-            </p>
-            
-            <p>You will be notified once your issue is reviewed and assigned. You can track the progress in your dashboard.</p>
-          </div>
-          
-          <div class="footer">
-            <p>This is an automated notification from the Asset Management System.</p>
-            <p>Please do not reply to this email.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    return wrapEmail({
+      title: 'Issue Reported Successfully',
+      preheader: `Your issue "${title}" is being reviewed`,
+      bodyHtml: [
+        paragraph(`Hello ${userName},`),
+        paragraph('Your issue has been successfully reported and is being reviewed:'),
+        heading('Issue Details'),
+        detailTable([
+          ['Title:', title],
+          ['Priority:', badge(PRIORITY_TEXT[priority], PRIORITY_KIND[priority])],
+          category && ['Category:', category],
+        ]),
+        heading('Description', 3),
+        callout(description),
+        paragraph('You will be notified once your issue is reviewed and assigned. You can track the progress in your dashboard.'),
+      ].join(''),
+      footerHtml: systemFooter(),
+    });
   }
 
   // Generate text email for user issue creation
@@ -1159,77 +756,26 @@ Please do not reply to this email.
 
   // Generate HTML email for manager issue creation
   generateManagerIssueCreationEmailHtml(managerName, reporterName, title, description, priority, category, assetName) {
-    const priorityColors = {
-      'critical': '#ef4444',
-      'high': '#f59e0b',
-      'medium': '#3b82f6',
-      'low': '#10b981'
-    };
-
-    const priorityText = {
-      'critical': 'Critical',
-      'high': 'High',
-      'medium': 'Medium',
-      'low': 'Low'
-    };
-
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>Team Member Reported New Issue</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-          .priority-badge { 
-            display: inline-block; 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            color: white; 
-            font-weight: bold;
-            background-color: ${priorityColors[priority]};
-          }
-          .content { background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; }
-          .footer { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #6b7280; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>Team Member Reported New Issue</h1>
-            <p>Hello ${managerName},</p>
-          </div>
-          
-          <div class="content">
-            <p>A team member from your department has reported a new issue:</p>
-            
-            <h2>Issue Details</h2>
-            <ul>
-              <li><strong>Reporter:</strong> ${reporterName}</li>
-              <li><strong>Title:</strong> ${title}</li>
-              <li><strong>Priority:</strong> <span class="priority-badge">${priorityText[priority]}</span></li>
-              ${category ? `<li><strong>Category:</strong> ${category}</li>` : ''}
-              ${assetName ? `<li><strong>Asset:</strong> ${assetName}</li>` : ''}
-            </ul>
-            
-            <h3>Description</h3>
-            <p style="background: #f8f9fa; padding: 15px; border-radius: 4px; border-left: 4px solid #3b82f6;">
-              ${description}
-            </p>
-            
-            <p>Please review this issue and provide input in your dashboard. The issue will be processed by the admin team.</p>
-          </div>
-          
-          <div class="footer">
-            <p>This is an automated notification from the Asset Management System.</p>
-            <p>Please do not reply to this email.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    return wrapEmail({
+      title: 'Team Member Reported New Issue',
+      preheader: `${reporterName} reported: ${title}`,
+      bodyHtml: [
+        paragraph(`Hello ${managerName},`),
+        paragraph('A team member from your department has reported a new issue:'),
+        heading('Issue Details'),
+        detailTable([
+          ['Reporter:', reporterName],
+          ['Title:', title],
+          ['Priority:', badge(PRIORITY_TEXT[priority], PRIORITY_KIND[priority])],
+          category && ['Category:', category],
+          assetName && ['Asset:', assetName],
+        ]),
+        heading('Description', 3),
+        callout(description),
+        paragraph('Please review this issue and provide input in your dashboard. The issue will be processed by the admin team.'),
+      ].join(''),
+      footerHtml: systemFooter(),
+    });
   }
 
   // Generate text email for manager issue creation
@@ -1267,77 +813,26 @@ Please do not reply to this email.
 
   // Generate HTML email for admin issue creation
   generateAdminIssueCreationEmailHtml(adminName, reporterName, title, description, priority, category, assetName) {
-    const priorityColors = {
-      'critical': '#ef4444',
-      'high': '#f59e0b',
-      'medium': '#3b82f6',
-      'low': '#10b981'
-    };
-
-    const priorityText = {
-      'critical': 'Critical',
-      'high': 'High',
-      'medium': 'Medium',
-      'low': 'Low'
-    };
-
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>New Issue Reported</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-          .priority-badge { 
-            display: inline-block; 
-            padding: 8px 16px; 
-            border-radius: 20px; 
-            color: white; 
-            font-weight: bold;
-            background-color: ${priorityColors[priority]};
-          }
-          .content { background: white; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; }
-          .footer { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #6b7280; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>New Issue Reported</h1>
-            <p>Hello ${adminName},</p>
-          </div>
-          
-          <div class="content">
-            <p>A new issue has been reported and requires your attention:</p>
-            
-            <h2>Issue Details</h2>
-            <ul>
-              <li><strong>Reporter:</strong> ${reporterName}</li>
-              <li><strong>Title:</strong> ${title}</li>
-              <li><strong>Priority:</strong> <span class="priority-badge">${priorityText[priority]}</span></li>
-              ${category ? `<li><strong>Category:</strong> ${category}</li>` : ''}
-              ${assetName ? `<li><strong>Asset:</strong> ${assetName}</li>` : ''}
-            </ul>
-            
-            <h3>Description</h3>
-            <p style="background: #f8f9fa; padding: 15px; border-radius: 4px; border-left: 4px solid #3b82f6;">
-              ${description}
-            </p>
-            
-            <p>Please review and take appropriate action on this issue in your dashboard.</p>
-          </div>
-          
-          <div class="footer">
-            <p>This is an automated notification from the Asset Management System.</p>
-            <p>Please do not reply to this email.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    return wrapEmail({
+      title: 'New Issue Reported',
+      preheader: `${reporterName} reported: ${title}`,
+      bodyHtml: [
+        paragraph(`Hello ${adminName},`),
+        paragraph('A new issue has been reported and requires your attention:'),
+        heading('Issue Details'),
+        detailTable([
+          ['Reporter:', reporterName],
+          ['Title:', title],
+          ['Priority:', badge(PRIORITY_TEXT[priority], PRIORITY_KIND[priority])],
+          category && ['Category:', category],
+          assetName && ['Asset:', assetName],
+        ]),
+        heading('Description', 3),
+        callout(description),
+        paragraph('Please review and take appropriate action on this issue in your dashboard.'),
+      ].join(''),
+      footerHtml: systemFooter(),
+    });
   }
 
   // Generate text email for admin issue creation
@@ -1411,123 +906,28 @@ Please do not reply to this email.
   generateWelcomeEmailHtml(userName, userEmail, temporaryPassword) {
     const loginUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>Welcome to Caava Group Devices</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f3f4f6; }
-          .container { max-width: 600px; margin: 20px auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-          .header { 
-            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%); 
-            padding: 40px 20px; 
-            text-align: center; 
-            color: white; 
-          }
-          .logo { font-size: 48px; font-weight: bold; margin-bottom: 10px; }
-          .company { font-size: 24px; font-weight: 700; margin-bottom: 5px; }
-          .subtitle { font-size: 14px; opacity: 0.9; }
-          .content { padding: 30px 20px; }
-          .welcome-title { color: #1f2937; font-size: 24px; font-weight: bold; margin-bottom: 15px; }
-          .message { color: #4b5563; margin-bottom: 20px; }
-          .login-box { 
-            background: #f9fafb; 
-            border: 2px solid #e5e7eb; 
-            border-radius: 8px; 
-            padding: 20px; 
-            margin: 20px 0; 
-          }
-          .login-title { font-weight: 600; color: #1f2937; margin-bottom: 10px; }
-          .login-url { 
-            color: #3b82f6; 
-            font-size: 16px; 
-            word-break: break-all; 
-            text-decoration: none; 
-          }
-          .credentials { 
-            background: #fef3c7; 
-            border-left: 4px solid #f59e0b; 
-            padding: 15px; 
-            margin: 20px 0; 
-            border-radius: 4px; 
-          }
-          .credentials-title { font-weight: 600; color: #92400e; margin-bottom: 10px; }
-          .credential-item { color: #78350f; margin: 8px 0; }
-          .next-steps { margin: 20px 0; }
-          .next-steps-title { font-weight: 600; color: #1f2937; margin-bottom: 10px; }
-          .step { color: #4b5563; margin: 8px 0; padding-left: 10px; }
-          .footer { 
-            background: #f9fafb; 
-            padding: 20px; 
-            text-align: center; 
-            color: #6b7280; 
-            font-size: 12px; 
-          }
-          .button { 
-            display: inline-block; 
-            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%); 
-            color: white; 
-            padding: 12px 24px; 
-            text-decoration: none; 
-            border-radius: 6px; 
-            font-weight: 600; 
-            margin: 15px 0; 
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <div class="logo">C</div>
-            <div class="company">Caava Group</div>
-            <div class="subtitle">Assets Management System</div>
-          </div>
-          
-          <div class="content">
-            <h1 class="welcome-title">Welcome ${userName}! 🎉</h1>
-            
-            <div class="message">
-              Your account has been successfully created. You can now access the Caava Group Assets Management System to manage your assets and track your requests.
-            </div>
-            
-            <div class="login-box">
-              <div class="login-title">🔗 Access Your Account</div>
-              <a href="${loginUrl}" class="login-url">${loginUrl}</a>
-            </div>
-            
-            <div class="credentials">
-              <div class="credentials-title">📧 Your Login Credentials:</div>
-              <div class="credential-item"><strong>Email:</strong> ${userEmail}</div>
-              <div class="credential-item"><strong>Temporary Password:</strong> ${temporaryPassword}</div>
-            </div>
-            
-            <div class="next-steps">
-              <div class="next-steps-title">🚀 Next Steps:</div>
-              <div class="step">1. Click the login URL above or visit the site</div>
-              <div class="step">2. Log in with your email and temporary password</div>
-              <div class="step">3. Change your password in the security settings</div>
-              <div class="step">4. Complete your profile information</div>
-            </div>
-            
-            <div class="message">
-              If you have any questions or need assistance, please don't hesitate to contact your administrator or the support team.
-            </div>
-            
-            <div style="text-align: center;">
-              <a href="${loginUrl}" class="button">Login to Your Account</a>
-            </div>
-          </div>
-          
-          <div class="footer">
-            <p>This is an automated notification from the Caava Group Assets Management System.</p>
-            <p>© ${new Date().getFullYear()} Caava Group. All rights reserved.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    return wrapEmail({
+      title: 'Caava Group',
+      subtitle: 'Assets Management System',
+      preheader: 'Your account has been created',
+      bodyHtml: [
+        heading(`Welcome ${userName}! 🎉`, 1),
+        paragraph('Your account has been successfully created. You can now access the Caava Group Assets Management System to manage your assets and track your requests.'),
+        panel(`<div class="em-h" style="margin:0 0 8px;font-weight:700;color:${LIGHT.heading};">🔗 Access Your Account</div>${link(loginUrl, loginUrl)}`),
+        callout(`<div style="margin:0 0 8px;font-weight:700;">📧 Your Login Credentials:</div>
+          <div style="margin:6px 0;"><strong>Email:</strong> ${userEmail}</div>
+          <div style="margin:6px 0;"><strong>Temporary Password:</strong> ${temporaryPassword}</div>`),
+        `<div class="em-h" style="margin:20px 0 8px;font-weight:700;color:${LIGHT.heading};">🚀 Next Steps:</div>`,
+        paragraph('1. Click the login URL above or visit the site', { margin: '0 0 6px' }),
+        paragraph('2. Log in with your email and temporary password', { margin: '0 0 6px' }),
+        paragraph('3. Change your password in the security settings', { margin: '0 0 6px' }),
+        paragraph('4. Complete your profile information', { margin: '0 0 14px' }),
+        paragraph("If you have any questions or need assistance, please don't hesitate to contact your administrator or the support team."),
+        button('Login to Your Account', loginUrl, { align: 'center' }),
+      ].join(''),
+      footerHtml: `<p style="margin:0 0 6px;">This is an automated notification from the Caava Group Assets Management System.</p>
+      <p style="margin:0;">© ${new Date().getFullYear()} Caava Group. All rights reserved.</p>`,
+    });
   }
 
   // Generate text email for welcome/user creation
@@ -1566,122 +966,25 @@ This is an automated notification from the Caava Group Assets Management System.
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     const userManagementUrl = `${frontendUrl}/admin/users`;
 
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>New User Registration</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background: #f3f4f6; }
-          .container { max-width: 600px; margin: 20px auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
-          .header { 
-            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%); 
-            padding: 30px 20px; 
-            text-align: center; 
-            color: white; 
-          }
-          .header h1 { margin: 0; font-size: 24px; }
-          .content { padding: 30px 20px; }
-          .alert-box { 
-            background: #fef3c7; 
-            border-left: 4px solid #f59e0b; 
-            padding: 15px; 
-            margin: 20px 0; 
-            border-radius: 4px; 
-          }
-          .alert-title { font-weight: 600; color: #92400e; margin-bottom: 10px; }
-          .user-details { 
-            background: #f9fafb; 
-            border: 1px solid #e5e7eb; 
-            border-radius: 8px; 
-            padding: 20px; 
-            margin: 20px 0; 
-          }
-          .detail-row { 
-            display: flex; 
-            justify-content: space-between; 
-            padding: 10px 0; 
-            border-bottom: 1px solid #e5e7eb; 
-          }
-          .detail-row:last-child { border-bottom: none; }
-          .detail-label { font-weight: 600; color: #4b5563; }
-          .detail-value { color: #1f2937; }
-          .button { 
-            display: inline-block; 
-            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%); 
-            color: white; 
-            padding: 12px 24px; 
-            text-decoration: none; 
-            border-radius: 6px; 
-            font-weight: 600; 
-            margin: 15px 0; 
-          }
-          .footer { 
-            background: #f9fafb; 
-            padding: 20px; 
-            text-align: center; 
-            color: #6b7280; 
-            font-size: 12px; 
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>New User Registration</h1>
-          </div>
-          
-          <div class="content">
-            <p>Hello ${adminName},</p>
-            
-            <div class="alert-box">
-              <div class="alert-title">Action Required</div>
-              <p style="color: #78350f; margin: 0;">A new user has successfully registered and created their account.</p>
-            </div>
-            
-            <div class="user-details">
-              <h2 style="margin-top: 0; color: #1f2937;">User Details</h2>
-              <div class="detail-row">
-                <span class="detail-label">Name:</span>
-                <span class="detail-value">${userName}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Email:</span>
-                <span class="detail-value">${userEmail}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Position:</span>
-                <span class="detail-value">${position}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Department:</span>
-                <span class="detail-value">${department}</span>
-              </div>
-              <div class="detail-row">
-                <span class="detail-label">Phone:</span>
-                <span class="detail-value">${phone}</span>
-              </div>
-            </div>
-            
-            <p style="color: #4b5563;">
-              The user has been automatically assigned the "user" role and can now access the system. 
-              You can review and manage this user in the User Management section.
-            </p>
-            
-            <div style="text-align: center;">
-              <a href="${userManagementUrl}" class="button">View User Management</a>
-            </div>
-          </div>
-          
-          <div class="footer">
-            <p>This is an automated notification from the Caava Group Assets Management System.</p>
-            <p>© ${new Date().getFullYear()} Caava Group. All rights reserved.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    return wrapEmail({
+      title: 'New User Registration',
+      preheader: `${userName} has registered`,
+      bodyHtml: [
+        paragraph(`Hello ${adminName},`),
+        callout('<strong>Action Required</strong><br>A new user has successfully registered and created their account.'),
+        panel(`<div class="em-h" style="margin:0 0 4px;font-size:18px;font-weight:700;color:${LIGHT.heading};">User Details</div>` + detailTable([
+          ['Name:', userName],
+          ['Email:', userEmail],
+          ['Position:', position],
+          ['Department:', department],
+          ['Phone:', phone],
+        ])),
+        paragraph('The user has been automatically assigned the "user" role and can now access the system. You can review and manage this user in the User Management section.'),
+        button('View User Management', userManagementUrl, { align: 'center' }),
+      ].join(''),
+      footerHtml: `<p style="margin:0 0 6px;">This is an automated notification from the Caava Group Assets Management System.</p>
+      <p style="margin:0;">© ${new Date().getFullYear()} Caava Group. All rights reserved.</p>`,
+    });
   }
 
   // Generate text email for admin new user registration notification
@@ -1893,201 +1196,77 @@ This is an automated notification from the Caava Group Assets Management System.
     const issuesUrl = `${frontendUrl}/admin/issues`;
     const requestsUrl = `${frontendUrl}/admin/asset-requests`;
 
-    const priorityColors = {
-      'critical': '#ef4444',
-      'high': '#f59e0b',
-      'medium': '#3b82f6',
-      'low': '#10b981',
-      'urgent': '#ef4444'
-    };
-
-    const statusColors = {
-      'open': '#ef4444',
-      'in_progress': '#f59e0b',
-      'scheduled': '#3b82f6',
-      'pending': '#f59e0b'
-    };
-
     const formatDate = (dateString) => {
       if (!dateString) return 'N/A';
       const date = new Date(dateString);
       return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
     };
 
+    const titleCell = (name, ...lines) => td(
+      `<div class="em-h" style="font-weight:600;color:${LIGHT.heading};">${name}</div>` +
+      lines.filter(Boolean).map(l => `<div class="em-muted" style="font-size:12px;color:${LIGHT.muted};margin-top:4px;">${l}</div>`).join('')
+    );
+
     const issuesListHtml = unresolvedIssues.length > 0
       ? unresolvedIssues.slice(0, 10).map(issue => `
           <tr>
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
-              <div style="font-weight: 600; color: #1f2937;">${issue.title || 'Untitled Issue'}</div>
-              ${issue.description ? `<div style="font-size: 12px; color: #6b7280; margin-top: 4px;">${(issue.description || '').substring(0, 160)}${(issue.description || '').length > 160 ? '…' : ''}</div>` : ''}
-              <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">Reported By: ${issue.reported_by_name || 'Unknown'} • ${formatDate(issue.created_at)}</div>
-            </td>
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
-              <span style="
-                display: inline-block;
-                padding: 4px 12px;
-                border-radius: 12px;
-                font-size: 12px;
-                font-weight: 600;
-                background-color: ${statusColors[issue.status] || '#6b7280'}20;
-                color: ${statusColors[issue.status] || '#6b7280'};
-              ">${issue.status.replace('_', ' ').toUpperCase()}</span>
-            </td>
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
-              <span style="
-                display: inline-block;
-                padding: 4px 12px;
-                border-radius: 12px;
-                font-size: 12px;
-                font-weight: 600;
-                background-color: ${priorityColors[issue.priority] || '#6b7280'}20;
-                color: ${priorityColors[issue.priority] || '#6b7280'};
-              ">${(issue.priority || 'medium').toUpperCase()}</span>
-            </td>
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">
-              ${issue.reported_by_name || 'Unknown'}
-            </td>
+            ${titleCell(
+              issue.title || 'Untitled Issue',
+              issue.description ? `${(issue.description || '').substring(0, 160)}${(issue.description || '').length > 160 ? '…' : ''}` : '',
+              `Reported By: ${issue.reported_by_name || 'Unknown'} • ${formatDate(issue.created_at)}`
+            )}
+            ${td(badge(issue.status.replace('_', ' ').toUpperCase(), kindFor(issue.status)))}
+            ${td(badge((issue.priority || 'medium').toUpperCase(), kindFor(issue.priority || 'medium')))}
+            ${td(`${issue.reported_by_name || 'Unknown'}`, { muted: true })}
           </tr>
         `).join('')
-      : '<tr><td colspan="4" style="padding: 20px; text-align: center; color: #6b7280;">No unresolved issues found.</td></tr>';
+      : `<tr>${td('No unresolved issues found.', { muted: true, colspan: 4, center: true })}</tr>`;
 
     const requestsListHtml = pendingRequests.length > 0
       ? pendingRequests.slice(0, 10).map(request => `
           <tr>
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
-              <div style="font-weight: 600; color: #1f2937;">${request.asset_name || 'Unnamed Asset'}</div>
-              <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
-                ${request.asset_type || ''} ${request.category ? `• ${request.category}` : ''}
-              </div>
-              ${request.reason ? `<div style=\"font-size: 12px; color: #6b7280; margin-top: 4px;\">Reason: ${(request.reason || '').substring(0, 160)}${(request.reason || '').length > 160 ? '…' : ''}</div>` : ''}
-            </td>
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
-              <span style="
-                display: inline-block;
-                padding: 4px 12px;
-                border-radius: 12px;
-                font-size: 12px;
-                font-weight: 600;
-                background-color: ${priorityColors[request.priority] || '#6b7280'}20;
-                color: ${priorityColors[request.priority] || '#6b7280'};
-              ">${(request.priority || 'medium').toUpperCase()}</span>
-            </td>
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">
-              ${request.user_name || 'Unknown'} ${request.user_email ? `(${request.user_email})` : ''}
-            </td>
-            <td style="padding: 12px; border-bottom: 1px solid #e5e7eb; color: #6b7280; font-size: 14px;">
-              ${formatDate(request.created_at)}
-            </td>
+            ${titleCell(
+              request.asset_name || 'Unnamed Asset',
+              `${request.asset_type || ''} ${request.category ? `• ${request.category}` : ''}`,
+              request.reason ? `Reason: ${(request.reason || '').substring(0, 160)}${(request.reason || '').length > 160 ? '…' : ''}` : ''
+            )}
+            ${td(badge((request.priority || 'medium').toUpperCase(), kindFor(request.priority || 'medium')))}
+            ${td(`${request.user_name || 'Unknown'} ${request.user_email ? `(${request.user_email})` : ''}`, { muted: true })}
+            ${td(formatDate(request.created_at), { muted: true })}
           </tr>
         `).join('')
-      : '<tr><td colspan="4" style="padding: 20px; text-align: center; color: #6b7280;">No pending asset requests found.</td></tr>';
+      : `<tr>${td('No pending asset requests found.', { muted: true, colspan: 4, center: true })}</tr>`;
 
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>Weekly Summary - Unresolved Issues & Pending Requests</title>
-        <style>
-          body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f8fafc; }
-          .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%); color: white; padding: 30px; border-radius: 12px 12px 0 0; text-align: center; }
-          .content { background: white; padding: 30px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-          .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 30px 0; }
-          .stat-card { background: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #3b82f6; }
-          .stat-number { font-size: 36px; font-weight: 700; color: #3b82f6; margin: 10px 0; }
-          .stat-label { font-size: 14px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
-          .section { margin: 40px 0; }
-          .section-title { font-size: 20px; font-weight: 700; color: #1f2937; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e5e7eb; }
-          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-          th { background: #f8f9fa; padding: 12px; text-align: left; font-weight: 600; color: #374151; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
-          td { padding: 12px; border-bottom: 1px solid #e5e7eb; }
-          .button { display: inline-block; background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%); color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 20px 10px 0 0; }
-          .footer { margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #6b7280; text-align: center; }
-          .more-info { margin-top: 15px; font-size: 14px; color: #6b7280; font-style: italic; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1 style="margin: 0; font-size: 28px;">📊 Weekly Summary Report</h1>
-            <p style="margin: 10px 0 0 0; opacity: 0.9;">Caava Group Assets Management System</p>
-          </div>
-          
-          <div class="content">
-            <p>Hello ${adminName},</p>
-            
-            <p>This is your weekly summary of unresolved issues and pending asset requests that require your attention.</p>
-            
-            <div class="stats-grid">
-              <div class="stat-card">
-                <div class="stat-label">Unresolved Issues</div>
-                <div class="stat-number">${unresolvedIssues.length}</div>
-                <div style="font-size: 14px; color: #6b7280; margin-top: 10px;">
-                  Issues that are still open, in progress, or scheduled
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-label">Pending Asset Requests</div>
-                <div class="stat-number">${pendingRequests.length}</div>
-                <div style="font-size: 14px; color: #6b7280; margin-top: 10px;">
-                  Requests awaiting approval or denial
-                </div>
-              </div>
-            </div>
+    const bodyHtml = [
+      paragraph(`Hello ${adminName},`),
+      paragraph('This is your weekly summary of unresolved issues and pending asset requests that require your attention.'),
+      statCards([
+        { label: 'Unresolved Issues', value: unresolvedIssues.length, note: 'Issues that are still open, in progress, or scheduled' },
+        { label: 'Pending Asset Requests', value: pendingRequests.length, note: 'Requests awaiting approval or denial' },
+      ]),
+      sectionTitle(`🔴 Unresolved Issues (${unresolvedIssues.length})`),
+      unresolvedIssues.length > 0
+        ? dataTable(['Issue', 'Status', 'Priority', 'Reported By'], issuesListHtml) +
+          (unresolvedIssues.length > 10 ? muted(`... and ${unresolvedIssues.length - 10} more unresolved issues`) : '') +
+          button('View All Issues', issuesUrl)
+        : muted('No unresolved issues. Great work! 🎉'),
+      sectionTitle(`⏳ Pending Asset Requests (${pendingRequests.length})`),
+      pendingRequests.length > 0
+        ? dataTable(['Asset', 'Priority', 'Requested By', 'Requested Date'], requestsListHtml) +
+          (pendingRequests.length > 10 ? muted(`... and ${pendingRequests.length - 10} more pending requests`) : '') +
+          button('View All Requests', requestsUrl)
+        : muted('No pending asset requests. All caught up! ✅'),
+    ].join('');
 
-            <div class="section">
-              <h2 class="section-title">🔴 Unresolved Issues (${unresolvedIssues.length})</h2>
-              ${unresolvedIssues.length > 0 ? `
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Issue</th>
-                      <th>Status</th>
-                      <th>Priority</th>
-                      <th>Reported By</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${issuesListHtml}
-                  </tbody>
-                </table>
-                ${unresolvedIssues.length > 10 ? `<div class="more-info">... and ${unresolvedIssues.length - 10} more unresolved issues</div>` : ''}
-                <a href="${issuesUrl}" class="button">View All Issues</a>
-              ` : '<p style="color: #6b7280;">No unresolved issues. Great work! 🎉</p>'}
-            </div>
-
-            <div class="section">
-              <h2 class="section-title">⏳ Pending Asset Requests (${pendingRequests.length})</h2>
-              ${pendingRequests.length > 0 ? `
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Asset</th>
-                      <th>Priority</th>
-                      <th>Requested By</th>
-                      <th>Requested Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    ${requestsListHtml}
-                  </tbody>
-                </table>
-                ${pendingRequests.length > 10 ? `<div class="more-info">... and ${pendingRequests.length - 10} more pending requests</div>` : ''}
-                <a href="${requestsUrl}" class="button">View All Requests</a>
-              ` : '<p style="color: #6b7280;">No pending asset requests. All caught up! ✅</p>'}
-            </div>
-
-            <div class="footer">
-              <p><strong>Next Summary:</strong> You will receive the next weekly summary in 7 days.</p>
-              <p style="margin-top: 10px;">This is an automated notification from the Caava Group Assets Management System.</p>
-              <p>© ${new Date().getFullYear()} Caava Group. All rights reserved.</p>
-            </div>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    return wrapEmail({
+      title: '📊 Weekly Summary Report',
+      subtitle: 'Caava Group Assets Management System',
+      preheader: `${unresolvedIssues.length} unresolved issues, ${pendingRequests.length} pending requests`,
+      bodyHtml,
+      footerHtml: `<p style="margin:0 0 6px;"><strong>Next Summary:</strong> You will receive the next weekly summary in 7 days.</p>
+      <p style="margin:0 0 6px;">This is an automated notification from the Caava Group Assets Management System.</p>
+      <p style="margin:0;">© ${new Date().getFullYear()} Caava Group. All rights reserved.</p>`,
+    });
   }
 
   // Generate text email for weekly summary
@@ -2201,8 +1380,8 @@ This is an automated notification from the Caava Group Assets Management System.
         doc.on('error', reject);
 
         // Brand colors
-        const primary = '#10b981';
-        const secondary = '#3b82f6';
+        const primary = '#152F52';
+        const secondary = '#152F52';
 
         // Header banner
         const pageWidth = doc.page.width;

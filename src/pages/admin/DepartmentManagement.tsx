@@ -667,7 +667,7 @@ const DepartmentManagement: React.FC = () => {
         {selectedDepartmentIds.length > 0 && (
           <div className="mb-2 flex items-center space-x-4">
             <span className="text-sm">{selectedDepartmentIds.length} selected</span>
-            <button onClick={handleBulkDeleteDepartments} className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm">Delete Selected</button>
+            <button onClick={handleBulkDeleteDepartments} className="px-3 py-1 bg-primary text-white rounded hover:bg-primary/90 text-sm">Delete Selected</button>
           </div>
         )}
 
@@ -693,7 +693,7 @@ const DepartmentManagement: React.FC = () => {
                         setShowEditDepartmentModal(true);
                       }
                     }}
-                    className="p-1 text-yellow-600 rounded hover:bg-yellow-100"
+                    className="p-1 text-brand-orange rounded hover:bg-brand-orange/25"
                     title="Edit Root Department"
                   >
                     <EditIcon className="w-5 h-5" />
@@ -705,7 +705,7 @@ const DepartmentManagement: React.FC = () => {
                         setShowDeleteModal(true);
                       }
                     }}
-                    className="p-1 text-red-600 rounded hover:bg-red-100"
+                    className="p-1 text-primary rounded hover:bg-primary/10"
                     title="Delete Root Department"
                   >
                     <TrashIcon className="w-5 h-5" />
@@ -757,14 +757,14 @@ const DepartmentManagement: React.FC = () => {
                                   setNewDepartment({ name: dept.name, description: dept.description, location: dept.location, manager: dept.manager !== 'Unassigned' ? dept.manager : '', manager_id: ((dept as any).manager_id as any) || '', parent_id: (dept as any).parent_id || '' });
                                   setShowEditDepartmentModal(true);
                                 }}
-                                className="p-1 text-yellow-600 rounded hover:bg-yellow-100"
+                                className="p-1 text-brand-orange rounded hover:bg-brand-orange/25"
                                 title="Edit Department"
                               >
                                 <EditIcon className="w-5 h-5" />
                               </button>
                               <button
                                 onClick={() => { setSelectedDepartment(dept); setShowDeleteModal(true); }}
-                                className="p-1 text-red-600 rounded hover:bg-red-100"
+                                className="p-1 text-primary rounded hover:bg-primary/10"
                                 title="Delete Department"
                               >
                                 <TrashIcon className="w-5 h-5" />
@@ -1005,8 +1005,8 @@ const DepartmentManagement: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="w-full max-w-md p-6 mx-4 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
             <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-                <TrashIcon className="h-6 w-6 text-red-600" />
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 dark:bg-primary/20">
+                <TrashIcon className="h-6 w-6 text-primary" />
               </div>
               <h3 className="mt-4 text-lg font-medium text-gray-900">Delete Department</h3>
               <p className="mt-2 text-sm text-gray-500">
@@ -1016,7 +1016,7 @@ const DepartmentManagement: React.FC = () => {
             <div className="mt-6 flex space-x-3">
               <button
                 onClick={handleDeleteDepartment}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700"
+                className="flex-1 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary/90"
               >
                 Delete
               </button>
@@ -1035,8 +1035,8 @@ const DepartmentManagement: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="w-full max-w-md p-6 mx-4 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
             <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-                <svg className="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 dark:bg-primary/20">
+                <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </div>
               <h3 className="mt-4 text-lg font-medium text-gray-900">Delete Departments</h3>
               <p className="mt-2 text-sm text-gray-500">
@@ -1046,7 +1046,7 @@ const DepartmentManagement: React.FC = () => {
             <div className="mt-6 flex space-x-3">
               <button
                 onClick={confirmBulkDeleteDepartments}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700"
+                className="flex-1 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary/90"
               >
                 Delete
               </button>

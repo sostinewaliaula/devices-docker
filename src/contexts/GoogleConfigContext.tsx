@@ -5,17 +5,19 @@ interface GoogleConfig {
   enabled: boolean;
   clientId: string;
   allowedDomain: string;
+  /** True once the config request has settled (success or failure). */
+  loaded: boolean;
 }
 
-const GoogleConfigContext = createContext<GoogleConfig>({ enabled: false, clientId: '', allowedDomain: '' });
+const GoogleConfigContext = createContext<GoogleConfig>({ enabled: false, clientId: '', allowedDomain: '', loaded: false });
 
 export const GoogleConfigProvider = ({ children }: { children: ReactNode }) => {
-  const [config, setConfig] = useState<GoogleConfig>({ enabled: false, clientId: '', allowedDomain: '' });
+  const [config, setConfig] = useState<GoogleConfig>({ enabled: false, clientId: '', allowedDomain: '', loaded: false });
 
   useEffect(() => {
     settingsAPI.getGoogleOAuthConfig()
-      .then(setConfig)
-      .catch(() => { /* non-fatal — leave defaults */ });
+      .then(cfg => setConfig({ ...cfg, loaded: true }))
+      .catch(() => setConfig(prev => ({ ...prev, loaded: true }))); // non-fatal — keep defaults
   }, []);
 
   return (

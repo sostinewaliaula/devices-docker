@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import { authAPI, User } from '../services/apiService';
 import mfaService, { MFAFactor, MFAEnrollmentData } from '../services/mfaService';
+import { LAST_ACTIVITY_KEY } from '../hooks/useIdleTimeout';
 
 interface AuthContextType {
   user: User | null;
@@ -21,6 +22,8 @@ interface AuthContextType {
   completeGoogleProfile: (data: { position: string; department_id: string; phone?: string }) => Promise<void>;
   logout: () => void;
   updateProfile: (userData: Partial<User>) => Promise<void>;
+  /** Call after the user uploads/removes their photo so every avatar on screen refreshes. */
+  setAvatarVersion: (version: string | null) => void;
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
   resetPassword: (token: string, password: string) => Promise<void>;
@@ -241,15 +244,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Logout function
   const logout = useCallback(async (): Promise<void> => {
     try {
-      await authAPI.logout();
+      // Best-effort server-side logout. Skip it when the token is already gone
+      // (e.g. another tab signed out first) and never let a slow/unreachable
+      // server keep the user signed in locally.
+      if (localStorage.getItem('authToken')) {
+        await Promise.race([
+          authAPI.logout(),
+          new Promise((resolve) => setTimeout(resolve, 3000)),
+        ]);
+      }
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
       // Clear local storage and state
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
+      localStorage.removeItem(LAST_ACTIVITY_KEY);
       setUser(null);
     }
+  }, []);
+
+  // Sign out this tab when another tab signs out (or the timeout logs it out)
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      // key === null means localStorage.clear() was called in another tab
+      if ((e.key === 'authToken' && !e.newValue) || e.key === null) {
+        setUser(null);
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
   }, []);
 
   // Update profile function
@@ -275,6 +299,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       throw new Error(error.response?.data?.error || 'Profile update failed');
     }
   }, [user]);
+
+  // Reflect a new/removed avatar in state + storage (the image itself lives in the DB)
+  const setAvatarVersion = useCallback((version: string | null): void => {
+    setUser(prev => {
+      if (!prev) return prev;
+      const next = { ...prev, avatar_updated_at: version };
+      try { localStorage.setItem('user', JSON.stringify(next)); } catch { /* storage unavailable */ }
+      return next;
+    });
+  }, []);
 
   // Change password function
   const changePassword = useCallback(async (currentPassword: string, newPassword: string): Promise<void> => {
@@ -385,6 +419,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     completeGoogleProfile,
     logout,
     updateProfile,
+    setAvatarVersion,
     changePassword,
     forgotPassword,
     resetPassword,
@@ -399,7 +434,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     verifyEnrollTotp,
     disableTotp,
     listMfaFactors,
-  }), [user, loading, login, verifyMfaLogin, register, googleLogin, completeGoogleProfile, logout, updateProfile, changePassword, forgotPassword, resetPassword, validateResetToken, verifyResetCode, changePasswordWithCode, isAuthenticated, isAdmin, isManager, startEnrollTotp, verifyEnrollTotp, disableTotp, listMfaFactors]);
+  }), [user, loading, login, verifyMfaLogin, register, googleLogin, completeGoogleProfile, logout, updateProfile, setAvatarVersion, changePassword, forgotPassword, resetPassword, validateResetToken, verifyResetCode, changePasswordWithCode, isAuthenticated, isAdmin, isManager, startEnrollTotp, verifyEnrollTotp, disableTotp, listMfaFactors]);
 
   return (
     <AuthContext.Provider value={value}>

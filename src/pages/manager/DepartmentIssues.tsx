@@ -117,12 +117,12 @@ const DepartmentIssues: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Open':
-        return 'bg-red-100 text-red-800';
+        return 'bg-primary/10 dark:bg-primary/20 text-primary';
       case 'In Progress':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange';
       case 'Resolved':
       case 'Closed':
-        return 'bg-green-100 text-green-800';
+        return 'bg-brand-green/25 dark:bg-brand-green/20 text-secondary dark:text-brand-green';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -131,11 +131,11 @@ const DepartmentIssues: React.FC = () => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'High':
-        return 'bg-red-100 text-red-800';
+        return 'bg-primary/10 dark:bg-primary/20 text-primary';
       case 'Medium':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange';
       case 'Low':
-        return 'bg-green-100 text-green-800';
+        return 'bg-brand-green/25 dark:bg-brand-green/20 text-secondary dark:text-brand-green';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -144,12 +144,12 @@ const DepartmentIssues: React.FC = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'Open':
-        return <AlertCircleIcon className="w-5 h-5 text-red-600" />;
+        return <AlertCircleIcon className="w-5 h-5 text-primary" />;
       case 'In Progress':
-        return <ClockIcon className="w-5 h-5 text-yellow-600" />;
+        return <ClockIcon className="w-5 h-5 text-brand-orange" />;
       case 'Resolved':
       case 'Closed':
-        return <CheckCircleIcon className="w-5 h-5 text-green-600" />;
+        return <CheckCircleIcon className="w-5 h-5 text-secondary dark:text-brand-green" />;
       default:
         return <ArchiveIcon className="w-5 h-5 text-gray-600" />;
     }
@@ -515,7 +515,7 @@ const DepartmentIssues: React.FC = () => {
         const headers = ['Title', 'Description', 'Status', 'Priority', 'Reported By', 'Asset', 'Created At'];
         const escapeHtml = (s: any) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         
-        const thead = `<thead><tr style="background-color: #2563eb; color: white; font-weight: bold;">${headers.map(h => 
+        const thead = `<thead><tr style="background-color: #152F52; color: white; font-weight: bold;">${headers.map(h => 
           `<th style="text-align:left; border:1px solid #ccc; padding:12px; font-size:14px;">${h}</th>`
         ).join('')}</tr></thead>`;
         
@@ -539,7 +539,7 @@ const DepartmentIssues: React.FC = () => {
   <meta charset="utf-8" />
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
-    h1 { color: #2563eb; margin-bottom: 10px; }
+    h1 { color: #152F52; margin-bottom: 10px; }
     .info { color: #666; margin-bottom: 20px; font-size: 14px; }
   </style>
 </head>
@@ -740,7 +740,7 @@ const DepartmentIssues: React.FC = () => {
           <div className="flex flex-wrap gap-2">
             <button
               onClick={handleReportIssue}
-              className="px-6 py-3 bg-gradient-to-r from-primary to-purple-600 text-white rounded-lg hover:from-primary/90 hover:to-purple-600/90 transition-all duration-200 flex items-center font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all duration-200 flex items-center font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               <PlusIcon className="w-5 h-5 mr-2" />
               Report New Issue
@@ -772,8 +772,8 @@ const DepartmentIssues: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-blue-100 rounded-full">
-              <AlertCircleIcon className="w-6 h-6 text-blue-600" />
+            <div className="p-3 mr-4 bg-secondary/10 dark:bg-accent/15 rounded-full">
+              <AlertCircleIcon className="w-6 h-6 text-secondary dark:text-accent" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Issues</p>
@@ -783,8 +783,8 @@ const DepartmentIssues: React.FC = () => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-red-100 rounded-full">
-              <AlertCircleIcon className="w-6 h-6 text-red-600" />
+            <div className="p-3 mr-4 bg-primary/10 dark:bg-primary/20 rounded-full">
+              <AlertCircleIcon className="w-6 h-6 text-primary" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Open Issues</p>
@@ -794,8 +794,8 @@ const DepartmentIssues: React.FC = () => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-yellow-100 rounded-full">
-              <ClockIcon className="w-6 h-6 text-yellow-600" />
+            <div className="p-3 mr-4 bg-brand-orange/15 dark:bg-brand-orange/20 rounded-full">
+              <ClockIcon className="w-6 h-6 text-brand-orange" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">In Progress</p>
@@ -805,8 +805,8 @@ const DepartmentIssues: React.FC = () => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-green-100 rounded-full">
-              <CheckCircleIcon className="w-6 h-6 text-green-600" />
+            <div className="p-3 mr-4 bg-brand-green/25 dark:bg-brand-green/20 rounded-full">
+              <CheckCircleIcon className="w-6 h-6 text-secondary dark:text-brand-green" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Resolved</p>
@@ -873,7 +873,7 @@ const DepartmentIssues: React.FC = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <div className={`p-2 rounded-full ${issue.status === 'Open' ? 'bg-red-100' : issue.status === 'In Progress' ? 'bg-yellow-100' : 'bg-green-100'}`}>
+                      <div className={`p-2 rounded-full ${issue.status === 'Open' ? 'bg-primary/10 dark:bg-primary/20' : issue.status === 'In Progress' ? 'bg-brand-orange/15 dark:bg-brand-orange/20' : 'bg-brand-green/25 dark:bg-brand-green/20'}`}>
                         {getStatusIcon(issue.status)}
                       </div>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{issue.title}</h3>
@@ -920,7 +920,7 @@ const DepartmentIssues: React.FC = () => {
                     </button>
                     <button
                       onClick={() => handleEscalateIssue(issue)}
-                      className="px-4 py-2 text-sm font-medium text-orange-600 border border-orange-600 rounded-lg hover:bg-orange-600 hover:text-white transition-colors"
+                      className="px-4 py-2 text-sm font-medium text-brand-orange border border-brand-orange rounded-lg hover:bg-brand-orange/90 hover:text-secondary transition-colors"
                     >
                       <TrendingUpIcon className="w-4 h-4 mr-1 inline" />
                       Escalate
@@ -956,7 +956,7 @@ const DepartmentIssues: React.FC = () => {
             <div className="space-y-6">
               {/* Issue Header */}
               <div className="flex items-start gap-4">
-                <div className={`p-3 rounded-full ${selectedIssue.status === 'Open' ? 'bg-red-100' : selectedIssue.status === 'In Progress' ? 'bg-yellow-100' : 'bg-green-100'}`}>
+                <div className={`p-3 rounded-full ${selectedIssue.status === 'Open' ? 'bg-primary/10 dark:bg-primary/20' : selectedIssue.status === 'In Progress' ? 'bg-brand-orange/15 dark:bg-brand-orange/20' : 'bg-brand-green/25 dark:bg-brand-green/20'}`}>
                   {getStatusIcon(selectedIssue.status)}
                 </div>
                 <div className="flex-1">
@@ -1035,7 +1035,7 @@ const DepartmentIssues: React.FC = () => {
                               </button>
                               <button
                                 onClick={() => handleDeleteComment(comment.id)}
-                                className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                className="p-1 text-gray-400 hover:text-primary/80 transition-colors"
                                 title="Delete comment"
                               >
                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1095,7 +1095,7 @@ const DepartmentIssues: React.FC = () => {
                     <button
                       onClick={handleSubmitComment}
                       disabled={!newComment.trim() || submittingComment}
-                      className="px-4 py-2 bg-gradient-to-r from-primary to-purple-600 text-white rounded-lg hover:from-primary/90 hover:to-purple-600/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center font-medium"
+                      className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center font-medium"
                     >
                       {submittingComment ? (
                         <>
@@ -1118,13 +1118,13 @@ const DepartmentIssues: React.FC = () => {
                 {selectedIssue.priority !== 'critical' ? (
                   <button
                     onClick={() => handleEscalateIssue(selectedIssue)}
-                    className="flex-1 px-4 py-2 text-orange-600 border border-orange-600 rounded-lg hover:bg-orange-600 hover:text-white transition-colors flex items-center justify-center"
+                    className="flex-1 px-4 py-2 text-brand-orange border border-brand-orange rounded-lg hover:bg-brand-orange/90 hover:text-secondary transition-colors flex items-center justify-center"
                   >
                     <TrendingUpIcon className="w-4 h-4 mr-2" />
                     Escalate to Critical
                   </button>
                 ) : (
-                  <div className="flex-1 px-4 py-2 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-300 dark:border-red-700 rounded-lg flex items-center justify-center">
+                  <div className="flex-1 px-4 py-2 bg-primary/10 dark:bg-primary/20 text-primary dark:text-accent border border-primary/30 dark:border-primary/50 rounded-lg flex items-center justify-center">
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                     </svg>
@@ -1223,7 +1223,7 @@ const DepartmentIssues: React.FC = () => {
                 <button
                   onClick={handleSubmitIssue}
                   disabled={submittingIssue}
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-primary to-purple-600 text-white rounded-lg hover:from-primary/90 hover:to-purple-600/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center font-medium shadow-md hover:shadow-lg"
+                  className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center font-medium shadow-md hover:shadow-lg"
                 >
                   {submittingIssue ? (
                     <>

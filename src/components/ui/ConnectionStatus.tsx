@@ -24,23 +24,23 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
   }
 
   return (
-    <div className={`p-4 bg-red-50 border border-red-200 rounded-xl ${className}`}>
+    <div className={`p-4 bg-primary/10 dark:bg-primary/20 border border-primary/30 rounded-xl ${className}`}>
       <div className="flex items-center space-x-3">
-        <WifiOffIcon className="w-5 h-5 text-red-500" />
+        <WifiOffIcon className="w-5 h-5 text-primary" />
         <div className="flex-1">
-          <p className="text-sm font-medium text-red-800">
+          <p className="text-sm font-medium text-primary">
             Database Connection Lost
           </p>
-          <p className="text-xs text-red-600">
+          <p className="text-xs text-primary">
             Unable to connect to the database. Some features may be unavailable.
           </p>
         </div>
         {isChecking ? (
-          <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
         ) : (
           <button 
             onClick={() => window.location.reload()}
-            className="px-3 py-1 text-xs font-medium text-red-700 bg-red-100 rounded-lg hover:bg-red-200 transition-colors"
+            className="px-3 py-1 text-xs font-medium text-primary bg-primary/10 dark:bg-primary/20 rounded-lg hover:bg-primary/10 transition-colors"
           >
             Retry
           </button>

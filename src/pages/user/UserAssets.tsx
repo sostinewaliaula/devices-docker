@@ -519,9 +519,9 @@ const UserAssets: React.FC = () => {
         return 'bg-lightred text-primary';
       case 'In Maintenance':
       case 'Reserved':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange';
       case 'Disposed':
-        return 'bg-red-100 text-red-800';
+        return 'bg-primary/10 dark:bg-primary/20 text-primary';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -853,7 +853,7 @@ const UserAssets: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => removeAttachment(index)}
-                            className="p-1 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+                            className="p-1 text-gray-400 hover:text-primary/80 transition-colors rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
                           >
                             <XIcon className="w-4 h-4" />
                           </button>
@@ -878,7 +878,7 @@ const UserAssets: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isSubmittingIssue}
-                    className="px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-primary to-secondary rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[120px] shadow-lg"
+                    className="px-6 py-3 text-sm font-medium text-white bg-primary rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[120px] shadow-lg"
                   >
                     {isSubmittingIssue ? (
                       <>

@@ -310,12 +310,12 @@ const IssueDetail: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'open':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+        return 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-accent';
       case 'in_progress':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+        return 'bg-brand-orange/15 text-secondary dark:bg-brand-orange/20 dark:text-brand-orange';
       case 'resolved':
       case 'closed':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+        return 'bg-brand-green/25 text-secondary dark:bg-brand-green/20 dark:text-brand-green';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
@@ -324,13 +324,13 @@ const IssueDetail: React.FC = () => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'Critical':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+        return 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-accent';
       case 'High':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+        return 'bg-brand-orange/15 text-secondary dark:bg-brand-orange/20 dark:text-brand-orange';
       case 'Medium':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+        return 'bg-brand-orange/15 text-secondary dark:bg-brand-orange/20 dark:text-brand-orange';
       case 'Low':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+        return 'bg-brand-green/25 text-secondary dark:bg-brand-green/20 dark:text-brand-green';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
@@ -471,7 +471,7 @@ const IssueDetail: React.FC = () => {
                     <AlertCircleIcon className="w-5 h-5" />
                     <Link
                       to={`/assets/${asset.id}`}
-                      className="flex items-center space-x-2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+                      className="flex items-center space-x-2 text-secondary dark:text-accent hover:opacity-80 transition-colors"
                     >
                       <div className="w-8 h-8 rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center border border-gray-200 dark:border-gray-800">
                         <AssetImage
@@ -528,8 +528,8 @@ const IssueDetail: React.FC = () => {
                 <div className="bg-gray-50 dark:bg-gray-700 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="p-3 bg-blue-100 rounded-full">
-                        <DollarSignIcon className="w-6 h-6 text-blue-600" />
+                      <div className="p-3 bg-secondary/10 dark:bg-accent/15 rounded-full">
+                        <DollarSignIcon className="w-6 h-6 text-secondary dark:text-accent" />
                       </div>
                       <div>
                         <p className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -703,7 +703,7 @@ const IssueDetail: React.FC = () => {
                           </button>
                           <button
                             onClick={() => handleDeleteComment(comment.id)}
-                            className="p-1 text-gray-400 hover:text-red-600 dark:hover:text-red-400 rounded"
+                            className="p-1 text-gray-400 hover:text-primary/80 dark:hover:text-accent/80 rounded"
                             title="Delete Comment"
                           >
                             <TrashIcon className="w-4 h-4" />

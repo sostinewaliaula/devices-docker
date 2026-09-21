@@ -6,6 +6,7 @@ import notificationService from '../services/notificationService.js';
 import emailService from '../services/emailService.js';
 import { authenticateToken } from '../middleware/auth.js';
 import { sanitizePagination } from '../utils/pagination.js';
+import { wrapEmail, paragraph, callout } from '../utils/emailTheme.js';
 
 import upload from '../middleware/upload.js';
 
@@ -549,45 +550,15 @@ function generateIssueCommentEmailHtml(userName, issueTitle, commenterName, comm
   const issueOwner = isReporter ? 'your' : `${reporterName}'s`;
   const actionText = isAdminComment ? 'responded to' : 'added a comment to';
 
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>New Comment on Issue</title>
-      <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        .comment { background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #3b82f6; margin: 15px 0; }
-        .footer { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #6b7280; }
-      </style>
-    </head>
-    <body>
-      <div class="container">
-        <div class="header">
-          <h1>${isAdminComment ? 'Admin Response on Issue' : 'New Comment on Issue'}</h1>
-          <p>Hello ${userName},</p>
-        </div>
-        
-        <div class="content">
-          <p><strong>${isAdminComment ? 'Admin ' : ''}${commenterName}</strong> ${actionText} ${issueOwner} issue <strong>${issueTitle}</strong>:</p>
-          
-          <div class="comment">
-            ${comment}
-          </div>
-          
-          <p>You can view the full conversation and respond in your dashboard.</p>
-        </div>
-        
-        <div class="footer">
-          <p>This is an automated notification from the Asset Management System.</p>
-          <p>Please do not reply to this email.</p>
-        </div>
-      </div>
-    </body>
-    </html>
-  `;
+  return wrapEmail({
+    title: isAdminComment ? 'Admin Response on Issue' : 'New Comment on Issue',
+    preheader: `${commenterName} ${actionText} ${issueOwner} issue ${issueTitle}`,
+    bodyHtml:
+      paragraph(`Hello ${userName},`) +
+      paragraph(`<strong>${isAdminComment ? 'Admin ' : ''}${commenterName}</strong> ${actionText} ${issueOwner} issue <strong>${issueTitle}</strong>:`) +
+      callout(`${comment}`) +
+      paragraph('You can view the full conversation and respond in your dashboard.'),
+  });
 }
 
 // Helper function to generate text email for issue comment
