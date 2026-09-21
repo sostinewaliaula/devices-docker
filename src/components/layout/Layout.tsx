@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import IdleSessionWatcher from '../auth/IdleSessionWatcher';
 const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const toggleSidebar = () => {
@@ -22,6 +23,7 @@ const Layout: React.FC = () => {
           </div>
         </main>
       </div>
+      <IdleSessionWatcher />
     </div>;
 };
 export default Layout;

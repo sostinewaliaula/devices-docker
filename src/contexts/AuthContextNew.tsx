@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import { authAPI, User } from '../services/apiService';
 import mfaService, { MFAFactor, MFAEnrollmentData } from '../services/mfaService';
+import { LAST_ACTIVITY_KEY } from '../hooks/useIdleTimeout';
 
 interface AuthContextType {
   user: User | null;
@@ -241,7 +242,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Logout function
   const logout = useCallback(async (): Promise<void> => {
     try {
-      await authAPI.logout();
+      // Best-effort server-side logout. Skip it when the token is already gone
+      // (e.g. another tab signed out first) and never let a slow/unreachable
+      // server keep the user signed in locally.
+      if (localStorage.getItem('authToken')) {
+        await Promise.race([
+          authAPI.logout(),
+          new Promise((resolve) => setTimeout(resolve, 3000)),
+        ]);
+      }
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -250,10 +259,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.removeItem('user');
       setUser(null);
     }
+      localStorage.removeItem(LAST_ACTIVITY_KEY);
   }, []);
 
   // Update profile function
   const updateProfile = useCallback(async (userData: Partial<User>): Promise<void> => {
+  // Sign out this tab when another tab signs out (or the timeout logs it out)
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      // key === null means localStorage.clear() was called in another tab
+      if ((e.key === 'authToken' && !e.newValue) || e.key === null) {
+        setUser(null);
+      }
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
     try {
       if (!user) throw new Error('No user logged in');
 
