@@ -4,8 +4,7 @@ import { useAuth } from '../../contexts/AuthContextNew';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { MailIcon, ArrowLeftIcon, CheckCircleIcon } from 'lucide-react';
-import logo from '../../assets/logo.png';
-import ThemeToggle from '../../components/ui/ThemeToggle';
+import AuthLayout, { AuthAlert, AuthBadge, AuthSpinner, authStyles } from '../../components/auth/AuthLayout';
 
 const VerifyCode: React.FC = () => {
   const [code, setCode] = useState('');
@@ -106,129 +105,100 @@ const VerifyCode: React.FC = () => {
 
   if (isVerified) {
     return (
-      <div className="flex items-center min-h-screen p-6 bg-lightred dark:bg-gray-950">
-        <div className="w-full max-w-md mx-auto">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 text-center">
-            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircleIcon className="w-8 h-8 text-green-600 dark:text-green-400" />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              Code Verified!
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300 mb-6">
-              Redirecting you to change your password...
-            </p>
-            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-          </div>
+      <AuthLayout
+        title="Code Verified!"
+        subtitle="Redirecting you to change your password..."
+        icon={
+          <AuthBadge tone="success">
+            <CheckCircleIcon className="w-7 h-7" />
+          </AuthBadge>
+        }
+      >
+        <div className="flex justify-center">
+          <AuthSpinner />
         </div>
-      </div>
+      </AuthLayout>
     );
   }
 
   return (
-    <div className="flex items-center min-h-screen p-6 bg-lightred dark:bg-gray-950">
-      <div className="w-full max-w-md mx-auto">
-        {/* Theme Toggle */}
-        <div className="flex justify-end mb-6">
-          <ThemeToggle />
-        </div>
-
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
-          <div className="text-center mb-8">
-            {/* Logo */}
-            <div className="mb-6">
-              <img
-                src={logo}
-                alt="Caava Group Logo"
-                className="h-16 w-auto mx-auto"
-              />
-            </div>
-
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
-              <MailIcon className="w-8 h-8 text-primary" />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              Enter Verification Code
-            </h1>
-            <p className="text-gray-600 dark:text-gray-300">
-              We've sent a 6-digit code to <br />
-              <span className="font-medium text-gray-900 dark:text-white">{email}</span>
-            </p>
-          </div>
-
-          {/* Timer */}
-          <div className="text-center mb-6">
-            <div className="inline-flex items-center px-4 py-2 bg-red-50 dark:bg-red-900/20 rounded-lg">
-              <span className="text-sm font-medium text-red-600 dark:text-red-400">
-                Code expires in: {formatTime(timeLeft)}
-              </span>
-            </div>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Verification Code
-              </label>
-              <input
-                type="text"
-                value={code}
-                onChange={handleCodeChange}
-                placeholder="000000"
-                className="w-full px-4 py-3 text-center text-2xl font-mono tracking-widest border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
-                maxLength={6}
-                disabled={isLoading}
-                autoComplete="one-time-code"
-              />
-            </div>
-
-            {error && (
-              <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
-                <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isLoading || code.length !== 6 || timeLeft === 0}
-              className="w-full py-3 px-4 bg-gradient-to-r from-primary to-secondary text-white font-medium rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-            >
-              {isLoading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                  Verifying...
-                </>
-              ) : (
-                'Verify Code'
-              )}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center space-y-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Didn't receive the code?
-            </p>
-            <button
-              onClick={handleResendCode}
-              disabled={isLoading}
-              className="text-primary hover:text-primary/80 font-medium text-sm transition-colors disabled:opacity-50"
-            >
-              Resend Code
-            </button>
-          </div>
-
-          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <Link
-              to="/forgot-password"
-              className="flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-            >
-              <ArrowLeftIcon className="w-4 h-4 mr-2" />
-              Back to Forgot Password
-            </Link>
-          </div>
-        </div>
+    <AuthLayout
+      title="Enter Verification Code"
+      subtitle={
+        <>
+          We've sent a 6-digit code to <br />
+          <span className="font-medium text-heading">{email}</span>
+        </>
+      }
+      icon={
+        <AuthBadge>
+          <MailIcon className="w-7 h-7" />
+        </AuthBadge>
+      }
+      footer={
+        <Link to="/forgot-password" className={`inline-flex items-center justify-center ${authStyles.link}`}>
+          <ArrowLeftIcon className="w-4 h-4 mr-2" />
+          Back to Forgot Password
+        </Link>
+      }
+    >
+      {/* Timer */}
+      <div className="mb-6 text-center">
+        <span
+          className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-xl border ${
+            timeLeft === 0
+              ? 'bg-lightred border-primary/30 text-primary dark:text-heading'
+              : 'bg-brand-orange/10 border-brand-orange/40 text-content'
+          }`}
+        >
+          Code expires in: {formatTime(timeLeft)}
+        </span>
       </div>
-    </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label className={`${authStyles.label} mb-2`}>Verification Code</label>
+          <input
+            type="text"
+            value={code}
+            onChange={handleCodeChange}
+            placeholder="000000"
+            className={`${authStyles.input} px-4 text-2xl font-mono tracking-widest text-center`}
+            maxLength={6}
+            disabled={isLoading}
+            autoComplete="one-time-code"
+          />
+        </div>
+
+        {error && <AuthAlert>{error}</AuthAlert>}
+
+        <button
+          type="submit"
+          disabled={isLoading || code.length !== 6 || timeLeft === 0}
+          className={authStyles.button}
+        >
+          {isLoading ? (
+            <>
+              <div className="w-5 h-5 mr-2 border-2 rounded-full animate-spin border-on-action/40 border-t-on-action"></div>
+              Verifying...
+            </>
+          ) : (
+            'Verify Code'
+          )}
+        </button>
+      </form>
+
+      <div className="mt-6 space-y-1 text-center">
+        <p className="text-sm text-muted">Didn't receive the code?</p>
+        <button
+          onClick={handleResendCode}
+          disabled={isLoading}
+          className={`text-sm disabled:opacity-50 ${authStyles.link}`}
+        >
+          Resend Code
+        </button>
+      </div>
+    </AuthLayout>
   );
 };
 

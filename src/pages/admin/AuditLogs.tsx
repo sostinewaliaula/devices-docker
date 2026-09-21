@@ -385,7 +385,7 @@ const AuditLogs: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Creates</p>
-                <p className="text-2xl font-bold text-green-600">{stats.create_count || 0}</p>
+                <p className="text-2xl font-bold text-secondary dark:text-brand-green">{stats.create_count || 0}</p>
               </div>
             </div>
           </div>
@@ -393,7 +393,7 @@ const AuditLogs: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Updates</p>
-                <p className="text-2xl font-bold text-blue-600">{stats.update_count || 0}</p>
+                <p className="text-2xl font-bold text-secondary dark:text-accent">{stats.update_count || 0}</p>
               </div>
             </div>
           </div>
@@ -408,7 +408,7 @@ const AuditLogs: React.FC = () => {
             {hasActiveFilters && (
               <button 
                 onClick={clearFilters}
-                className="text-sm text-red-600 hover:text-red-700 flex items-center"
+                className="text-sm text-primary hover:text-primary/80 flex items-center"
               >
                 <XIcon className="w-4 h-4 mr-1" />
                 Clear All
@@ -547,12 +547,12 @@ const AuditLogs: React.FC = () => {
                         {l.user_id ? (userMap.get(l.user_id) || l.user_id) : 'System'}
                       </td>
                       <td className="px-6 py-3">
-                        <span className="px-2 py-1 text-xs rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200">
+                        <span className="px-2 py-1 text-xs rounded-full bg-secondary/10 dark:bg-accent/15 text-secondary dark:text-accent">
                           {l.action}
                         </span>
                       </td>
                       <td className="px-6 py-3">
-                        <span className="px-2 py-1 text-xs rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200">
+                        <span className="px-2 py-1 text-xs rounded-full bg-brand-green/25 dark:bg-brand-green/20 text-secondary dark:text-brand-green">
                           {l.entity_type}
                         </span>
                       </td>

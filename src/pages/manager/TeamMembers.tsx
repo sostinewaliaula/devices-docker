@@ -72,18 +72,18 @@ const TeamMembers: React.FC = () => {
   const getRoleColor = (role: string) => {
     switch (role) {
       case 'admin':
-        return 'bg-red-100 text-red-800';
+        return 'bg-primary/10 dark:bg-primary/20 text-primary';
       case 'manager':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-secondary/10 dark:bg-accent/15 text-secondary dark:text-accent';
       case 'user':
-        return 'bg-green-100 text-green-800';
+        return 'bg-brand-green/25 dark:bg-brand-green/20 text-secondary dark:text-brand-green';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getStatusColor = (isActive: boolean) => {
-    return isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+    return isActive ? 'bg-brand-green/25 dark:bg-brand-green/20 text-secondary dark:text-brand-green' : 'bg-primary/10 dark:bg-primary/20 text-primary';
   };
 
   const formatDate = (dateString: string) => {
@@ -232,7 +232,7 @@ const TeamMembers: React.FC = () => {
         const headers = ['Name', 'Email', 'Role', 'Position', 'Phone', 'Status', 'Created At'];
         const escapeHtml = (s: any) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         
-        const thead = `<thead><tr style="background-color: #2563eb; color: white; font-weight: bold;">${headers.map(h => 
+        const thead = `<thead><tr style="background-color: #152F52; color: white; font-weight: bold;">${headers.map(h => 
           `<th style="text-align:left; border:1px solid #ccc; padding:12px; font-size:14px;">${h}</th>`
         ).join('')}</tr></thead>`;
         
@@ -256,7 +256,7 @@ const TeamMembers: React.FC = () => {
   <meta charset="utf-8" />
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
-    h1 { color: #2563eb; margin-bottom: 10px; }
+    h1 { color: #152F52; margin-bottom: 10px; }
     .info { color: #666; margin-bottom: 20px; font-size: 14px; }
   </style>
 </head>
@@ -547,8 +547,8 @@ const TeamMembers: React.FC = () => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-yellow-100 rounded-full">
-              <CalendarIcon className="w-6 h-6 text-yellow-600" />
+            <div className="p-3 mr-4 bg-brand-orange/15 dark:bg-brand-orange/20 rounded-full">
+              <CalendarIcon className="w-6 h-6 text-brand-orange" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Recently Joined</p>

@@ -136,13 +136,13 @@ const AssetRequests: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Approved':
-        return 'bg-green-100 text-green-800';
+        return 'bg-brand-green/25 dark:bg-brand-green/20 text-secondary dark:text-brand-green';
       case 'Pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange';
       case 'Rejected':
-        return 'bg-red-100 text-red-800';
+        return 'bg-primary/10 dark:bg-primary/20 text-primary';
       case 'In Progress':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-secondary/10 dark:bg-accent/15 text-secondary dark:text-accent';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -151,11 +151,11 @@ const AssetRequests: React.FC = () => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'High':
-        return 'bg-red-100 text-red-800';
+        return 'bg-primary/10 dark:bg-primary/20 text-primary';
       case 'Medium':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange';
       case 'Low':
-        return 'bg-green-100 text-green-800';
+        return 'bg-brand-green/25 dark:bg-brand-green/20 text-secondary dark:text-brand-green';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -164,13 +164,13 @@ const AssetRequests: React.FC = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'Approved':
-        return <CheckCircleIcon className="w-5 h-5 text-green-600" />;
+        return <CheckCircleIcon className="w-5 h-5 text-secondary dark:text-brand-green" />;
       case 'Pending':
-        return <ClockIcon className="w-5 h-5 text-yellow-600" />;
+        return <ClockIcon className="w-5 h-5 text-brand-orange" />;
       case 'Rejected':
-        return <XCircleIcon className="w-5 h-5 text-red-600" />;
+        return <XCircleIcon className="w-5 h-5 text-primary" />;
       case 'In Progress':
-        return <TrendingUpIcon className="w-5 h-5 text-blue-600" />;
+        return <TrendingUpIcon className="w-5 h-5 text-secondary dark:text-accent" />;
       default:
         return <TicketIcon className="w-5 h-5 text-gray-600" />;
     }
@@ -540,7 +540,7 @@ const AssetRequests: React.FC = () => {
         const headers = ['Asset Name', 'Status', 'Priority', 'Requested By', 'Category', 'Reason', 'Created At'];
         const escapeHtml = (s: any) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-        const thead = `<thead><tr style="background-color: #2563eb; color: white; font-weight: bold;">${headers.map(h =>
+        const thead = `<thead><tr style="background-color: #152F52; color: white; font-weight: bold;">${headers.map(h =>
           `<th style="text-align:left; border:1px solid #ccc; padding:12px; font-size:14px;">${h}</th>`
         ).join('')}</tr></thead>`;
 
@@ -564,7 +564,7 @@ const AssetRequests: React.FC = () => {
   <meta charset="utf-8" />
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
-    h1 { color: #2563eb; margin-bottom: 10px; }
+    h1 { color: #152F52; margin-bottom: 10px; }
     .info { color: #666; margin-bottom: 20px; font-size: 14px; }
   </style>
 </head>
@@ -766,7 +766,7 @@ const AssetRequests: React.FC = () => {
           <div className="flex flex-wrap gap-2">
             <button
               onClick={handleNewRequest}
-              className="px-6 py-3 bg-gradient-to-r from-primary to-purple-600 text-white rounded-lg hover:from-primary/90 hover:to-purple-600/90 transition-all duration-200 flex items-center font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all duration-200 flex items-center font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               <PlusIcon className="w-5 h-5 mr-2" />
               New Request
@@ -798,8 +798,8 @@ const AssetRequests: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-blue-100 rounded-full">
-              <TicketIcon className="w-6 h-6 text-blue-600" />
+            <div className="p-3 mr-4 bg-secondary/10 dark:bg-accent/15 rounded-full">
+              <TicketIcon className="w-6 h-6 text-secondary dark:text-accent" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Requests</p>
@@ -809,8 +809,8 @@ const AssetRequests: React.FC = () => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-yellow-100 rounded-full">
-              <ClockIcon className="w-6 h-6 text-yellow-600" />
+            <div className="p-3 mr-4 bg-brand-orange/15 dark:bg-brand-orange/20 rounded-full">
+              <ClockIcon className="w-6 h-6 text-brand-orange" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Pending</p>
@@ -820,8 +820,8 @@ const AssetRequests: React.FC = () => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-green-100 rounded-full">
-              <CheckCircleIcon className="w-6 h-6 text-green-600" />
+            <div className="p-3 mr-4 bg-brand-green/25 dark:bg-brand-green/20 rounded-full">
+              <CheckCircleIcon className="w-6 h-6 text-secondary dark:text-brand-green" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Approved</p>
@@ -831,8 +831,8 @@ const AssetRequests: React.FC = () => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-red-100 rounded-full">
-              <XCircleIcon className="w-6 h-6 text-red-600" />
+            <div className="p-3 mr-4 bg-primary/10 dark:bg-primary/20 rounded-full">
+              <XCircleIcon className="w-6 h-6 text-primary" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Rejected</p>
@@ -842,8 +842,8 @@ const AssetRequests: React.FC = () => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-blue-100 rounded-full">
-              <TrendingUpIcon className="w-6 h-6 text-blue-600" />
+            <div className="p-3 mr-4 bg-secondary/10 dark:bg-accent/15 rounded-full">
+              <TrendingUpIcon className="w-6 h-6 text-secondary dark:text-accent" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">In Progress</p>
@@ -916,7 +916,7 @@ const AssetRequests: React.FC = () => {
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <div className={`p-2 rounded-full ${request.status === 'Approved' ? 'bg-green-100' : request.status === 'Pending' ? 'bg-yellow-100' : request.status === 'Rejected' ? 'bg-red-100' : 'bg-blue-100'}`}>
+                      <div className={`p-2 rounded-full ${request.status === 'Approved' ? 'bg-brand-green/25 dark:bg-brand-green/20' : request.status === 'Pending' ? 'bg-brand-orange/15 dark:bg-brand-orange/20' : request.status === 'Rejected' ? 'bg-primary/10 dark:bg-primary/20' : 'bg-secondary/10 dark:bg-accent/15'}`}>
                         {getStatusIcon(request.status)}
                       </div>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -972,7 +972,7 @@ const AssetRequests: React.FC = () => {
                     </button>
                     <button
                       onClick={() => handleFollowUp(request)}
-                      className="px-4 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-colors"
+                      className="px-4 py-2 text-sm font-medium text-secondary dark:text-accent border border-secondary dark:border-accent rounded-lg hover:bg-action hover:text-on-action dark:hover:text-on-action transition-colors"
                     >
                       <svg className="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -983,14 +983,14 @@ const AssetRequests: React.FC = () => {
                       <>
                         <button
                           onClick={() => handleApproveRequest(request)}
-                          className="px-4 py-2 text-sm font-medium text-green-600 border border-green-600 rounded-lg hover:bg-green-600 hover:text-white transition-colors"
+                          className="px-4 py-2 text-sm font-medium text-secondary dark:text-brand-green border border-brand-green rounded-lg hover:bg-brand-green/80 hover:text-secondary dark:hover:text-secondary transition-colors"
                         >
                           <CheckCircleIcon className="w-4 h-4 mr-1 inline" />
                           Approve
                         </button>
                         <button
                           onClick={() => handleRejectRequest(request)}
-                          className="px-4 py-2 text-sm font-medium text-red-600 border border-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-colors"
+                          className="px-4 py-2 text-sm font-medium text-primary border border-primary rounded-lg hover:bg-primary/90 hover:text-white transition-colors"
                         >
                           <XCircleIcon className="w-4 h-4 mr-1 inline" />
                           Reject
@@ -1028,7 +1028,7 @@ const AssetRequests: React.FC = () => {
             <div className="space-y-6">
               {/* Request Header */}
               <div className="flex items-start gap-4">
-                <div className={`p-3 rounded-full ${selectedRequest.status === 'Approved' ? 'bg-green-100' : selectedRequest.status === 'Pending' ? 'bg-yellow-100' : selectedRequest.status === 'Rejected' ? 'bg-red-100' : 'bg-blue-100'}`}>
+                <div className={`p-3 rounded-full ${selectedRequest.status === 'Approved' ? 'bg-brand-green/25 dark:bg-brand-green/20' : selectedRequest.status === 'Pending' ? 'bg-brand-orange/15 dark:bg-brand-orange/20' : selectedRequest.status === 'Rejected' ? 'bg-primary/10 dark:bg-primary/20' : 'bg-secondary/10 dark:bg-accent/15'}`}>
                   {getStatusIcon(selectedRequest.status)}
                 </div>
                 <div className="flex-1">
@@ -1090,14 +1090,14 @@ const AssetRequests: React.FC = () => {
                   <>
                     <button
                       onClick={() => handleApproveRequest(selectedRequest)}
-                      className="flex-1 px-4 py-2 text-green-600 border border-green-600 rounded-lg hover:bg-green-600 hover:text-white transition-colors"
+                      className="flex-1 px-4 py-2 text-secondary dark:text-brand-green border border-brand-green rounded-lg hover:bg-brand-green/80 hover:text-secondary dark:hover:text-secondary transition-colors"
                     >
                       <CheckCircleIcon className="w-4 h-4 mr-2 inline" />
                       Approve Request
                     </button>
                     <button
                       onClick={() => handleRejectRequest(selectedRequest)}
-                      className="flex-1 px-4 py-2 text-red-600 border border-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-colors"
+                      className="flex-1 px-4 py-2 text-primary border border-primary rounded-lg hover:bg-primary/90 hover:text-white transition-colors"
                     >
                       <XCircleIcon className="w-4 h-4 mr-2 inline" />
                       Reject Request
@@ -1424,7 +1424,7 @@ const AssetRequests: React.FC = () => {
                 <button
                   onClick={handleSubmitNewRequest}
                   disabled={submittingRequest}
-                  className="px-6 py-2 bg-gradient-to-r from-primary to-purple-600 text-white rounded-lg hover:from-primary/90 hover:to-purple-600/90 transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                  className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                 >
                   {submittingRequest ? (
                     <>
@@ -1467,8 +1467,8 @@ const AssetRequests: React.FC = () => {
               </div>
 
               <div className="space-y-4">
-                <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                <div className="mb-4 p-3 bg-secondary/10 dark:bg-accent/15 rounded-lg">
+                  <p className="text-sm text-secondary dark:text-accent">
                     <strong>Note:</strong> This follow-up will be visible to admins and other managers for tracking request progress and communication.
                   </p>
                 </div>
@@ -1497,7 +1497,7 @@ const AssetRequests: React.FC = () => {
                   <button
                     onClick={handleSubmitFollowUp}
                     disabled={submittingFollowUp}
-                    className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                    className="px-6 py-2 bg-action text-on-action rounded-lg hover:opacity-90 transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                   >
                     {submittingFollowUp ? (
                       <>

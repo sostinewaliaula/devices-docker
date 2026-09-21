@@ -58,11 +58,11 @@ const DatabaseStatus: React.FC<DatabaseStatusProps> = ({ className = '' }) => {
   const getStatusIcon = () => {
     switch (status) {
       case 'connected':
-        return <CheckCircleIcon className="w-4 h-4 text-green-500" />;
+        return <CheckCircleIcon className="w-4 h-4 text-secondary dark:text-brand-green" />;
       case 'error':
-        return <XCircleIcon className="w-4 h-4 text-red-500" />;
+        return <XCircleIcon className="w-4 h-4 text-primary" />;
       case 'connecting':
-        return <ClockIcon className="w-4 h-4 text-yellow-500 animate-spin" />;
+        return <ClockIcon className="w-4 h-4 text-brand-orange animate-spin" />;
     }
   };
 
@@ -80,11 +80,11 @@ const DatabaseStatus: React.FC<DatabaseStatusProps> = ({ className = '' }) => {
   const getStatusColor = () => {
     switch (status) {
       case 'connected':
-        return 'text-green-600 dark:text-green-400';
+        return 'text-secondary dark:text-brand-green';
       case 'error':
-        return 'text-red-600 dark:text-red-400';
+        return 'text-primary dark:text-accent';
       case 'connecting':
-        return 'text-yellow-600 dark:text-yellow-400';
+        return 'text-brand-orange';
     }
   };
 
@@ -101,7 +101,7 @@ const DatabaseStatus: React.FC<DatabaseStatusProps> = ({ className = '' }) => {
       )}
       <button
         onClick={checkConnection}
-        className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+        className="text-xs text-secondary hover:opacity-80 dark:text-accent"
         title="Check connection"
       >
         Refresh

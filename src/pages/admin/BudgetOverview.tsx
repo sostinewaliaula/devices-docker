@@ -6,15 +6,15 @@ import { RefreshCwIcon, AlertCircleIcon, DollarSignIcon, PieChartIcon, LayersIco
 const DEFAULT_CURRENCY = import.meta.env.VITE_DEFAULT_CURRENCY || 'KES';
 
 const statusColors: Record<string, string> = {
-  open: 'text-red-600',
-  in_progress: 'text-yellow-600',
-  resolved: 'text-green-600',
+  open: 'text-primary',
+  in_progress: 'text-brand-orange',
+  resolved: 'text-secondary dark:text-brand-green',
   closed: 'text-slate-600',
-  scheduled: 'text-purple-600',
-  pending: 'text-yellow-600',
-  approved: 'text-green-600',
-  rejected: 'text-red-600',
-  fulfilled: 'text-blue-600'
+  scheduled: 'text-secondary dark:text-accent',
+  pending: 'text-brand-orange',
+  approved: 'text-secondary dark:text-brand-green',
+  rejected: 'text-primary',
+  fulfilled: 'text-secondary dark:text-accent'
 };
 
 const BudgetOverview: React.FC = () => {
@@ -129,7 +129,7 @@ const BudgetOverview: React.FC = () => {
   if (!summary) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-center">
-        <AlertCircleIcon className="w-12 h-12 text-red-500 mb-3" />
+        <AlertCircleIcon className="w-12 h-12 text-primary mb-3" />
         <p className="text-gray-700 dark:text-gray-300">Budget summary is unavailable.</p>
         <button
           onClick={fetchSummary}
@@ -323,7 +323,7 @@ const BudgetOverview: React.FC = () => {
                 {formatCurrency(summary.combined.overall_total)}
               </p>
             </div>
-            <DollarSignIcon className="w-10 h-10 text-emerald-500" />
+            <DollarSignIcon className="w-10 h-10 text-secondary dark:text-brand-green" />
           </div>
           <p className="text-sm text-gray-500 mt-2">Issues: {formatCurrency(summary.combined.total_issue_cost)}</p>
           <p className="text-sm text-gray-500">Requests: {formatCurrency(summary.combined.total_asset_request_cost)}</p>

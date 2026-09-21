@@ -470,7 +470,7 @@ const UserManagement: React.FC = () => {
   const getRoleBadgeClass = (role: string) => {
     switch (role) {
       case 'admin':
-        return 'bg-red-100 text-red-800';
+        return 'bg-primary/10 dark:bg-primary/20 text-primary';
       case 'manager':
         return 'bg-lightblue text-secondary';
       case 'user':
@@ -498,7 +498,7 @@ const UserManagement: React.FC = () => {
     return dept ? dept.name : 'N/A';
   };
   const getStatusBadgeClass = (isActive: boolean) => {
-    return isActive !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+    return isActive !== false ? 'bg-brand-green/25 dark:bg-brand-green/20 text-secondary dark:text-brand-green' : 'bg-primary/10 dark:bg-primary/20 text-primary';
   };
   if (loading) {
     return <div className="flex items-center justify-center h-64">
@@ -686,8 +686,8 @@ const UserManagement: React.FC = () => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-yellow-100 rounded-full">
-              <BuildingIcon className="w-6 h-6 text-yellow-600" />
+            <div className="p-3 mr-4 bg-brand-orange/15 dark:bg-brand-orange/20 rounded-full">
+              <BuildingIcon className="w-6 h-6 text-brand-orange" />
             </div>
             <div>
               <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">Department Officers</p>
@@ -697,8 +697,8 @@ const UserManagement: React.FC = () => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-red-100 rounded-full">
-              <UserXIcon className="w-6 h-6 text-red-600" />
+            <div className="p-3 mr-4 bg-primary/10 dark:bg-primary/20 rounded-full">
+              <UserXIcon className="w-6 h-6 text-primary" />
             </div>
             <div>
               <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">Suspended Users</p>
@@ -757,7 +757,7 @@ const UserManagement: React.FC = () => {
         {selectedUserIds.length > 0 && (
           <div className="mb-2 flex items-center space-x-4">
             <span className="text-sm">{selectedUserIds.length} selected</span>
-            <button onClick={handleBulkDeleteUsers} className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm">Delete Selected</button>
+            <button onClick={handleBulkDeleteUsers} className="px-3 py-1 bg-primary text-white rounded hover:bg-primary/90 text-sm">Delete Selected</button>
           </div>
         )}
         {filteredUsers.length > 0 ? <div className="overflow-x-auto">
@@ -784,7 +784,7 @@ const UserManagement: React.FC = () => {
                     </div>
                     <div className="flex flex-col">
                       <span className={!user.is_active ? 'text-gray-500 line-through' : ''}>{user.name}</span>
-                      {!user.is_active && <span className="text-[10px] text-red-600 font-bold uppercase tracking-wider">Suspended</span>}
+                      {!user.is_active && <span className="text-[10px] text-primary font-bold uppercase tracking-wider">Suspended</span>}
                     </div>
                   </div>
                 </td>
@@ -797,17 +797,17 @@ const UserManagement: React.FC = () => {
                 <td className="px-6 py-4">{user.phone || 'N/A'}</td>
                 <td className="px-6 py-4">
                   <div className="flex space-x-2">
-                    <button onClick={() => { setEditingUser(user); setNewUser({ name: user.name, email: user.email, role: user.role, department_id: user.department_id || '', position: user.position || '', phone: user.phone || '', password: '', confirmPassword: '' }); setShowEditUserModal(true); }} className="p-1 text-yellow-600 rounded hover:bg-yellow-100" title="Edit User"><EditIcon className="w-5 h-5" /></button>
+                    <button onClick={() => { setEditingUser(user); setNewUser({ name: user.name, email: user.email, role: user.role, department_id: user.department_id || '', position: user.position || '', phone: user.phone || '', password: '', confirmPassword: '' }); setShowEditUserModal(true); }} className="p-1 text-brand-orange rounded hover:bg-brand-orange/25" title="Edit User"><EditIcon className="w-5 h-5" /></button>
                     <button
                       onClick={() => handleToggleUserStatus(user)}
-                      className={`p-1 rounded ${!user.is_active ? 'text-green-600 hover:bg-green-100' : 'text-orange-600 hover:bg-orange-100'}`}
+                      className={`p-1 rounded ${!user.is_active ? 'text-secondary dark:text-brand-green hover:bg-brand-green/20' : 'text-brand-orange hover:bg-brand-orange/25'}`}
                       title={!user.is_active ? "Activate User" : "Suspend User"}
                       disabled={user.role === 'admin'}
                     >
                       {!user.is_active ? <UserCheckIcon className="w-5 h-5" /> : <UserXIcon className="w-5 h-5" />}
                     </button>
-                    <button onClick={() => handleChangePassword(user)} className="p-1 text-blue-600 rounded hover:bg-blue-100" title="Change Password"><LockIcon className="w-5 h-5" /></button>
-                    <button onClick={() => { setEditingUser(user); setShowDeleteModal(true); }} className="p-1 text-red-600 rounded hover:bg-red-100" title="Delete User" disabled={user.role === 'admin'}><TrashIcon className="w-5 h-5" style={{ opacity: user.role === 'admin' ? 0.5 : 1 }} /></button>
+                    <button onClick={() => handleChangePassword(user)} className="p-1 text-secondary dark:text-accent rounded hover:bg-secondary/10 dark:hover:bg-accent/10" title="Change Password"><LockIcon className="w-5 h-5" /></button>
+                    <button onClick={() => { setEditingUser(user); setShowDeleteModal(true); }} className="p-1 text-primary rounded hover:bg-primary/10" title="Delete User" disabled={user.role === 'admin'}><TrashIcon className="w-5 h-5" style={{ opacity: user.role === 'admin' ? 0.5 : 1 }} /></button>
                   </div>
                 </td>
               </tr>)}
@@ -1313,7 +1313,7 @@ const UserManagement: React.FC = () => {
             }} className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600">
               Cancel
             </button>
-            <button onClick={handleDeleteUser} className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700" disabled={editingUser.role === 'admin'}>
+            <button onClick={handleDeleteUser} className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary/90" disabled={editingUser.role === 'admin'}>
               Delete User
             </button>
           </div>
@@ -1324,8 +1324,8 @@ const UserManagement: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="w-full max-w-md p-6 mx-4 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
             <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-                <svg className="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 dark:bg-primary/20">
+                <svg className="h-6 w-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </div>
               <h3 className="mt-4 text-lg font-medium text-gray-900">Delete Users</h3>
               <p className="mt-2 text-sm text-gray-500">
@@ -1335,7 +1335,7 @@ const UserManagement: React.FC = () => {
             <div className="mt-6 flex space-x-3">
               <button
                 onClick={confirmBulkDeleteUsers}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700"
+                className="flex-1 px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary/90"
               >
                 Delete
               </button>

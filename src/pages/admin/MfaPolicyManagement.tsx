@@ -212,8 +212,8 @@ const MfaPolicyManagement: React.FC = () => {
   const getEnforcementLevelBadge = (level: string) => {
     const colors = {
       optional: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
-      recommended: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-      required: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+      recommended: 'bg-secondary/10 text-secondary dark:bg-accent/15 dark:text-accent',
+      required: 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-accent'
     };
 
     return (
@@ -226,7 +226,7 @@ const MfaPolicyManagement: React.FC = () => {
   const getStatusBadge = (enabled: boolean) => {
     if (enabled) {
       return (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-green/25 text-secondary dark:bg-brand-green/20 dark:text-brand-green">
           <CheckCircleIcon className="w-3 h-3 mr-1" />
           Enabled
         </span>
@@ -245,7 +245,7 @@ const MfaPolicyManagement: React.FC = () => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex items-center gap-3">
-          <RefreshCwIcon className="w-6 h-6 animate-spin text-indigo-600" />
+          <RefreshCwIcon className="w-6 h-6 animate-spin text-secondary dark:text-accent" />
           <span className="text-gray-600 dark:text-gray-400">Loading MFA policies...</span>
         </div>
       </div>
@@ -267,14 +267,14 @@ const MfaPolicyManagement: React.FC = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowStatsModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-action text-on-action rounded-lg hover:opacity-90 transition-colors"
             >
               <BarChart3Icon className="w-4 h-4" />
               View Stats
             </button>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-brand-green text-secondary rounded-lg hover:bg-brand-green/80 transition-colors"
             >
               <PlusIcon className="w-4 h-4" />
               New Policy
@@ -288,8 +288,8 @@ const MfaPolicyManagement: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow-card p-6">
             <div className="flex items-center">
-              <div className="p-2 bg-indigo-100 dark:bg-indigo-900 rounded-lg">
-                <UsersIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+              <div className="p-2 bg-secondary/10 dark:bg-accent/15 rounded-lg">
+                <UsersIcon className="w-6 h-6 text-secondary dark:text-accent" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Users</p>
@@ -300,8 +300,8 @@ const MfaPolicyManagement: React.FC = () => {
 
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow-card p-6">
             <div className="flex items-center">
-              <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
-                <ShieldCheckIcon className="w-6 h-6 text-green-600 dark:text-green-400" />
+              <div className="p-2 bg-brand-green/25 dark:bg-brand-green/20 rounded-lg">
+                <ShieldCheckIcon className="w-6 h-6 text-secondary dark:text-brand-green" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Compliant Users</p>
@@ -312,8 +312,8 @@ const MfaPolicyManagement: React.FC = () => {
 
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow-card p-6">
             <div className="flex items-center">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                <KeyIcon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              <div className="p-2 bg-secondary/10 dark:bg-accent/15 rounded-lg">
+                <KeyIcon className="w-6 h-6 text-secondary dark:text-accent" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Users with MFA</p>
@@ -324,8 +324,8 @@ const MfaPolicyManagement: React.FC = () => {
 
           <div className="bg-white dark:bg-gray-900 rounded-xl shadow-card p-6">
             <div className="flex items-center">
-              <div className="p-2 bg-red-100 dark:bg-red-900 rounded-lg">
-                <AlertTriangleIcon className="w-6 h-6 text-red-600 dark:text-red-400" />
+              <div className="p-2 bg-primary/10 dark:bg-primary/20 rounded-lg">
+                <AlertTriangleIcon className="w-6 h-6 text-primary dark:text-accent" />
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Policy Violations</p>
@@ -405,13 +405,13 @@ const MfaPolicyManagement: React.FC = () => {
                           setSelectedPolicy(policy);
                           setShowEditModal(true);
                         }}
-                        className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
+                        className="text-secondary hover:opacity-80 dark:text-accent"
                       >
                         <EditIcon className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDeletePolicy(policy.id)}
-                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                        className="text-primary hover:text-primary/80 dark:text-accent dark:hover:text-accent/80"
                       >
                         <TrashIcon className="w-4 h-4" />
                       </button>
@@ -434,7 +434,7 @@ const MfaPolicyManagement: React.FC = () => {
             </p>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors mx-auto"
+              className="flex items-center gap-2 px-4 py-2 bg-action text-on-action rounded-lg hover:opacity-90 transition-colors mx-auto"
             >
               <PlusIcon className="w-4 h-4" />
               Create Policy
@@ -462,7 +462,7 @@ const MfaPolicyManagement: React.FC = () => {
                   type="text"
                   value={newPolicy.name}
                   onChange={(e) => setNewPolicy({ ...newPolicy, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-secondary dark:focus:ring-accent"
                   required
                 />
               </div>
@@ -475,7 +475,7 @@ const MfaPolicyManagement: React.FC = () => {
                   value={newPolicy.description}
                   onChange={(e) => setNewPolicy({ ...newPolicy, description: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-secondary dark:focus:ring-accent"
                 />
               </div>
 
@@ -486,7 +486,7 @@ const MfaPolicyManagement: React.FC = () => {
                 <select
                   value={newPolicy.enforcement_level}
                   onChange={(e) => setNewPolicy({ ...newPolicy, enforcement_level: e.target.value as any })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-secondary dark:focus:ring-accent"
                 >
                   <option value="optional">Optional</option>
                   <option value="recommended">Recommended</option>
@@ -528,7 +528,7 @@ const MfaPolicyManagement: React.FC = () => {
                   min="0"
                   value={newPolicy.grace_period_days}
                   onChange={(e) => setNewPolicy({ ...newPolicy, grace_period_days: parseInt(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-secondary dark:focus:ring-accent"
                 />
               </div>
 
@@ -555,7 +555,7 @@ const MfaPolicyManagement: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                  className="px-4 py-2 bg-action text-on-action rounded-lg hover:opacity-90 transition-colors"
                 >
                   Create Policy
                 </button>
@@ -584,7 +584,7 @@ const MfaPolicyManagement: React.FC = () => {
                   type="text"
                   value={selectedPolicy.name}
                   onChange={(e) => setSelectedPolicy({ ...selectedPolicy, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-secondary dark:focus:ring-accent"
                   required
                 />
               </div>
@@ -597,7 +597,7 @@ const MfaPolicyManagement: React.FC = () => {
                   value={selectedPolicy.description || ''}
                   onChange={(e) => setSelectedPolicy({ ...selectedPolicy, description: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-secondary dark:focus:ring-accent"
                 />
               </div>
 
@@ -608,7 +608,7 @@ const MfaPolicyManagement: React.FC = () => {
                 <select
                   value={selectedPolicy.enforcement_level}
                   onChange={(e) => setSelectedPolicy({ ...selectedPolicy, enforcement_level: e.target.value as any })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-secondary dark:focus:ring-accent"
                 >
                   <option value="optional">Optional</option>
                   <option value="recommended">Recommended</option>
@@ -650,7 +650,7 @@ const MfaPolicyManagement: React.FC = () => {
                   min="0"
                   value={selectedPolicy.grace_period_days}
                   onChange={(e) => setSelectedPolicy({ ...selectedPolicy, grace_period_days: parseInt(e.target.value) || 0 })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-secondary dark:focus:ring-accent"
                 />
               </div>
 
@@ -677,7 +677,7 @@ const MfaPolicyManagement: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                  className="px-4 py-2 bg-action text-on-action rounded-lg hover:opacity-90 transition-colors"
                 >
                   Update Policy
                 </button>
@@ -762,7 +762,7 @@ const MfaPolicyManagement: React.FC = () => {
             <div className="p-6 border-t border-gray-200 dark:border-gray-700">
               <button
                 onClick={() => setShowStatsModal(false)}
-                className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                className="w-full px-4 py-2 bg-action text-on-action rounded-lg hover:opacity-90 transition-colors"
               >
                 Close
               </button>

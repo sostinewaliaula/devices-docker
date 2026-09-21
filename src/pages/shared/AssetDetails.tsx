@@ -650,11 +650,11 @@ const AssetDetails: React.FC = () => {
       active: 'bg-lightred text-primary',
       Assigned: 'bg-lightblue text-secondary',
       assigned: 'bg-lightblue text-secondary',
-      'In Maintenance': 'bg-yellow-100 text-yellow-800',
-      maintenance: 'bg-yellow-100 text-yellow-800',
+      'In Maintenance': 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange',
+      maintenance: 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange',
       Reserved: 'bg-lightblue text-secondary',
-      Disposed: 'bg-red-100 text-red-800',
-      retired: 'bg-red-100 text-red-800'
+      Disposed: 'bg-primary/10 dark:bg-primary/20 text-primary',
+      retired: 'bg-primary/10 dark:bg-primary/20 text-primary'
     };
     return <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusColors[status] || 'bg-gray-100 text-gray-800'}`}>{status.charAt(0).toUpperCase() + status.slice(1)}</span>;
   };
@@ -665,18 +665,18 @@ const AssetDetails: React.FC = () => {
       excellent: 'bg-lightred text-primary',
       Good: 'bg-lightblue text-secondary',
       good: 'bg-lightblue text-secondary',
-      Fair: 'bg-yellow-100 text-yellow-800',
-      fair: 'bg-yellow-100 text-yellow-800',
-      Poor: 'bg-orange-100 text-orange-800',
-      poor: 'bg-orange-100 text-orange-800',
-      Defective: 'bg-red-100 text-red-800'
+      Fair: 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange',
+      fair: 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange',
+      Poor: 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange',
+      poor: 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange',
+      Defective: 'bg-primary/10 dark:bg-primary/20 text-primary'
     };
     return <span className={`px-2 py-1 text-xs font-medium rounded-full ${conditionColors[condition] || 'bg-gray-100 text-gray-800'}`}>{condition.charAt(0).toUpperCase() + condition.slice(1)}</span>;
   };
   const getIssueBadge = (status: string) => {
     const statusColors: Record<string, string> = {
-      Open: 'bg-red-100 text-red-800',
-      'In Progress': 'bg-yellow-100 text-yellow-800',
+      Open: 'bg-primary/10 dark:bg-primary/20 text-primary',
+      'In Progress': 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange',
       'Pending User Action': 'bg-lightblue text-secondary',
       'Pending Parts': 'bg-lightblue text-secondary',
       Resolved: 'bg-lightred text-primary',
@@ -769,7 +769,7 @@ const AssetDetails: React.FC = () => {
                 Edit Asset
               </button>
               <button
-                className="px-4 py-2 text-sm font-medium text-red-600 border border-red-600 rounded-full hover:bg-red-50 transition-colors disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium text-primary border border-primary rounded-full hover:bg-primary/10 transition-colors disabled:opacity-50"
                 onClick={() => setShowDisposeModal(true)}
                 disabled={asset.status === 'Disposed'}
               >
@@ -929,7 +929,7 @@ const AssetDetails: React.FC = () => {
               <div className="p-4 bg-lightred dark:bg-gray-800 rounded-xl">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Status</span>
-                  {new Date(asset?.warranty_expiry || '').getTime() > new Date().getTime() ? <span className="px-2 py-1 text-xs font-medium text-primary bg-lightred dark:bg-green-900 dark:text-green-200 rounded-full">Active</span> : <span className="px-2 py-1 text-xs font-medium text-red-800 dark:text-red-200 bg-red-100 dark:bg-red-900 rounded-full">Expired</span>}
+                  {new Date(asset?.warranty_expiry || '').getTime() > new Date().getTime() ? <span className="px-2 py-1 text-xs font-medium text-primary bg-lightred dark:bg-brand-green/20 dark:text-brand-green rounded-full">Active</span> : <span className="px-2 py-1 text-xs font-medium text-primary dark:text-accent bg-primary/10 dark:bg-primary/20 rounded-full">Expired</span>}
                 </div>
                 <div className="mt-3 space-y-2">
                   <div className="flex justify-between"><span className="text-xs text-gray-600 dark:text-gray-400">Purchase Date</span><span className="text-xs font-medium text-gray-700 dark:text-gray-300">{formatDate(asset?.purchase_date || null)}</span></div>
@@ -1134,7 +1134,7 @@ const AssetDetails: React.FC = () => {
                                 <span className="text-xs text-gray-500 dark:text-gray-400">{(file.size / 1024 / 1024).toFixed(2)} MB</span>
                               </div>
                             </div>
-                            <button type="button" onClick={() => removeAttachment(index)} className="p-1 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"><XIcon className="w-4 h-4" /></button>
+                            <button type="button" onClick={() => removeAttachment(index)} className="p-1 text-gray-400 hover:text-primary/80 transition-colors rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"><XIcon className="w-4 h-4" /></button>
                           </div>
                         ))}
                       </div>
@@ -1145,7 +1145,7 @@ const AssetDetails: React.FC = () => {
               </div>
               <div className="flex justify-end space-x-3 p-6 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-800">
                 <button type="button" onClick={() => setShowIssueForm(false)} className="px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">Cancel</button>
-                <button type="button" onClick={handleIssueSubmit} disabled={isSubmittingIssue} className="px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-primary to-secondary rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[120px] shadow-lg">
+                <button type="button" onClick={handleIssueSubmit} disabled={isSubmittingIssue} className="px-6 py-3 text-sm font-medium text-white bg-primary rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center min-w-[120px] shadow-lg">
                   {isSubmittingIssue ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />Submitting...</> : 'Submit Issue'}
                 </button>
               </div>
@@ -1160,15 +1160,15 @@ const AssetDetails: React.FC = () => {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
             <div className="w-full max-w-md p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-red-700">Dispose Asset</h3>
+                <h3 className="text-lg font-semibold text-primary">Dispose Asset</h3>
                 <button onClick={() => setShowDisposeModal(false)} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
                   <XCircleIcon className="w-6 h-6" />
                 </button>
               </div>
-              <p className="mb-6 text-gray-700 dark:text-gray-300">Are you sure you want to mark <span className="font-bold">{asset?.name}</span> as <span className="text-red-700">Disposed</span>? This action cannot be undone.</p>
+              <p className="mb-6 text-gray-700 dark:text-gray-300">Are you sure you want to mark <span className="font-bold">{asset?.name}</span> as <span className="text-primary">Disposed</span>? This action cannot be undone.</p>
               <div className="flex justify-end space-x-2">
                 <button type="button" onClick={() => setShowDisposeModal(false)} className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600" disabled={isDisposing}>Cancel</button>
-                <button type="button" onClick={handleDisposeAsset} className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-red-400 rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed" disabled={isDisposing}>{isDisposing ? 'Disposing...' : 'Confirm Dispose'}</button>
+                <button type="button" onClick={handleDisposeAsset} className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed" disabled={isDisposing}>{isDisposing ? 'Disposing...' : 'Confirm Dispose'}</button>
               </div>
             </div>
           </div>
@@ -1317,7 +1317,7 @@ const AssetDetails: React.FC = () => {
                       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         {selectedTypeConfig.parameters_schema.map(param => (
                           <div key={param.name}>
-                              <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">{param.name} {param.required && <span className="text-red-500">*</span>}</label>
+                              <label className="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">{param.name} {param.required && <span className="text-primary">*</span>}</label>
                               {param.type === 'global_dropdown' ? (
                                 <select
                                   value={editingAsset?.custom_attributes?.[param.name] || ''}

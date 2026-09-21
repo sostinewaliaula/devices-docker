@@ -170,7 +170,7 @@ const Settings: React.FC = () => {
             {factors.length > 0 && (
               <button
                 onClick={confirmDisableAll}
-                className="px-4 py-2 text-sm font-medium border border-red-300 dark:border-red-600 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-50 dark:hover:bg-red-900 transition-colors"
+                className="px-4 py-2 text-sm font-medium border border-primary/30 dark:border-primary/50 text-primary dark:text-accent rounded-xl hover:bg-primary/10 dark:hover:bg-primary/30 transition-colors"
               >
                 Disable All TOTP
               </button>
@@ -221,11 +221,11 @@ const Settings: React.FC = () => {
               {factors.map(f => (
                 <li key={f.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                    <div className="w-2 h-2 rounded-full bg-brand-green"></div>
                     <span className="font-medium">{(f.friendlyName || f.type)}</span>
                     <span className={`px-2 py-1 text-xs rounded-full ${f.status === 'verified'
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                      : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                      ? 'bg-brand-green/25 text-secondary dark:bg-brand-green/20 dark:text-brand-green'
+                      : 'bg-brand-orange/15 text-secondary dark:bg-brand-orange/20 dark:text-brand-orange'
                       }`}>
                       {f.status || 'pending'}
                     </span>
@@ -238,7 +238,7 @@ const Settings: React.FC = () => {
                           <button
                             onClick={() => disableById(f.id)}
                             disabled={disablingFactor === f.id}
-                            className="px-3 py-1 text-xs bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                            className="px-3 py-1 text-xs bg-primary text-white rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
                           >
                             {disablingFactor === f.id ? (
                               <>
@@ -261,7 +261,7 @@ const Settings: React.FC = () => {
                         <button
                           onClick={() => confirmDisable(f.id)}
                           disabled={disablingFactor === f.id}
-                          className="px-3 py-1 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900 rounded-md transition-colors disabled:opacity-50"
+                          className="px-3 py-1 text-xs text-primary hover:text-primary/80 hover:bg-primary/10 dark:hover:bg-primary/30 rounded-md transition-colors disabled:opacity-50"
                         >
                           Disable
                         </button>
@@ -273,33 +273,33 @@ const Settings: React.FC = () => {
             </ul>
           </div>
         )}
-        {mfaError && <div className="mt-3 text-sm text-red-600">{mfaError}</div>}
+        {mfaError && <div className="mt-3 text-sm text-primary">{mfaError}</div>}
 
         {/* Disable All Confirmation Dialog */}
         {showDisableAllConfirm && (
-          <div className="mt-4 p-4 bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded-lg">
+          <div className="mt-4 p-4 bg-primary/10 dark:bg-primary/20 border border-primary/30 dark:border-primary/50 rounded-lg">
             <div className="flex items-start gap-3">
-              <div className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5">
+              <div className="w-5 h-5 text-primary dark:text-accent mt-0.5">
                 <svg fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
               </div>
               <div className="flex-1">
-                <h3 className="text-sm font-medium text-red-800 dark:text-red-200">Disable All MFA Factors?</h3>
-                <p className="mt-1 text-sm text-red-700 dark:text-red-300">
+                <h3 className="text-sm font-medium text-primary dark:text-accent">Disable All MFA Factors?</h3>
+                <p className="mt-1 text-sm text-primary dark:text-accent">
                   This will disable all your MFA factors and remove two-factor authentication from your account.
                   You'll need to set up MFA again to re-enable it.
                 </p>
                 <div className="mt-3 flex gap-2">
                   <button
                     onClick={disableAllTotp}
-                    className="px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                    className="px-3 py-1 text-sm bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
                   >
                     Yes, Disable All
                   </button>
                   <button
                     onClick={cancelDisableAll}
-                    className="px-3 py-1 text-sm border border-red-300 dark:border-red-600 text-red-700 dark:text-red-300 rounded-md hover:bg-red-50 dark:hover:bg-red-800 transition-colors"
+                    className="px-3 py-1 text-sm border border-primary/30 dark:border-primary/50 text-primary dark:text-accent rounded-md hover:bg-primary/10 dark:hover:bg-primary/30 transition-colors"
                   >
                     Cancel
                   </button>

@@ -258,10 +258,10 @@ const DepartmentDetails: React.FC = () => {
     const statusColors: Record<string, string> = {
       Available: 'bg-lightred dark:bg-gray-800 text-primary',
       Assigned: 'bg-lightblue dark:bg-gray-800 text-secondary',
-      'In Maintenance': 'bg-yellow-100 dark:bg-gray-800 text-yellow-800 dark:text-yellow-300',
+      'In Maintenance': 'bg-brand-orange/15 dark:bg-gray-800 text-secondary dark:text-brand-orange',
       Reserved: 'bg-lightblue dark:bg-gray-800 text-secondary',
-      Disposed: 'bg-red-100 dark:bg-gray-800 text-red-800 dark:text-red-300',
-      active: 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
+      Disposed: 'bg-primary/10 dark:bg-gray-800 text-primary dark:text-accent',
+      active: 'bg-brand-green/25 dark:bg-brand-green/20 text-secondary dark:text-brand-green'
     };
     return <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusColors[status] || 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>{status}</span>;
   };
@@ -271,9 +271,9 @@ const DepartmentDetails: React.FC = () => {
       New: 'bg-lightred dark:bg-gray-800 text-primary',
       Excellent: 'bg-lightred dark:bg-gray-800 text-primary',
       Good: 'bg-lightblue dark:bg-gray-800 text-secondary',
-      Fair: 'bg-yellow-100 dark:bg-gray-800 text-yellow-800 dark:text-yellow-300',
-      Poor: 'bg-orange-100 dark:bg-gray-800 text-orange-800 dark:text-orange-300',
-      Defective: 'bg-red-100 dark:bg-gray-800 text-red-800 dark:text-red-300'
+      Fair: 'bg-brand-orange/15 dark:bg-gray-800 text-secondary dark:text-brand-orange',
+      Poor: 'bg-brand-orange/15 dark:bg-gray-800 text-secondary dark:text-brand-orange',
+      Defective: 'bg-primary/10 dark:bg-gray-800 text-primary dark:text-accent'
     };
     return <span className={`px-2 py-1 text-xs font-medium rounded-full ${conditionColors[condition] || 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'}`}>{condition}</span>;
   };
@@ -392,12 +392,12 @@ const DepartmentDetails: React.FC = () => {
 
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 bg-yellow-100 dark:bg-gray-800 rounded-xl">
-              <DollarSignIcon className="w-8 h-8 text-yellow-800 dark:text-yellow-300" />
+            <div className="p-3 bg-brand-orange/15 dark:bg-gray-800 rounded-xl">
+              <DollarSignIcon className="w-8 h-8 text-secondary dark:text-brand-orange" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Asset Value</p>
-              <p className="text-2xl font-bold text-yellow-800 dark:text-yellow-300">
+              <p className="text-2xl font-bold text-secondary dark:text-brand-orange">
                 {(department as any).asset_value || 'KSh 0'}
               </p>
             </div>
@@ -406,12 +406,12 @@ const DepartmentDetails: React.FC = () => {
 
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 bg-blue-100 dark:bg-gray-800 rounded-xl">
-              <BarChart2Icon className="w-8 h-8 text-blue-800 dark:text-blue-300" />
+            <div className="p-3 bg-secondary/10 dark:bg-gray-800 rounded-xl">
+              <BarChart2Icon className="w-8 h-8 text-secondary dark:text-accent" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Active Assets</p>
-              <p className="text-2xl font-bold text-blue-800 dark:text-blue-300">
+              <p className="text-2xl font-bold text-secondary dark:text-accent">
                 {departmentAssets.filter(asset => asset.status === 'Available' || asset.status === 'Assigned').length}
               </p>
             </div>
@@ -428,14 +428,14 @@ const DepartmentDetails: React.FC = () => {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="p-4 bg-lightred dark:bg-gray-800 dark:border dark:border-gray-700 rounded-xl hover:shadow-md dark:hover:shadow-lg transition-shadow duration-200">
                 <div className="flex items-center mb-2">
-                  <BuildingIcon className="w-5 h-5 mr-2 text-primary dark:text-green-400" />
+                  <BuildingIcon className="w-5 h-5 mr-2 text-primary dark:text-brand-green" />
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Description</span>
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-300">{department.description || 'No description available'}</p>
               </div>
               <div className="p-4 bg-lightred dark:bg-gray-800 dark:border dark:border-gray-700 rounded-xl hover:shadow-md dark:hover:shadow-lg transition-shadow duration-200">
                 <div className="flex items-center mb-2">
-                  <MapPinIcon className="w-5 h-5 mr-2 text-primary dark:text-green-400" />
+                  <MapPinIcon className="w-5 h-5 mr-2 text-primary dark:text-brand-green" />
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Location</span>
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-300">{department.location}</p>
@@ -449,7 +449,7 @@ const DepartmentDetails: React.FC = () => {
               </div>
               <div className="p-4 bg-lightred dark:bg-gray-800 dark:border dark:border-gray-700 rounded-xl hover:shadow-md dark:hover:shadow-lg transition-shadow duration-200">
                 <div className="flex items-center mb-2">
-                  <CalendarIcon className="w-5 h-5 mr-2 text-primary dark:text-green-400" />
+                  <CalendarIcon className="w-5 h-5 mr-2 text-primary dark:text-brand-green" />
                   <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Created</span>
                 </div>
                 <p className="text-sm text-gray-600 dark:text-gray-300">{formatDate(department.created_at)}</p>
@@ -503,7 +503,7 @@ const DepartmentDetails: React.FC = () => {
                       </div>
                       <button
                         onClick={() => handleRemoveUserFromDepartment(user.id)}
-                        className="text-red-500 hover:text-red-700 p-1"
+                        className="text-primary hover:text-primary/80 p-1"
                         disabled={isUpdating}
                       >
                         <TrashIcon className="w-4 h-4" />
@@ -570,7 +570,7 @@ const DepartmentDetails: React.FC = () => {
                         </Link>
                         <button
                           onClick={() => handleRemoveAssetFromDepartment(asset.id)}
-                          className="text-red-500 hover:text-red-700 p-1"
+                          className="text-primary hover:text-primary/80 p-1"
                           disabled={isUpdating}
                         >
                           <TrashIcon className="w-4 h-4" />
@@ -606,14 +606,14 @@ const DepartmentDetails: React.FC = () => {
                   <UserIcon className="w-8 h-8" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-800 dark:text-gray-200">{departmentManager.user?.name}</h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-300 dark:text-gray-300">{departmentManager.user?.email}</p>
-                  {departmentManager.user?.phone && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">{departmentManager.user.phone}</p>
+                  <h3 className="text-sm font-medium text-gray-800 dark:text-gray-200">{departmentManager.name}</h3>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 dark:text-gray-300">{departmentManager.email}</p>
+                  {departmentManager.phone && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">{departmentManager.phone}</p>
                   )}
                   <div className="mt-1">
                     <span className="px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-700 bg-gray-100 dark:bg-gray-200 rounded">
-                      {departmentManager.user?.role}
+                      {departmentManager.role}
                     </span>
                   </div>
                 </div>

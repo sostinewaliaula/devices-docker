@@ -289,27 +289,27 @@ const AssetRequestsManagement: React.FC = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'approved':
-        return <CheckCircleIcon className="w-5 h-5 text-green-500" />;
+        return <CheckCircleIcon className="w-5 h-5 text-secondary dark:text-brand-green" />;
       case 'rejected':
-        return <XCircleIcon className="w-5 h-5 text-red-500" />;
+        return <XCircleIcon className="w-5 h-5 text-primary" />;
       case 'fulfilled':
-        return <CheckCircleIcon className="w-5 h-5 text-blue-500" />;
+        return <CheckCircleIcon className="w-5 h-5 text-secondary dark:text-accent" />;
       case 'pending':
       default:
-        return <ClockIcon className="w-5 h-5 text-yellow-500" />;
+        return <ClockIcon className="w-5 h-5 text-brand-orange" />;
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'urgent':
-        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-700';
+        return 'bg-primary/10 dark:bg-primary/20 text-primary dark:text-accent border border-primary/30 dark:border-primary/50';
       case 'high':
-        return 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 border border-orange-200 dark:border-orange-700';
+        return 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange border border-brand-orange/40 dark:border-brand-orange/40';
       case 'medium':
-        return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-700';
+        return 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange border border-brand-orange/40 dark:border-brand-orange/40';
       case 'low':
-        return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-700';
+        return 'bg-brand-green/25 dark:bg-brand-green/20 text-secondary dark:text-brand-green border border-brand-green/60 dark:border-brand-green/40';
       default:
         return 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-600';
     }
@@ -318,14 +318,14 @@ const AssetRequestsManagement: React.FC = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'approved':
-        return 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-700';
+        return 'bg-brand-green/25 dark:bg-brand-green/20 text-secondary dark:text-brand-green border border-brand-green/60 dark:border-brand-green/40';
       case 'rejected':
-        return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-700';
+        return 'bg-primary/10 dark:bg-primary/20 text-primary dark:text-accent border border-primary/30 dark:border-primary/50';
       case 'fulfilled':
-        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-700';
+        return 'bg-secondary/10 dark:bg-accent/15 text-secondary dark:text-accent border border-secondary/20 dark:border-accent/30';
       case 'pending':
       default:
-        return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-700';
+        return 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange border border-brand-orange/40 dark:border-brand-orange/40';
     }
   };
 
@@ -364,30 +364,30 @@ const AssetRequestsManagement: React.FC = () => {
 
       {/* Bulk Actions Toolbar */}
       {selectedRequests.length > 0 && (
-        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-200 dark:border-blue-800">
+        <div className="p-4 bg-secondary/10 dark:bg-accent/15 rounded-2xl border border-secondary/20 dark:border-accent/30">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+              <span className="text-sm font-medium text-secondary dark:text-accent">
                 {selectedRequests.length} request(s) selected
               </span>
               <div className="flex space-x-2">
                 <button
                   onClick={() => handleBulkAction('approve')}
-                  className="px-3 py-1 bg-green-500 dark:bg-green-600 text-white text-sm rounded-lg hover:bg-green-600 dark:hover:bg-green-700 transition-colors flex items-center"
+                  className="px-3 py-1 bg-brand-green dark:bg-brand-green text-secondary text-sm rounded-lg hover:bg-brand-green/80 dark:hover:bg-brand-green/80 transition-colors flex items-center"
                 >
                   <CheckIcon className="w-4 h-4 mr-1" />
                   Approve All
                 </button>
                 <button
                   onClick={() => handleBulkAction('reject')}
-                  className="px-3 py-1 bg-red-500 dark:bg-red-600 text-white text-sm rounded-lg hover:bg-red-600 dark:hover:bg-red-700 transition-colors flex items-center"
+                  className="px-3 py-1 bg-primary dark:bg-primary text-white text-sm rounded-lg hover:bg-primary/90 dark:hover:bg-primary/90 transition-colors flex items-center"
                 >
                   <XIcon className="w-4 h-4 mr-1" />
                   Reject All
                 </button>
                 <button
                   onClick={() => handleBulkAction('fulfill')}
-                  className="px-3 py-1 bg-blue-500 dark:bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors flex items-center"
+                  className="px-3 py-1 bg-action text-on-action text-sm rounded-lg hover:opacity-90 transition-colors flex items-center"
                 >
                   <PackageIcon className="w-4 h-4 mr-1" />
                   Fulfill All
@@ -396,7 +396,7 @@ const AssetRequestsManagement: React.FC = () => {
             </div>
             <button
               onClick={() => setSelectedRequests([])}
-              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium"
+              className="text-secondary dark:text-accent hover:opacity-80 text-sm font-medium"
             >
               Clear Selection
             </button>
@@ -456,7 +456,7 @@ const AssetRequestsManagement: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <ClockIcon className="w-8 h-8 text-yellow-500" />
+            <ClockIcon className="w-8 h-8 text-brand-orange" />
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Pending</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -468,7 +468,7 @@ const AssetRequestsManagement: React.FC = () => {
 
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <CheckCircleIcon className="w-8 h-8 text-green-500" />
+            <CheckCircleIcon className="w-8 h-8 text-secondary dark:text-brand-green" />
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Approved</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -480,7 +480,7 @@ const AssetRequestsManagement: React.FC = () => {
 
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <XCircleIcon className="w-8 h-8 text-red-500" />
+            <XCircleIcon className="w-8 h-8 text-primary" />
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Rejected</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -492,7 +492,7 @@ const AssetRequestsManagement: React.FC = () => {
 
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <PackageIcon className="w-8 h-8 text-blue-500" />
+            <PackageIcon className="w-8 h-8 text-secondary dark:text-accent" />
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Fulfilled</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -504,7 +504,7 @@ const AssetRequestsManagement: React.FC = () => {
 
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <AlertCircleIcon className="w-8 h-8 text-purple-500" />
+            <AlertCircleIcon className="w-8 h-8 text-secondary dark:text-accent" />
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -516,7 +516,7 @@ const AssetRequestsManagement: React.FC = () => {
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card lg:col-span-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <DollarSignIcon className="w-8 h-8 text-blue-600" />
+              <DollarSignIcon className="w-8 h-8 text-secondary dark:text-accent" />
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Estimated Cost</p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -567,7 +567,7 @@ const AssetRequestsManagement: React.FC = () => {
               {filteredRequests.map((request) => (
                 <tr
                   key={request.id}
-                  className={`border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer ${selectedRequests.includes(request.id) ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-white dark:bg-gray-900'}`}
+                  className={`border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer ${selectedRequests.includes(request.id) ? 'bg-secondary/10 dark:bg-accent/15' : 'bg-white dark:bg-gray-900'}`}
                   onClick={() => openDetailsModal(request)}
                 >
                   <td className="py-4 px-6">
@@ -632,7 +632,7 @@ const AssetRequestsManagement: React.FC = () => {
                           e.stopPropagation();
                           openDetailsModal(request);
                         }}
-                        className="p-2 text-purple-600 hover:text-purple-800 hover:bg-purple-100 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                        className="p-2 text-secondary dark:text-accent hover:opacity-80 hover:bg-secondary/10 dark:hover:bg-accent/10 rounded-lg transition-colors"
                         title="View Details"
                       >
                         <EyeIcon className="w-5 h-5" />
@@ -644,7 +644,7 @@ const AssetRequestsManagement: React.FC = () => {
                           e.stopPropagation();
                           openUpdateModal(request);
                         }}
-                        className="p-2 text-orange-500 hover:text-orange-700 hover:bg-orange-100 dark:hover:bg-orange-900/20 rounded-lg transition-colors"
+                        className="p-2 text-brand-orange hover:opacity-80 hover:bg-brand-orange/25 dark:hover:bg-brand-orange/20 rounded-lg transition-colors"
                         title="Edit Request"
                       >
                         <EditIcon className="w-5 h-5" />
@@ -658,7 +658,7 @@ const AssetRequestsManagement: React.FC = () => {
                               e.stopPropagation();
                               handleQuickAction('approve', request.id);
                             }}
-                            className="p-2 text-green-600 hover:text-green-800 hover:bg-green-100 dark:hover:bg-green-900/20 rounded-lg transition-colors"
+                            className="p-2 text-secondary dark:text-brand-green hover:opacity-80 hover:bg-brand-green/20 dark:hover:bg-brand-green/20 rounded-lg transition-colors"
                             title="Approve Request"
                           >
                             <CheckIcon className="w-5 h-5" />
@@ -668,7 +668,7 @@ const AssetRequestsManagement: React.FC = () => {
                               e.stopPropagation();
                               handleQuickAction('reject', request.id);
                             }}
-                            className="p-2 text-red-600 hover:text-red-800 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                            className="p-2 text-primary hover:text-primary/80 hover:bg-primary/10 dark:hover:bg-primary/30 rounded-lg transition-colors"
                             title="Reject Request"
                           >
                             <XIcon className="w-5 h-5" />
@@ -681,7 +681,7 @@ const AssetRequestsManagement: React.FC = () => {
                             e.stopPropagation();
                             handleQuickAction('fulfill', request.id);
                           }}
-                          className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                          className="p-2 text-secondary dark:text-accent hover:opacity-80 hover:bg-secondary/10 dark:hover:bg-accent/10 rounded-lg transition-colors"
                           title="Mark as Fulfilled"
                         >
                           <PackageIcon className="w-5 h-5" />
@@ -694,7 +694,7 @@ const AssetRequestsManagement: React.FC = () => {
                           e.stopPropagation();
                           handleDeleteRequest(request.id.toString());
                         }}
-                        className="p-2 text-red-500 hover:text-red-700 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                        className="p-2 text-primary hover:text-primary/80 hover:bg-primary/10 dark:hover:bg-primary/30 rounded-lg transition-colors"
                         title="Delete Request"
                       >
                         <TrashIcon className="w-5 h-5" />
@@ -948,21 +948,21 @@ const AssetRequestsManagement: React.FC = () => {
 
             <div className="flex items-start space-x-4 mb-6">
               <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${confirmAction.type === 'approve'
-                ? 'bg-green-100 dark:bg-green-900/30'
+                ? 'bg-brand-green/25 dark:bg-brand-green/20'
                 : confirmAction.type === 'reject'
-                  ? 'bg-red-100 dark:bg-red-900/30'
+                  ? 'bg-primary/10 dark:bg-primary/20'
                   : confirmAction.type === 'delete'
-                    ? 'bg-red-100 dark:bg-red-900/30'
-                    : 'bg-blue-100 dark:bg-blue-900/30'
+                    ? 'bg-primary/10 dark:bg-primary/20'
+                    : 'bg-secondary/10 dark:bg-accent/15'
                 }`}>
                 {confirmAction.type === 'approve' ? (
-                  <CheckIcon className="w-6 h-6 text-green-600 dark:text-green-400" />
+                  <CheckIcon className="w-6 h-6 text-secondary dark:text-brand-green" />
                 ) : confirmAction.type === 'reject' ? (
-                  <XIcon className="w-6 h-6 text-red-600 dark:text-red-400" />
+                  <XIcon className="w-6 h-6 text-primary dark:text-accent" />
                 ) : confirmAction.type === 'delete' ? (
-                  <TrashIcon className="w-6 h-6 text-red-600 dark:text-red-400" />
+                  <TrashIcon className="w-6 h-6 text-primary dark:text-accent" />
                 ) : (
-                  <PackageIcon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                  <PackageIcon className="w-6 h-6 text-secondary dark:text-accent" />
                 )}
               </div>
               <div className="flex-1">
@@ -989,13 +989,13 @@ const AssetRequestsManagement: React.FC = () => {
               </button>
               <button
                 onClick={executeAction}
-                className={`px-4 py-2 text-white rounded-lg transition-colors ${confirmAction.type === 'approve'
-                  ? 'bg-green-500 dark:bg-green-600 hover:bg-green-600 dark:hover:bg-green-700'
+                className={`px-4 py-2 rounded-lg transition-colors ${confirmAction.type === 'approve'
+                  ? 'bg-brand-green text-secondary hover:bg-brand-green/80'
                   : confirmAction.type === 'reject'
-                    ? 'bg-red-500 dark:bg-red-600 hover:bg-red-600 dark:hover:bg-red-700'
+                    ? 'bg-primary text-white hover:bg-primary/90'
                     : confirmAction.type === 'delete'
-                      ? 'bg-red-500 dark:bg-red-600 hover:bg-red-600 dark:hover:bg-red-700'
-                      : 'bg-blue-500 dark:bg-blue-600 hover:bg-blue-600 dark:hover:bg-blue-700'
+                      ? 'bg-primary text-white hover:bg-primary/90'
+                      : 'bg-action text-on-action hover:opacity-90'
                   }`}
               >
                 {confirmAction.type === 'approve' ? 'Approve' :

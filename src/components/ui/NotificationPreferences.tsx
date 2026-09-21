@@ -19,10 +19,10 @@ const NotificationPreferences: React.FC = () => {
   const [saving, setSaving] = useState(false);
 
   const notificationTypeOptions = [
-    { value: 'success', label: 'Success', color: 'text-green-600' },
-    { value: 'error', label: 'Error', color: 'text-red-600' },
-    { value: 'warning', label: 'Warning', color: 'text-yellow-600' },
-    { value: 'info', label: 'Info', color: 'text-blue-600' }
+    { value: 'success', label: 'Success', color: 'text-secondary dark:text-brand-green' },
+    { value: 'error', label: 'Error', color: 'text-primary' },
+    { value: 'warning', label: 'Warning', color: 'text-brand-orange' },
+    { value: 'info', label: 'Info', color: 'text-secondary dark:text-accent' }
   ];
 
   const frequencyOptions = [
@@ -299,18 +299,18 @@ const NotificationPreferences: React.FC = () => {
 
 
       {/* Info Box */}
-      <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900 dark:bg-opacity-20 rounded-lg">
+      <div className="mt-6 p-4 bg-secondary/10 dark:bg-accent/15 dark:bg-opacity-20 rounded-lg">
         <div className="flex items-start">
           <div className="flex-shrink-0">
-            <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+            <svg className="h-5 w-5 text-secondary dark:text-accent" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
             </svg>
           </div>
           <div className="ml-3">
-            <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">
+            <h3 className="text-sm font-medium text-secondary dark:text-accent">
               How it works
             </h3>
-            <div className="mt-2 text-sm text-blue-700 dark:text-blue-300">
+            <div className="mt-2 text-sm text-secondary dark:text-accent">
               <ul className="list-disc list-inside space-y-1">
                 <li>In-app notifications are always shown regardless of email settings</li>
                 <li>Email notifications are sent based on your preferences</li>

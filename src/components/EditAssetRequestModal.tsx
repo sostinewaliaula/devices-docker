@@ -102,9 +102,9 @@ const EditAssetRequestModal: React.FC<EditAssetRequestModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 flex items-center space-x-2">
-              <AlertCircleIcon className="w-5 h-5 text-red-500" />
-              <span className="text-red-700 dark:text-red-400 text-sm">{error}</span>
+            <div className="bg-primary/10 dark:bg-primary/20 border border-primary/30 dark:border-primary/50 rounded-lg p-4 flex items-center space-x-2">
+              <AlertCircleIcon className="w-5 h-5 text-primary" />
+              <span className="text-primary dark:text-accent text-sm">{error}</span>
             </div>
           )}
 
@@ -119,7 +119,7 @@ const EditAssetRequestModal: React.FC<EditAssetRequestModalProps> = ({
               value={formData.asset_name}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-gray-100"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary dark:focus:ring-accent focus:border-transparent dark:bg-gray-800 dark:text-gray-100"
               placeholder="Enter asset name"
             />
           </div>
@@ -134,7 +134,7 @@ const EditAssetRequestModal: React.FC<EditAssetRequestModalProps> = ({
               value={formData.asset_type}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-gray-100"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary dark:focus:ring-accent focus:border-transparent dark:bg-gray-800 dark:text-gray-100"
               disabled={loadingAssetTypes || (activeAssetTypes.length === 0 && !formData.asset_type)}
             >
               <option value="">
@@ -154,7 +154,7 @@ const EditAssetRequestModal: React.FC<EditAssetRequestModalProps> = ({
               )}
             </select>
             {assetTypeError && (
-              <p className="mt-2 text-xs text-red-500">{assetTypeError}</p>
+              <p className="mt-2 text-xs text-primary">{assetTypeError}</p>
             )}
           </div>
 
@@ -169,7 +169,7 @@ const EditAssetRequestModal: React.FC<EditAssetRequestModalProps> = ({
               onChange={handleChange}
               required
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-gray-100"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-secondary dark:focus:ring-accent focus:border-transparent dark:bg-gray-800 dark:text-gray-100"
               placeholder="Explain why you need this asset"
             />
           </div>
@@ -185,7 +185,7 @@ const EditAssetRequestModal: React.FC<EditAssetRequestModalProps> = ({
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 rounded-lg transition-colors flex items-center space-x-2"
+              className="px-4 py-2 text-sm font-medium text-on-action bg-action hover:opacity-90 disabled:opacity-60 rounded-lg transition-colors flex items-center space-x-2"
             >
               {loading ? (
                 <>

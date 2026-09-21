@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContextNew';
 import { useNotifications } from '../../contexts/NotificationContext';
+import { useTheme } from '../../contexts/ThemeContext';
 import { 
   MonitorIcon, 
   AlertCircleIcon, 
@@ -23,6 +24,8 @@ import { Asset, Issue, User, Department, AssetRequest } from '../../lib/supabase
 const ManagerDashboard: React.FC = () => {
   const { user } = useAuth();
   const { addToast } = useNotifications();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark' || (theme === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [issues, setIssues] = useState<Issue[]>([]);
   const [teamMembers, setTeamMembers] = useState<User[]>([]);
@@ -133,11 +136,11 @@ const ManagerDashboard: React.FC = () => {
       case 'Pending User Action':
       case 'Pending Parts':
       case 'Pending':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange';
       case 'Disposed':
       case 'Open':
       case 'Rejected':
-        return 'bg-red-100 text-red-800';
+        return 'bg-primary/10 dark:bg-primary/20 text-primary';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -167,7 +170,10 @@ const ManagerDashboard: React.FC = () => {
   };
 
   // Colors for charts
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658', '#8dd1e1'];
+  const COLORS = isDark
+    ? ['#F7E7C6', '#E59730', '#D90429', '#D9E021', '#8FA3C0', '#F2C879', '#EE6B80', '#EAF06A']
+    : ['#152F52', '#E59730', '#D90429', '#D9E021', '#4A6A96', '#C9A25E', '#EE6B80', '#A9AF10'];
+  const axisColor = isDark ? '#C0CBDA' : '#46566F';
 
   if (loading) {
     return (
@@ -247,8 +253,8 @@ const ManagerDashboard: React.FC = () => {
         {/* Open Issues Card */}
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-red-100 rounded-full">
-              <AlertCircleIcon className="w-6 h-6 text-red-600" />
+            <div className="p-3 mr-4 bg-primary/10 dark:bg-primary/20 rounded-full">
+              <AlertCircleIcon className="w-6 h-6 text-primary" />
             </div>
             <div>
               <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">Open Issues</p>
@@ -275,8 +281,8 @@ const ManagerDashboard: React.FC = () => {
         {/* Pending Requests Card */}
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-yellow-100 rounded-full">
-              <TicketIcon className="w-6 h-6 text-yellow-600" />
+            <div className="p-3 mr-4 bg-brand-orange/15 dark:bg-brand-orange/20 rounded-full">
+              <TicketIcon className="w-6 h-6 text-brand-orange" />
             </div>
             <div>
               <p className="mb-2 text-sm font-medium text-gray-600 dark:text-gray-300">Pending Requests</p>
@@ -303,7 +309,7 @@ const ManagerDashboard: React.FC = () => {
                   labelLine={false} 
                   label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`} 
                   outerRadius={80} 
-                  fill="#8884d8" 
+                  fill="#152F52" 
                   dataKey="value"
                 >
                   {assetsByStatus.map((entry, index) => (
@@ -311,7 +317,7 @@ const ManagerDashboard: React.FC = () => {
                   ))}
                 </Pie>
                 <Tooltip formatter={value => [`${value} assets`, null]} />
-                <Legend />
+                <Legend wrapperStyle={{ color: axisColor }} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -330,7 +336,7 @@ const ManagerDashboard: React.FC = () => {
                   labelLine={false} 
                   label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`} 
                   outerRadius={80} 
-                  fill="#8884d8" 
+                  fill="#152F52" 
                   dataKey="value"
                 >
                   {issuesByStatus.map((entry, index) => (
@@ -338,7 +344,7 @@ const ManagerDashboard: React.FC = () => {
                   ))}
                 </Pie>
                 <Tooltip formatter={value => [`${value} issues`, null]} />
-                <Legend />
+                <Legend wrapperStyle={{ color: axisColor }} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -360,12 +366,12 @@ const ManagerDashboard: React.FC = () => {
               <div key={issue.id} className="p-4 bg-lightred dark:bg-gray-800 rounded-xl">
                 <div className="flex items-start">
                   <div className={`p-2 mr-4 rounded-full ${
-                    issue.status === 'Open' ? 'bg-red-100' : 
-                    issue.status === 'In Progress' ? 'bg-yellow-100' : 
+                    issue.status === 'Open' ? 'bg-primary/10 dark:bg-primary/20' : 
+                    issue.status === 'In Progress' ? 'bg-brand-orange/15 dark:bg-brand-orange/20' : 
                     issue.status === 'Resolved' || issue.status === 'Closed' ? 'bg-lightred' : 'bg-gray-100'
                   }`}>
-                    {issue.status === 'Open' ? <AlertCircleIcon className="w-5 h-5 text-red-600" /> : 
-                     issue.status === 'In Progress' ? <ClockIcon className="w-5 h-5 text-yellow-600" /> : 
+                    {issue.status === 'Open' ? <AlertCircleIcon className="w-5 h-5 text-primary" /> : 
+                     issue.status === 'In Progress' ? <ClockIcon className="w-5 h-5 text-brand-orange" /> : 
                      issue.status === 'Resolved' || issue.status === 'Closed' ? <CheckCircleIcon className="w-5 h-5 text-primary" /> : 
                      <ArchiveIcon className="w-5 h-5 text-gray-600" />}
                   </div>
@@ -402,13 +408,13 @@ const ManagerDashboard: React.FC = () => {
               <div key={request.id} className="p-4 bg-lightblue dark:bg-gray-800 rounded-xl">
                 <div className="flex items-start">
                   <div className={`p-2 mr-4 rounded-full ${
-                    request.status === 'Pending' ? 'bg-yellow-100' : 
+                    request.status === 'Pending' ? 'bg-brand-orange/15 dark:bg-brand-orange/20' : 
                     request.status === 'Approved' ? 'bg-lightred' : 
-                    request.status === 'Rejected' ? 'bg-red-100' : 'bg-gray-100'
+                    request.status === 'Rejected' ? 'bg-primary/10 dark:bg-primary/20' : 'bg-gray-100'
                   }`}>
-                    {request.status === 'Pending' ? <ClockIcon className="w-5 h-5 text-yellow-600" /> : 
+                    {request.status === 'Pending' ? <ClockIcon className="w-5 h-5 text-brand-orange" /> : 
                      request.status === 'Approved' ? <CheckCircleIcon className="w-5 h-5 text-primary" /> : 
-                     request.status === 'Rejected' ? <AlertCircleIcon className="w-5 h-5 text-red-600" /> : 
+                     request.status === 'Rejected' ? <AlertCircleIcon className="w-5 h-5 text-primary" /> : 
                      <ArchiveIcon className="w-5 h-5 text-gray-600" />}
                   </div>
                   <div>

@@ -184,7 +184,7 @@ const PositionsManagement: React.FC = () => {
                         <CheckCircleIcon className="w-3 h-3 mr-1" /> Active
                       </span>
                     ) : (
-                      <span className="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-700">
+                      <span className="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full bg-primary/10 dark:bg-primary/20 text-primary">
                         <XCircleIcon className="w-3 h-3 mr-1" /> Inactive
                       </span>
                     )}
@@ -192,7 +192,7 @@ const PositionsManagement: React.FC = () => {
                   <td className="px-6 py-4 text-right space-x-3">
                     <button
                       onClick={() => handleOpenModal(position)}
-                      className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 inline-flex items-center"
+                      className="text-secondary hover:opacity-80 dark:text-accent inline-flex items-center"
                     >
                       <EditIcon className="w-4 h-4 mr-1" /> Edit
                     </button>
@@ -201,7 +201,7 @@ const PositionsManagement: React.FC = () => {
                         setPositionToDelete(position);
                         setShowDeleteModal(true);
                       }}
-                      className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 inline-flex items-center"
+                      className="text-primary hover:text-primary/80 dark:text-accent dark:hover:text-accent/80 inline-flex items-center"
                     >
                       <TrashIcon className="w-4 h-4 mr-1" /> Delete
                     </button>
@@ -293,7 +293,7 @@ const PositionsManagement: React.FC = () => {
               >
                 Cancel
               </button>
-              <button onClick={handleDelete} className="px-4 py-2 rounded-xl bg-red-600 text-white hover:bg-red-700">
+              <button onClick={handleDelete} className="px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary/90">
                 Delete
               </button>
             </div>

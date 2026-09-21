@@ -145,13 +145,13 @@ useEffect(() => {
     switch (status) {
       case 'Available':
       case 'Assigned':
-        return 'bg-green-100 text-green-800';
+        return 'bg-brand-green/25 dark:bg-brand-green/20 text-secondary dark:text-brand-green';
       case 'In Maintenance':
       case 'In Use':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange';
       case 'Disposed':
       case 'Retired':
-        return 'bg-red-100 text-red-800';
+        return 'bg-primary/10 dark:bg-primary/20 text-primary';
       default:
         return 'bg-gray-100 text-gray-800';
     }
@@ -160,16 +160,16 @@ useEffect(() => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'Available':
-        return <CheckCircleIcon className="w-5 h-5 text-green-600" />;
+        return <CheckCircleIcon className="w-5 h-5 text-secondary dark:text-brand-green" />;
       case 'Assigned':
         return <UserIcon className="w-5 h-5 text-green-600" />;
       case 'In Maintenance':
-        return <ClockIcon className="w-5 h-5 text-yellow-600" />;
+        return <ClockIcon className="w-5 h-5 text-brand-orange" />;
       case 'In Use':
-        return <MonitorIcon className="w-5 h-5 text-yellow-600" />;
+        return <MonitorIcon className="w-5 h-5 text-brand-orange" />;
       case 'Disposed':
       case 'Retired':
-        return <ArchiveIcon className="w-5 h-5 text-red-600" />;
+        return <ArchiveIcon className="w-5 h-5 text-primary" />;
       default:
         return <MonitorIcon className="w-5 h-5 text-gray-600" />;
     }
@@ -503,7 +503,7 @@ useEffect(() => {
         const headers = ['Name', 'Type', 'Serial Number', 'Status', 'Location', 'Assigned To', 'Purchase Date'];
         const escapeHtml = (s: any) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         
-        const thead = `<thead><tr style="background-color: #2563eb; color: white; font-weight: bold;">${headers.map(h => 
+        const thead = `<thead><tr style="background-color: #152F52; color: white; font-weight: bold;">${headers.map(h => 
           `<th style="text-align:left; border:1px solid #ccc; padding:12px; font-size:14px;">${h}</th>`
         ).join('')}</tr></thead>`;
         
@@ -527,7 +527,7 @@ useEffect(() => {
   <meta charset="utf-8" />
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; }
-    h1 { color: #2563eb; margin-bottom: 10px; }
+    h1 { color: #152F52; margin-bottom: 10px; }
     .info { color: #666; margin-bottom: 20px; font-size: 14px; }
   </style>
 </head>
@@ -731,7 +731,7 @@ useEffect(() => {
           <div className="flex flex-wrap gap-2">
             <button
               onClick={handleRequestAsset}
-              className="px-6 py-3 bg-gradient-to-r from-primary to-purple-600 text-white rounded-lg hover:from-primary/90 hover:to-purple-600/90 transition-all duration-200 flex items-center font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
+              className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all duration-200 flex items-center font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               <PlusIcon className="w-5 h-5 mr-2" />
               Request New Asset
@@ -763,8 +763,8 @@ useEffect(() => {
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-blue-100 rounded-full">
-              <MonitorIcon className="w-6 h-6 text-blue-600" />
+            <div className="p-3 mr-4 bg-secondary/10 dark:bg-accent/15 rounded-full">
+              <MonitorIcon className="w-6 h-6 text-secondary dark:text-accent" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Total Assets</p>
@@ -774,8 +774,8 @@ useEffect(() => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-green-100 rounded-full">
-              <CheckCircleIcon className="w-6 h-6 text-green-600" />
+            <div className="p-3 mr-4 bg-brand-green/25 dark:bg-brand-green/20 rounded-full">
+              <CheckCircleIcon className="w-6 h-6 text-secondary dark:text-brand-green" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Available</p>
@@ -796,8 +796,8 @@ useEffect(() => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-yellow-100 rounded-full">
-              <ClockIcon className="w-6 h-6 text-yellow-600" />
+            <div className="p-3 mr-4 bg-brand-orange/15 dark:bg-brand-orange/20 rounded-full">
+              <ClockIcon className="w-6 h-6 text-brand-orange" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Maintenance</p>
@@ -807,8 +807,8 @@ useEffect(() => {
         </div>
         <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
           <div className="flex items-center">
-            <div className="p-3 mr-4 bg-red-100 rounded-full">
-              <ArchiveIcon className="w-6 h-6 text-red-600" />
+            <div className="p-3 mr-4 bg-primary/10 dark:bg-primary/20 rounded-full">
+              <ArchiveIcon className="w-6 h-6 text-primary" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Disposed</p>
@@ -890,7 +890,7 @@ useEffect(() => {
                         <p className="text-sm text-gray-500 dark:text-gray-400">{asset.type}</p>
                       </div>
                     </div>
-                    <div className={`p-2 rounded-full ${asset.status === 'Available' ? 'bg-green-100' : asset.status === 'Assigned' ? 'bg-blue-100' : asset.status === 'In Maintenance' ? 'bg-yellow-100' : 'bg-red-100'}`}>
+                    <div className={`p-2 rounded-full ${asset.status === 'Available' ? 'bg-brand-green/25 dark:bg-brand-green/20' : asset.status === 'Assigned' ? 'bg-secondary/10 dark:bg-accent/15' : asset.status === 'In Maintenance' ? 'bg-brand-orange/15 dark:bg-brand-orange/20' : 'bg-primary/10 dark:bg-primary/20'}`}>
                       {getStatusIcon(asset.status)}
                     </div>
                   </div>
@@ -910,7 +910,7 @@ useEffect(() => {
                     )}
 
                     {openIssues.length > 0 && (
-                      <div className="flex items-center text-sm text-red-600 dark:text-red-400">
+                      <div className="flex items-center text-sm text-primary dark:text-accent">
                         <AlertCircleIcon className="w-4 h-4 mr-1" />
                         <span>{openIssues.length} open issue{openIssues.length > 1 ? 's' : ''}</span>
                       </div>
@@ -936,7 +936,7 @@ useEffect(() => {
                     </button>
                     <button
                       onClick={() => handleReportIssue(asset)}
-                      className="flex-1 px-3 py-2 text-sm font-medium text-red-600 border border-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-colors"
+                      className="flex-1 px-3 py-2 text-sm font-medium text-primary border border-primary rounded-lg hover:bg-primary/90 hover:text-white transition-colors"
                     >
                       <AlertCircleIcon className="w-4 h-4 mr-1 inline" />
                       Report Issue
@@ -1021,7 +1021,7 @@ useEffect(() => {
                       <div key={issue.id} className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium text-gray-900 dark:text-white">{issue.title}</span>
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${issue.status === 'Open' ? 'bg-red-100 text-red-800' : issue.status === 'In Progress' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`}>
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${issue.status === 'Open' ? 'bg-primary/10 dark:bg-primary/20 text-primary' : issue.status === 'In Progress' ? 'bg-brand-orange/15 dark:bg-brand-orange/20 text-secondary dark:text-brand-orange' : 'bg-brand-green/25 dark:bg-brand-green/20 text-secondary dark:text-brand-green'}`}>
                             {issue.status}
                           </span>
                         </div>
@@ -1041,7 +1041,7 @@ useEffect(() => {
               <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <button
                   onClick={() => handleReportIssue(selectedAsset)}
-                  className="flex-1 px-4 py-2 text-red-600 border border-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-colors"
+                  className="flex-1 px-4 py-2 text-primary border border-primary rounded-lg hover:bg-primary/90 hover:text-white transition-colors"
                 >
                   <AlertCircleIcon className="w-4 h-4 mr-2 inline" />
                   Report Issue
@@ -1120,7 +1120,7 @@ useEffect(() => {
                 <button
                   onClick={handleSubmitIssue}
                   disabled={submittingIssue}
-                  className="flex-1 px-4 py-2 bg-gradient-to-r from-primary to-purple-600 text-white rounded-lg hover:from-primary/90 hover:to-purple-600/90 transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg flex items-center justify-center"
+                  className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all duration-200 font-medium shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg flex items-center justify-center"
                 >
                   {submittingIssue ? (
                     <>
@@ -1345,7 +1345,7 @@ useEffect(() => {
                 </button>
                 <button
                   onClick={handleSubmitAssetRequest}
-                  className="px-6 py-2 bg-gradient-to-r from-primary to-purple-600 text-white rounded-lg hover:from-primary/90 hover:to-purple-600/90 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+                  className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
                 >
                   Submit Request
                 </button>

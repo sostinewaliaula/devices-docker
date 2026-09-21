@@ -121,7 +121,7 @@ const QrScanner: React.FC = () => {
   return (
     <div className="p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-card">
       <h1 className="text-2xl font-bold text-primary mb-4">QR Scanner</h1>
-      {error && <p className="mb-4 text-red-600">{error}</p>}
+      {error && <p className="mb-4 text-primary">{error}</p>}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
         <div className="rounded-xl overflow-hidden bg-black">
           <video ref={videoRef} className="w-full h-full" playsInline muted />
@@ -144,10 +144,10 @@ const QrScanner: React.FC = () => {
             >Retry</button>
           </div>
           {!('BarcodeDetector' in window) && (
-            <p className="text-xs text-yellow-700 bg-yellow-50 border border-yellow-200 rounded-lg p-2">Your browser lacks native QR detection; using a basic fallback. Prefer Chrome/Edge for best results.</p>
+            <p className="text-xs text-secondary dark:text-brand-orange bg-brand-orange/15 dark:bg-brand-orange/20 border border-brand-orange/40 rounded-lg p-2">Your browser lacks native QR detection; using a basic fallback. Prefer Chrome/Edge for best results.</p>
           )}
           {error && (
-            <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg p-2">{error}</p>
+            <p className="text-xs text-primary bg-primary/10 dark:bg-primary/20 border border-primary/30 rounded-lg p-2">{error}</p>
           )}
         </div>
       </div>

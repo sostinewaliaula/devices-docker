@@ -1,13 +1,14 @@
 import React from 'react';
-import { 
-  CheckIcon, 
-  XIcon, 
+import {
+  CheckIcon,
+  XIcon,
   TrashIcon,
   ClockIcon,
   CheckCircleIcon,
   XCircleIcon,
   PackageIcon,
-  MessageCircleIcon
+  MessageCircleIcon,
+  BellIcon
 } from 'lucide-react';
 import { useNotifications } from '../contexts/NotificationContext';
 
@@ -16,29 +17,31 @@ interface NotificationDropdownProps {
 }
 
 const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onClose }) => {
-  const { 
-    notifications, 
-    unreadCount, 
-    loading, 
-    markAsRead, 
-    markAllAsRead, 
-    deleteNotification 
+  const {
+    notifications,
+    unreadCount,
+    loading,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification
   } = useNotifications();
 
+  // Company palette: approved → Green, rejected → Red, fulfilled/comment → Blue Tint (Golden brown in dark),
+  // status change → Orange, anything else → muted.
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'request_approved':
-        return <CheckCircleIcon className="w-5 h-5 text-green-500" />;
+        return <CheckCircleIcon className="w-5 h-5 text-secondary dark:text-brand-green" />;
       case 'request_rejected':
-        return <XCircleIcon className="w-5 h-5 text-red-500" />;
+        return <XCircleIcon className="w-5 h-5 text-primary" />;
       case 'request_fulfilled':
-        return <PackageIcon className="w-5 h-5 text-blue-500" />;
+        return <PackageIcon className="w-5 h-5 text-secondary dark:text-accent" />;
       case 'comment_added':
-        return <MessageCircleIcon className="w-5 h-5 text-purple-500" />;
+        return <MessageCircleIcon className="w-5 h-5 text-secondary dark:text-accent" />;
       case 'status_change':
-        return <ClockIcon className="w-5 h-5 text-yellow-500" />;
+        return <ClockIcon className="w-5 h-5 text-brand-orange" />;
       default:
-        return <ClockIcon className="w-5 h-5 text-gray-500" />;
+        return <ClockIcon className="w-5 h-5 text-muted" />;
     }
   };
 
@@ -68,9 +71,9 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onClose }) 
     return (
       <div className="p-4">
         <div className="animate-pulse space-y-3">
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+          <div className="h-4 bg-surface-2 rounded w-3/4"></div>
+          <div className="h-4 bg-surface-2 rounded w-1/2"></div>
+          <div className="h-4 bg-surface-2 rounded w-5/6"></div>
         </div>
       </div>
     );
@@ -79,11 +82,11 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onClose }) 
   return (
     <div className="w-80">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+      <div className="px-4 py-3 border-b border-line flex items-center justify-between">
+        <h3 className="text-lg font-semibold text-heading">
           Notifications
           {unreadCount > 0 && (
-            <span className="ml-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+            <span className="ml-2 bg-primary text-white text-xs px-2 py-1 rounded-full">
               {unreadCount}
             </span>
           )}
@@ -92,14 +95,15 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onClose }) 
           {unreadCount > 0 && (
             <button
               onClick={markAllAsRead}
-              className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+              className="text-xs text-secondary dark:text-accent hover:text-primary hover:underline"
             >
               Mark all read
             </button>
           )}
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            className="text-muted hover:text-heading"
+            aria-label="Close notifications"
           >
             <XIcon className="w-5 h-5" />
           </button>
@@ -109,17 +113,17 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onClose }) 
       {/* Notifications List */}
       <div className="max-h-96 overflow-y-auto">
         {notifications.length === 0 ? (
-          <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-            <BellIcon className="w-8 h-8 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
+          <div className="p-4 text-center text-muted">
+            <BellIcon className="w-8 h-8 mx-auto mb-2 text-muted/60" />
             <p>No notifications yet</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200 dark:divide-gray-700">
+          <div className="divide-y divide-line">
             {notifications.slice(0, 10).map((notification) => (
               <div
                 key={notification.id}
-                className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-                  !notification.is_read ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                className={`p-4 hover:bg-surface-2 transition-colors ${
+                  !notification.is_read ? 'bg-lightblue/40 dark:bg-surface-2/60 border-l-4 border-primary' : ''
                 }`}
               >
                 <div className="flex items-start space-x-3">
@@ -129,9 +133,9 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onClose }) 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <p className={`text-sm font-medium ${
-                        !notification.is_read 
-                          ? 'text-gray-900 dark:text-gray-100' 
-                          : 'text-gray-700 dark:text-gray-300'
+                        !notification.is_read
+                          ? 'text-heading'
+                          : 'text-content'
                       }`}>
                         {notification.title}
                       </p>
@@ -139,7 +143,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onClose }) 
                         {!notification.is_read && (
                           <button
                             onClick={() => handleMarkAsRead(notification.id, notification.is_read)}
-                            className="text-gray-400 hover:text-green-600 dark:hover:text-green-400"
+                            className="text-muted hover:text-secondary dark:hover:text-brand-green"
                             title="Mark as read"
                           >
                             <CheckIcon className="w-4 h-4" />
@@ -147,22 +151,22 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onClose }) 
                         )}
                         <button
                           onClick={() => handleDelete(notification.id)}
-                          className="text-gray-400 hover:text-red-600 dark:hover:text-red-400"
+                          className="text-muted hover:text-primary"
                           title="Delete"
                         >
                           <TrashIcon className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-muted mt-1">
                       {notification.message}
                     </p>
                     {notification.asset_name && (
-                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                      <p className="text-xs text-muted mt-1">
                         Asset: {notification.asset_name}
                       </p>
                     )}
-                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                    <p className="text-xs text-muted mt-1">
                       {formatTimeAgo(notification.created_at)}
                     </p>
                   </div>
@@ -175,8 +179,8 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onClose }) 
 
       {/* Footer */}
       {notifications.length > 10 && (
-        <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
-          <button className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+        <div className="px-4 py-3 border-t border-line">
+          <button className="text-sm text-secondary dark:text-accent hover:text-primary hover:underline">
             View all notifications
           </button>
         </div>

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContextNew';
-import { authAPI, Department } from '../../services/apiService';
+import { authAPI, usersAPI, Department } from '../../services/apiService';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { UserIcon, SettingsIcon, Edit2Icon, SaveIcon, XIcon, CheckCircleIcon, EyeIcon, EyeOffIcon, XCircleIcon } from 'lucide-react';
 
@@ -398,19 +398,19 @@ const Profile: React.FC = () => {
             </div>
             {/* Requirements indicator */}
             <ul className="mt-2 space-y-1 text-xs">
-              <li className={`flex items-center ${passwordChecks.len ? 'text-green-600' : 'text-gray-500'}`}>
+              <li className={`flex items-center ${passwordChecks.len ? 'text-secondary dark:text-brand-green' : 'text-gray-500'}`}>
                 {passwordChecks.len ? <CheckCircleIcon className="w-4 h-4 mr-1" /> : <XCircleIcon className="w-4 h-4 mr-1" />} At least 8 characters
               </li>
-              <li className={`flex items-center ${passwordChecks.upper ? 'text-green-600' : 'text-gray-500'}`}>
+              <li className={`flex items-center ${passwordChecks.upper ? 'text-secondary dark:text-brand-green' : 'text-gray-500'}`}>
                 {passwordChecks.upper ? <CheckCircleIcon className="w-4 h-4 mr-1" /> : <XCircleIcon className="w-4 h-4 mr-1" />} Contains an uppercase letter
               </li>
-              <li className={`flex items-center ${passwordChecks.lower ? 'text-green-600' : 'text-gray-500'}`}>
+              <li className={`flex items-center ${passwordChecks.lower ? 'text-secondary dark:text-brand-green' : 'text-gray-500'}`}>
                 {passwordChecks.lower ? <CheckCircleIcon className="w-4 h-4 mr-1" /> : <XCircleIcon className="w-4 h-4 mr-1" />} Contains a lowercase letter
               </li>
-              <li className={`flex items-center ${passwordChecks.num ? 'text-green-600' : 'text-gray-500'}`}>
+              <li className={`flex items-center ${passwordChecks.num ? 'text-secondary dark:text-brand-green' : 'text-gray-500'}`}>
                 {passwordChecks.num ? <CheckCircleIcon className="w-4 h-4 mr-1" /> : <XCircleIcon className="w-4 h-4 mr-1" />} Contains a number
               </li>
-              <li className={`flex items-center ${passwordChecks.special ? 'text-green-600' : 'text-gray-500'}`}>
+              <li className={`flex items-center ${passwordChecks.special ? 'text-secondary dark:text-brand-green' : 'text-gray-500'}`}>
                 {passwordChecks.special ? <CheckCircleIcon className="w-4 h-4 mr-1" /> : <XCircleIcon className="w-4 h-4 mr-1" />} Contains a special character
               </li>
             </ul>
@@ -432,7 +432,7 @@ const Profile: React.FC = () => {
               </button>
             </div>
             {confirmPassword && (
-              <div className={`mt-2 text-xs flex items-center ${passwordChecks.match ? 'text-green-600' : 'text-red-600'}`}>
+              <div className={`mt-2 text-xs flex items-center ${passwordChecks.match ? 'text-secondary dark:text-brand-green' : 'text-primary'}`}>
                 {passwordChecks.match ? <CheckCircleIcon className="w-4 h-4 mr-1" /> : <XCircleIcon className="w-4 h-4 mr-1" />}
                 {passwordChecks.match ? 'Passwords match' : 'Passwords do not match'}
               </div>

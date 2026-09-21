@@ -230,16 +230,16 @@ const AssetTypesConfig: React.FC = () => {
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${type.is_active ? 'bg-lightred text-primary' : 'bg-red-100 text-red-700'}`}>
+                  <span className={`inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full ${type.is_active ? 'bg-lightred text-primary' : 'bg-primary/10 dark:bg-primary/20 text-primary'}`}>
                     {type.is_active ? <CheckCircleIcon className="w-3 h-3 mr-1" /> : <XCircleIcon className="w-3 h-3 mr-1" />}
                     {type.is_active ? 'Active' : 'Inactive'}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-right space-x-3">
-                  <button onClick={() => handleOpenTypeModal(type)} className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                  <button onClick={() => handleOpenTypeModal(type)} className="text-secondary hover:opacity-80 dark:text-accent">
                     <SettingsIcon className="w-4 h-4" />
                   </button>
-                  <button onClick={() => { setTypeToDelete(type); setShowTypeDeleteModal(true); }} className="text-red-600 hover:text-red-800">
+                  <button onClick={() => { setTypeToDelete(type); setShowTypeDeleteModal(true); }} className="text-primary hover:text-primary/80">
                     <TrashIcon className="w-4 h-4" />
                   </button>
                 </td>
@@ -285,11 +285,11 @@ const AssetTypesConfig: React.FC = () => {
                       <tr key={opt.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                         <td className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                           {opt.value}
-                          {!opt.is_active && <span className="ml-2 text-[10px] bg-red-100 text-red-600 px-1 rounded">Inactive</span>}
+                          {!opt.is_active && <span className="ml-2 text-[10px] bg-primary/10 dark:bg-primary/20 text-primary px-1 rounded">Inactive</span>}
                         </td>
                         <td className="px-4 py-3 text-right space-x-2">
-                          <button onClick={() => handleOpenDropdownModal(opt)} className="text-blue-500 hover:text-blue-700"><SettingsIcon className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => { setDropdownToDelete(opt); setShowDropdownDeleteModal(true); }} className="text-red-500 hover:text-red-700"><TrashIcon className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => handleOpenDropdownModal(opt)} className="text-secondary dark:text-accent hover:opacity-80"><SettingsIcon className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => { setDropdownToDelete(opt); setShowDropdownDeleteModal(true); }} className="text-primary hover:text-primary/80"><TrashIcon className="w-3.5 h-3.5" /></button>
                         </td>
                       </tr>
                     ))}
@@ -481,7 +481,7 @@ const AssetTypesConfig: React.FC = () => {
                         const newParams = [...parameters];
                         newParams.splice(idx, 1);
                         setParameters(newParams);
-                      }} className="text-red-500">
+                      }} className="text-primary">
                         <TrashIcon className="w-4 h-4" />
                       </button>
                     </div>
@@ -561,11 +561,11 @@ const AssetTypesConfig: React.FC = () => {
       {showTypeDeleteModal && typeToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
           <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-xl">
-            <h2 className="text-xl font-bold text-red-600 mb-4">Delete Asset Type</h2>
+            <h2 className="text-xl font-bold text-primary mb-4">Delete Asset Type</h2>
             <p>Delete <strong>{typeToDelete.name}</strong>? This cannot be undone.</p>
             <div className="flex justify-end space-x-3 mt-6">
               <button onClick={() => setShowTypeDeleteModal(false)} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl">Cancel</button>
-              <button onClick={handleDeleteType} className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700">Delete</button>
+              <button onClick={handleDeleteType} className="px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary/90">Delete</button>
             </div>
           </div>
         </div>
@@ -574,11 +574,11 @@ const AssetTypesConfig: React.FC = () => {
       {showDropdownDeleteModal && dropdownToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
           <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-xl">
-            <h2 className="text-xl font-bold text-red-600 mb-4">Delete Option</h2>
+            <h2 className="text-xl font-bold text-primary mb-4">Delete Option</h2>
             <p>Delete <strong>{dropdownToDelete.value}</strong> from {dropdownToDelete.type}s?</p>
             <div className="flex justify-end space-x-3 mt-6">
               <button onClick={() => setShowDropdownDeleteModal(false)} className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl">Cancel</button>
-              <button onClick={handleDeleteDropdown} className="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700">Delete</button>
+              <button onClick={handleDeleteDropdown} className="px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary/90">Delete</button>
             </div>
           </div>
         </div>

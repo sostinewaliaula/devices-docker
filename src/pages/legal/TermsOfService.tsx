@@ -7,7 +7,7 @@ const Section = ({ icon: Icon, title, children }: { icon: any; title: string; ch
   <section className="mb-10">
     <div className="flex items-center gap-3 mb-4">
       <div className="p-2 rounded-xl bg-secondary/10 dark:bg-secondary/20 shrink-0">
-        <Icon className="w-5 h-5 text-secondary dark:text-blue-400" />
+        <Icon className="w-5 h-5 text-secondary dark:text-accent" />
       </div>
       <h2 className="text-lg font-bold text-secondary dark:text-white m-0">{title}</h2>
     </div>
@@ -19,7 +19,7 @@ const Section = ({ icon: Icon, title, children }: { icon: any; title: string; ch
 
 const Bullet = ({ children }: { children: React.ReactNode }) => (
   <li className="flex gap-2">
-    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-secondary dark:bg-blue-400 shrink-0" />
+    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-secondary shrink-0" />
     <span>{children}</span>
   </li>
 );
@@ -36,7 +36,7 @@ const TermsOfService = () => {
           <div className="flex items-center gap-3">
             <Link
               to="/login"
-              className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-secondary dark:hover:text-blue-400 transition-colors"
+              className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-secondary transition-colors"
             >
               <ArrowLeftIcon className="w-4 h-4" />
               Back
@@ -44,7 +44,7 @@ const TermsOfService = () => {
             <span className="text-gray-300 dark:text-gray-700">|</span>
             <div className="flex items-center gap-2">
               <img src={logoUrl} alt={siteName} className="h-7 w-auto" />
-              <span className="font-bold text-secondary text-sm hidden sm:block dark:text-blue-400">{siteName}</span>
+              <span className="font-bold text-secondary text-sm hidden sm:block dark:text-accent">{siteName}</span>
             </div>
           </div>
           <ThemeToggle />
@@ -55,11 +55,11 @@ const TermsOfService = () => {
         {/* Hero */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-secondary/10 dark:bg-secondary/20 mb-5">
-            <ScrollTextIcon className="w-8 h-8 text-secondary dark:text-blue-400" />
+            <ScrollTextIcon className="w-8 h-8 text-secondary dark:text-accent" />
           </div>
           <h1 className="text-3xl font-bold text-secondary dark:text-white mb-3">Terms of Service</h1>
           <p className="text-gray-500 dark:text-gray-400 text-sm">Effective date: <span className="font-semibold text-gray-700 dark:text-gray-300">{effectiveDate}</span></p>
-          <div className="mt-4 inline-block px-4 py-2 rounded-full bg-secondary/10 dark:bg-secondary/20 text-secondary dark:text-blue-400 text-xs font-semibold tracking-wide uppercase">
+          <div className="mt-4 inline-block px-4 py-2 rounded-full bg-secondary/10 dark:bg-secondary/20 text-secondary dark:text-accent text-xs font-semibold tracking-wide uppercase">
             {siteName}
           </div>
         </div>
@@ -202,7 +202,7 @@ const TermsOfService = () => {
             <div className="mt-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 space-y-1">
               <p className="font-bold text-secondary dark:text-white">{siteName}</p>
               <p>Legal & Compliance Team</p>
-              <p>Email: <a href="mailto:legal@caavagroup.com" className="text-secondary dark:text-blue-400 underline hover:opacity-80">legal@caavagroup.com</a></p>
+              <p>Email: <a href="mailto:legal@caavagroup.com" className="text-secondary dark:text-accent underline hover:opacity-80">legal@caavagroup.com</a></p>
             </div>
           </Section>
 
@@ -210,8 +210,8 @@ const TermsOfService = () => {
           <div className="pt-8 mt-8 border-t border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-gray-500 dark:text-gray-400">
             <span>© {new Date().getFullYear()} {siteName}. All rights reserved.</span>
             <div className="flex gap-4">
-              <Link to="/privacy" className="hover:text-secondary dark:hover:text-blue-400 transition-colors">Privacy Policy</Link>
-              <Link to="/login" className="hover:text-secondary dark:hover:text-blue-400 transition-colors">Back to Login</Link>
+              <Link to="/privacy" className="hover:text-secondary transition-colors">Privacy Policy</Link>
+              <Link to="/login" className="hover:text-secondary transition-colors">Back to Login</Link>
             </div>
           </div>
         </div>
