@@ -1,6 +1,7 @@
 import express from 'express';
 import { authenticateToken, requireAdmin } from '../middleware/auth.js';
 import { executeQuery } from '../config/database.js';
+import { backupEmail } from '../utils/emailTheme.js';
 
 const router = express.Router();
 
@@ -218,64 +219,24 @@ router.post('/trigger', authenticateToken, requireAdmin, async (req, res) => {
     const subject = `[${systemName}] Database Backup - ${filename}`;
     const text = `DATABASE BACKUP NOTIFICATION\n\nSystem: ${systemName}\nDatabase: ${dbName}\nBackup Type: ${backupType}\n\nBackup Details:\n- File Name: ${filename}\n- File Size: ${fileSizeMB} MB (${fileSizeKB} KB)\n- Created At: ${formattedDate} (${emailTimezone})\n- Timestamp: ${now.toISOString()}\n\nThis backup was triggered manually for testing purposes.\n\nThe backup SQL file is attached to this email.`;
 
-    const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px 8px 0 0;">
-          <h2 style="color: white; margin: 0;">📦 Database Backup Notification</h2>
-        </div>
-        <div style="background: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; border-top: none;">
-          <table style="width: 100%; border-collapse: collapse;">
-            <tr>
-              <td style="padding: 8px 0; font-weight: bold; color: #374151; width: 150px;">System:</td>
-              <td style="padding: 8px 0; color: #6b7280;">${systemName}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 0; font-weight: bold; color: #374151;">Database:</td>
-              <td style="padding: 8px 0; color: #6b7280;">${dbName}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 0; font-weight: bold; color: #374151;">Backup Type:</td>
-              <td style="padding: 8px 0; color: #6b7280;">${backupType}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 0; font-weight: bold; color: #374151;">File Name:</td>
-              <td style="padding: 8px 0; color: #6b7280; font-family: monospace;">${filename}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 0; font-weight: bold; color: #374151;">File Size:</td>
-              <td style="padding: 8px 0; color: #6b7280;">${fileSizeMB} MB (${fileSizeKB} KB)</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 0; font-weight: bold; color: #374151;">Created At:</td>
-              <td style="padding: 8px 0; color: #6b7280;">${formattedDate}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 0; font-weight: bold; color: #374151;">Timezone:</td>
-              <td style="padding: 8px 0; color: #6b7280;">${emailTimezone}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px 0; font-weight: bold; color: #374151;">Timestamp (ISO):</td>
-              <td style="padding: 8px 0; color: #6b7280; font-family: monospace; font-size: 12px;">${now.toISOString()}</td>
-            </tr>
-          </table>
-          <div style="margin-top: 20px; padding: 12px; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
-            <p style="margin: 0; color: #92400e; font-size: 14px;">
-              <strong>ℹ️ Note:</strong> This backup was triggered manually for testing purposes.
-            </p>
-          </div>
-          <div style="margin-top: 20px; padding: 12px; background: #dbeafe; border-left: 4px solid #3b82f6; border-radius: 4px;">
-            <p style="margin: 0; color: #1e40af; font-size: 14px;">
-              <strong>📎 Attachment:</strong> The backup SQL file is attached to this email.
-            </p>
-          </div>
-        </div>
-        <div style="background: #f3f4f6; padding: 15px; text-align: center; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
-          <p style="margin: 0; color: #6b7280; font-size: 12px;">
-            This is an automated backup notification from ${systemName}
-          </p>
-        </div>
-      </div>
-    `;
+    const html = backupEmail({
+      title: '📦 Database Backup Notification',
+      systemName,
+      rows: [
+        ['System:', systemName],
+        ['Database:', dbName],
+        ['Backup Type:', backupType],
+        ['File Name:', filename, { mono: true }],
+        ['File Size:', `${fileSizeMB} MB (${fileSizeKB} KB)`],
+        ['Created At:', formattedDate],
+        ['Timezone:', emailTimezone],
+        ['Timestamp (ISO):', now.toISOString(), { mono: true, small: true }],
+      ],
+      notes: [
+        '<strong>ℹ️ Note:</strong> This backup was triggered manually for testing purposes.',
+        '<strong>📎 Attachment:</strong> The backup SQL file is attached to this email.',
+      ],
+    });
 
     const fileContent = fs.readFileSync(gzFile);
     for (const email of recipientEmails) {

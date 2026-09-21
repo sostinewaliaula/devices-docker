@@ -1051,7 +1051,6 @@ router.put('/:id', upload.single('image'), [
               'Asset Assigned',
               {
                 badge: 'INFO',
-                badgeColor: '#0ea5e9',
                 title: 'Asset Assigned',
                 greetingName: updatedAsset.assigned_user_name || '',
                 message: `You have been assigned the asset "${updatedAsset.name}" (SN: ${updatedAsset.serial_number}).`,
@@ -1083,7 +1082,6 @@ router.put('/:id', upload.single('image'), [
                   'Asset Assignment Update',
                   {
                     badge: 'INFO',
-                    badgeColor: '#0ea5e9',
                     title: 'Asset Assignment Update',
                     greetingName: mgr.name || '',
                     message: `Asset "${updatedAsset.name}" has been assigned${updatedAsset.assigned_user_name ? ` to ${updatedAsset.assigned_user_name}` : ''}.`,

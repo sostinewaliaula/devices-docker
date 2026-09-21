@@ -4,6 +4,7 @@ import { executeQuery } from '../config/database.js';
 import { authenticateToken, requireManager } from '../middleware/auth.js';
 import notificationService from '../services/notificationService.js';
 import emailService from '../services/emailService.js';
+import { wrapEmail, badge, callout, button, avatar, LIGHT } from '../utils/emailTheme.js';
 
 const router = express.Router();
 
@@ -364,69 +365,28 @@ router.post('/send-message', [
 
     // Send email to the receiver
     try {
-      const priorityColor = priority === 'High' ? '#ef4444' : priority === 'Medium' ? '#f59e0b' : '#10b981';
+      const priorityKind = priority === 'High' ? 'danger' : priority === 'Medium' ? 'warning' : 'success';
       const priorityIcon = priority === 'High' ? '🔴' : priority === 'Medium' ? '🟡' : '🟢';
-      
-      const htmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="utf-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>New Message from ${user.name}</title>
-          <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #374151; margin: 0; padding: 0; background-color: #f9fafb; }
-            .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 32px 24px; text-align: center; }
-            .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; }
-            .content { padding: 32px 24px; }
-            .message-card { background: #f8fafc; border-left: 4px solid ${priorityColor}; padding: 24px; border-radius: 8px; margin: 24px 0; }
-            .priority-badge { display: inline-flex; align-items: center; background: ${priorityColor}15; color: ${priorityColor}; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: 500; margin-bottom: 16px; }
-            .message-text { background: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; white-space: pre-wrap; font-size: 16px; line-height: 1.7; }
-            .cta-button { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; margin: 24px 0; }
-            .footer { background: #f8fafc; padding: 24px; text-align: center; color: #6b7280; font-size: 14px; border-top: 1px solid #e5e7eb; }
-            .sender-info { display: flex; align-items: center; margin-bottom: 20px; }
-            .sender-avatar { width: 48px; height: 48px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ffffff; font-weight: 600; font-size: 18px; margin-right: 16px; }
-            .sender-details h3 { margin: 0; font-size: 18px; color: #1f2937; }
-            .sender-details p { margin: 4px 0 0 0; color: #6b7280; font-size: 14px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>💬 New Message</h1>
-            </div>
-            <div class="content">
-              <div class="sender-info">
-                <div class="sender-avatar">${user.name.charAt(0).toUpperCase()}</div>
-                <div class="sender-details">
-                  <h3>${user.name}</h3>
-                  <p>Your Manager</p>
-                </div>
-              </div>
-              
-              <div class="message-card">
-                <div class="priority-badge">
-                  ${priorityIcon} ${priority} Priority
-                </div>
-                <h2 style="margin: 0 0 16px 0; color: #1f2937; font-size: 20px;">${subject}</h2>
-                <div class="message-text">${content}</div>
-              </div>
-              
-              <div style="text-align: center;">
-                <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/notifications" class="cta-button">
-                  View & Respond in System
-                </a>
-              </div>
-            </div>
-            <div class="footer">
-              <p>This message was sent through the Asset Management System</p>
-              <p>Please log in to respond to this message</p>
-            </div>
-          </div>
-        </body>
-        </html>
-      `;
+      const appUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+      const htmlContent = wrapEmail({
+        title: '💬 New Message',
+        preheader: `New message from ${user.name}: ${subject}`,
+        bodyHtml: `
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;"><tr>
+            <td valign="middle" style="padding-right:14px;">${avatar(user.name.charAt(0).toUpperCase())}</td>
+            <td valign="middle">
+              <div class="em-h" style="font-size:18px;font-weight:700;color:${LIGHT.heading};">${user.name}</div>
+              <div class="em-muted" style="font-size:14px;color:${LIGHT.muted};">Your Manager</div>
+            </td>
+          </tr></table>
+          <div style="margin:0 0 8px;">${badge(`${priorityIcon} ${priority} Priority`, priorityKind)}</div>
+          <h2 class="em-h" style="margin:8px 0 12px;font-size:20px;color:${LIGHT.heading};">${subject}</h2>
+          ${callout(`<div style="white-space:pre-wrap;">${content}</div>`)}
+          ${button('View &amp; Respond in System', `${appUrl}/notifications`, { align: 'center' })}`,
+        footerHtml: `<p style="margin:0 0 6px;">This message was sent through the Asset Management System</p>
+      <p style="margin:0;">Please log in to respond to this message</p>`,
+      });
       
       const textContent = `Dear ${receiver.name},\n\nYou have received a new message from your manager ${user.name}:\n\nSubject: ${subject}\n\nMessage:\n${content}\n\nPriority: ${priority}\n\nPlease log in to the asset management system to view and respond to this message.\n\nRegards,\nAsset Management System`;
       
@@ -513,71 +473,29 @@ router.post('/send-announcement', [
 
       // Send email
       try {
-        const priorityColor = priority === 'High' ? '#ef4444' : priority === 'Medium' ? '#f59e0b' : '#10b981';
+        const priorityKind = priority === 'High' ? 'danger' : priority === 'Medium' ? 'warning' : 'success';
         const priorityIcon = priority === 'High' ? '🔴' : priority === 'Medium' ? '🟡' : '🟢';
-        
-        const htmlContent = `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Department Announcement from ${user.name}</title>
-            <style>
-              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #374151; margin: 0; padding: 0; background-color: #f9fafb; }
-              .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-              .header { background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); padding: 32px 24px; text-align: center; }
-              .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 600; }
-              .content { padding: 32px 24px; }
-              .announcement-card { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 24px; border-radius: 8px; margin: 24px 0; }
-              .priority-badge { display: inline-flex; align-items: center; background: ${priorityColor}15; color: ${priorityColor}; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: 500; margin-bottom: 16px; }
-              .announcement-text { background: #ffffff; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; white-space: pre-wrap; font-size: 16px; line-height: 1.7; }
-              .cta-button { display: inline-block; background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); color: #ffffff; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; margin: 24px 0; }
-              .footer { background: #f8fafc; padding: 24px; text-align: center; color: #6b7280; font-size: 14px; border-top: 1px solid #e5e7eb; }
-              .sender-info { display: flex; align-items: center; margin-bottom: 20px; }
-              .sender-avatar { width: 48px; height: 48px; background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ffffff; font-weight: 600; font-size: 18px; margin-right: 16px; }
-              .sender-details h3 { margin: 0; font-size: 18px; color: #1f2937; }
-              .sender-details p { margin: 4px 0 0 0; color: #6b7280; font-size: 14px; }
-              .department-badge { display: inline-block; background: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; margin-top: 8px; }
-            </style>
-          </head>
-          <body>
-            <div class="container">
-              <div class="header">
-                <h1>📢 Department Announcement</h1>
-              </div>
-              <div class="content">
-                <div class="sender-info">
-                  <div class="sender-avatar">${user.name.charAt(0).toUpperCase()}</div>
-                  <div class="sender-details">
-                    <h3>${user.name}</h3>
-                    <p>Department Manager</p>
-                    <div class="department-badge">Department Announcement</div>
-                  </div>
-                </div>
-                
-                <div class="announcement-card">
-                  <div class="priority-badge">
-                    ${priorityIcon} ${priority} Priority
-                  </div>
-                  <h2 style="margin: 0 0 16px 0; color: #1f2937; font-size: 20px;">${subject}</h2>
-                  <div class="announcement-text">${content}</div>
-                </div>
-                
-                <div style="text-align: center;">
-                  <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/notifications" class="cta-button">
-                    View Announcement in System
-                  </a>
-                </div>
-              </div>
-              <div class="footer">
-                <p>This announcement was sent to all department members</p>
-                <p>Please log in to view and respond to this announcement</p>
-              </div>
-            </div>
-          </body>
-          </html>
-        `;
+        const appUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+
+        const htmlContent = wrapEmail({
+          title: '📢 Department Announcement',
+          preheader: `Department announcement from ${user.name}: ${subject}`,
+          bodyHtml: `
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;"><tr>
+              <td valign="middle" style="padding-right:14px;">${avatar(user.name.charAt(0).toUpperCase())}</td>
+              <td valign="middle">
+                <div class="em-h" style="font-size:18px;font-weight:700;color:${LIGHT.heading};">${user.name}</div>
+                <div class="em-muted" style="font-size:14px;color:${LIGHT.muted};">Department Manager</div>
+                <div style="margin-top:8px;">${badge('Department Announcement', 'info')}</div>
+              </td>
+            </tr></table>
+            <div style="margin:0 0 8px;">${badge(`${priorityIcon} ${priority} Priority`, priorityKind)}</div>
+            <h2 class="em-h" style="margin:8px 0 12px;font-size:20px;color:${LIGHT.heading};">${subject}</h2>
+            ${callout(`<div style="white-space:pre-wrap;">${content}</div>`)}
+            ${button('View Announcement in System', `${appUrl}/notifications`, { align: 'center' })}`,
+          footerHtml: `<p style="margin:0 0 6px;">This announcement was sent to all department members</p>
+      <p style="margin:0;">Please log in to view and respond to this announcement</p>`,
+        });
         
         const textContent = `Dear ${member.name},\n\nYou have received a new department announcement from your manager ${user.name}:\n\nSubject: ${subject}\n\nAnnouncement:\n${content}\n\nPriority: ${priority}\n\nPlease log in to the asset management system to view this announcement.\n\nRegards,\nAsset Management System`;
         

@@ -5,6 +5,7 @@ import db from '../config/database.js';
 import notificationService from '../services/notificationService.js';
 import { requireAdmin } from '../middleware/auth.js';
 import { sanitizePagination } from '../utils/pagination.js';
+import { backupEmail, wrapEmail, paragraph } from '../utils/emailTheme.js';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
@@ -303,7 +304,14 @@ router.post('/trigger', requireAdmin, async (req, res) => {
     // Email each recipient
     const subject = `Database Backup - ${name}`;
     const text = `A new database backup has been created.\n\nName: ${name}\nDate: ${now.toLocaleString()}\n\nThe backup JSON file is attached.`;
-    const html = `<p>A new database backup has been created.</p><p><strong>Name:</strong> ${name}<br/><strong>Date:</strong> ${now.toLocaleString()}</p><p>The backup JSON file is attached.</p>`;
+    const html = wrapEmail({
+      title: 'Database Backup',
+      preheader: 'A new database backup has been created.',
+      bodyHtml:
+        paragraph('A new database backup has been created.') +
+        paragraph(`<strong>Name:</strong> ${name}<br/><strong>Date:</strong> ${now.toLocaleString()}`) +
+        paragraph('The backup JSON file is attached.'),
+    });
 
     for (const email of recipientEmails) {
       try {
@@ -391,64 +399,24 @@ router.post('/sql', requireAdmin, async (req, res) => {
       const subject = `[${systemName}] SQL Backup - ${baseName}.sql.gz`;
       const text = `DATABASE BACKUP NOTIFICATION\n\nSystem: ${systemName}\nDatabase: ${dbName}\nBackup Type: ${backupType}\n\nBackup Details:\n- File Name: ${baseName}.sql.gz\n- File Size: ${fileSizeMB} MB (${fileSizeKB} KB)\n- Created At: ${formattedDate} (${emailTimezone})\n- Timestamp: ${now.toISOString()}\n\nThis backup was created manually via the admin interface.\n\nThe backup SQL file is attached to this email.`;
       
-      const html = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px 8px 0 0;">
-            <h2 style="color: white; margin: 0;">📦 SQL Backup Notification</h2>
-          </div>
-          <div style="background: #f9fafb; padding: 20px; border: 1px solid #e5e7eb; border-top: none;">
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr>
-                <td style="padding: 8px 0; font-weight: bold; color: #374151; width: 150px;">System:</td>
-                <td style="padding: 8px 0; color: #6b7280;">${systemName}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; font-weight: bold; color: #374151;">Database:</td>
-                <td style="padding: 8px 0; color: #6b7280;">${dbName}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; font-weight: bold; color: #374151;">Backup Type:</td>
-                <td style="padding: 8px 0; color: #6b7280;">${backupType}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; font-weight: bold; color: #374151;">File Name:</td>
-                <td style="padding: 8px 0; color: #6b7280; font-family: monospace;">${baseName}.sql.gz</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; font-weight: bold; color: #374151;">File Size:</td>
-                <td style="padding: 8px 0; color: #6b7280;">${fileSizeMB} MB (${fileSizeKB} KB)</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; font-weight: bold; color: #374151;">Created At:</td>
-                <td style="padding: 8px 0; color: #6b7280;">${formattedDate}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; font-weight: bold; color: #374151;">Timezone:</td>
-                <td style="padding: 8px 0; color: #6b7280;">${emailTimezone}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; font-weight: bold; color: #374151;">Timestamp (ISO):</td>
-                <td style="padding: 8px 0; color: #6b7280; font-family: monospace; font-size: 12px;">${now.toISOString()}</td>
-              </tr>
-            </table>
-            <div style="margin-top: 20px; padding: 12px; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 4px;">
-              <p style="margin: 0; color: #92400e; font-size: 14px;">
-                <strong>ℹ️ Note:</strong> This backup was created manually via the admin interface.
-              </p>
-            </div>
-            <div style="margin-top: 20px; padding: 12px; background: #dbeafe; border-left: 4px solid #3b82f6; border-radius: 4px;">
-              <p style="margin: 0; color: #1e40af; font-size: 14px;">
-                <strong>📎 Attachment:</strong> The backup SQL file is attached to this email.
-              </p>
-            </div>
-          </div>
-          <div style="background: #f3f4f6; padding: 15px; text-align: center; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 8px 8px;">
-            <p style="margin: 0; color: #6b7280; font-size: 12px;">
-              This is an automated backup notification from ${systemName}
-            </p>
-          </div>
-        </div>
-      `;
+      const html = backupEmail({
+        title: '📦 SQL Backup Notification',
+        systemName,
+        rows: [
+          ['System:', systemName],
+          ['Database:', dbName],
+          ['Backup Type:', backupType],
+          ['File Name:', `${baseName}.sql.gz`, { mono: true }],
+          ['File Size:', `${fileSizeMB} MB (${fileSizeKB} KB)`],
+          ['Created At:', formattedDate],
+          ['Timezone:', emailTimezone],
+          ['Timestamp (ISO):', now.toISOString(), { mono: true, small: true }],
+        ],
+        notes: [
+          '<strong>ℹ️ Note:</strong> This backup was created manually via the admin interface.',
+          '<strong>📎 Attachment:</strong> The backup SQL file is attached to this email.',
+        ],
+      });
       
       for (const email of recipientEmails) {
         await notificationService.sendEmailNotification(email, subject, html, text, [

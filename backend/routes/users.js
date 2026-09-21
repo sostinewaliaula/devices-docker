@@ -808,7 +808,6 @@ router.put('/:id/password', [
           'Your password was changed',
           {
             badge: 'WARNING',
-            badgeColor: '#f59e0b',
             title: 'Password Changed',
             greetingName: name || '',
             message: 'Your password was changed successfully. If you did not initiate this change, please contact support immediately.',

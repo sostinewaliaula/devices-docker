@@ -30,7 +30,7 @@ SET subject = 'Your Password Reset Code - Caava Group',
         .logo {
             width: 50px;
             height: 50px;
-            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+            background: #152F52;
             border-radius: 8px;
             display: inline-flex;
             align-items: center;

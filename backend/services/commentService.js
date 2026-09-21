@@ -1,5 +1,6 @@
 import { executeQuery } from '../config/database.js';
 import notificationService from './notificationService.js';
+import { wrapEmail, paragraph, callout } from '../utils/emailTheme.js';
 
 class CommentService {
   // Add comment to asset request
@@ -377,45 +378,15 @@ class CommentService {
     const requestOwner = isRequester ? 'your' : `${requesterName}'s`;
     const actionText = isAdminComment ? 'responded to' : 'added a comment to';
     
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <title>New Comment on Asset Request</title>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-          .comment { background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #3b82f6; margin: 15px 0; }
-          .footer { margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 8px; font-size: 14px; color: #6b7280; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>${isAdminComment ? 'Admin Response on Asset Request' : 'New Comment on Asset Request'}</h1>
-            <p>Hello ${userName},</p>
-          </div>
-          
-          <div class="content">
-            <p><strong>${isAdminComment ? 'Admin ' : ''}${commenterName}</strong> ${actionText} ${requestOwner} request for <strong>${assetName}</strong>:</p>
-            
-            <div class="comment">
-              ${comment}
-            </div>
-            
-            <p>You can view the full conversation and add your own comments in your dashboard.</p>
-          </div>
-          
-          <div class="footer">
-            <p>This is an automated notification from the Asset Management System.</p>
-            <p>Please do not reply to this email.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    return wrapEmail({
+      title: isAdminComment ? 'Admin Response on Asset Request' : 'New Comment on Asset Request',
+      preheader: `${commenterName} ${actionText} ${requestOwner} request for ${assetName}`,
+      bodyHtml:
+        paragraph(`Hello ${userName},`) +
+        paragraph(`<strong>${isAdminComment ? 'Admin ' : ''}${commenterName}</strong> ${actionText} ${requestOwner} request for <strong>${assetName}</strong>:`) +
+        callout(`${comment}`) +
+        paragraph('You can view the full conversation and add your own comments in your dashboard.'),
+    });
   }
 
   // Generate text email for comment

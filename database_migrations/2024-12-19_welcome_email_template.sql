@@ -31,7 +31,7 @@ INSERT INTO email_templates (name, subject, body, variables) VALUES (
         .logo {
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+            background: #152F52;
             border-radius: 12px;
             display: inline-flex;
             align-items: center;
@@ -135,7 +135,7 @@ INSERT INTO email_templates (name, subject, body, variables) VALUES (
         }
         .button {
             display: inline-block;
-            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+            background: #152F52;
             color: white;
             padding: 12px 24px;
             text-decoration: none;
