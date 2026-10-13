@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useNotifications } from '../../contexts/NotificationContext';
-import { PlusIcon, EditIcon, TrashIcon, RefreshCwIcon, CheckCircleIcon, XCircleIcon, SearchIcon, FilterIcon, UploadIcon, DownloadIcon, HistoryIcon, AlertCircleIcon, XIcon, CheckIcon, ImageIcon } from 'lucide-react';
+import { PlusIcon, EditIcon, TrashIcon, RefreshCwIcon, CheckCircleIcon, XCircleIcon, SearchIcon, FilterIcon, UploadIcon, DownloadIcon, HistoryIcon, AlertCircleIcon, XIcon, CheckIcon, ImageIcon, ColumnsIcon } from 'lucide-react';
 import AssetImage from '../../components/AssetImage';
 import { Asset, Department, User, AssetHistoryPayload, AssetAssignmentHistoryEntry, AssetIssueEventEntry, AssetType, DropdownOption } from '../../lib/supabase';
 import UserAvatar from '../../components/ui/UserAvatar';
@@ -27,6 +27,130 @@ const conditionLabels: Record<string, string> = {
   'good': 'Good',
   'fair': 'Fair',
   'poor': 'Poor'
+};
+
+// Every column the Manage Assets export (CSV/Excel/PDF/Text) can include. `pdfWeight` only
+// matters for the PDF table, where it sets each column's relative share of the page width.
+interface ExportColumnDef { key: string; label: string; pdfWeight: number; }
+const EXPORT_COLUMN_DEFS: ExportColumnDef[] = [
+  { key: 'name', label: 'Name', pdfWeight: 14 },
+  { key: 'type', label: 'Type', pdfWeight: 9 },
+  { key: 'category', label: 'Category', pdfWeight: 9 },
+  { key: 'manufacturer', label: 'Manufacturer', pdfWeight: 10 },
+  { key: 'model', label: 'Model', pdfWeight: 10 },
+  { key: 'serial_number', label: 'Serial Number', pdfWeight: 12 },
+  { key: 'status', label: 'Status', pdfWeight: 8 },
+  { key: 'condition', label: 'Condition', pdfWeight: 8 },
+  { key: 'location', label: 'Location', pdfWeight: 12 },
+  { key: 'department', label: 'Department', pdfWeight: 10 },
+  { key: 'assigned_to', label: 'Assigned To', pdfWeight: 10 },
+  { key: 'purchase_date', label: 'Purchase Date', pdfWeight: 9 },
+  { key: 'purchase_price', label: 'Purchase Price (KES)', pdfWeight: 9 },
+  { key: 'current_value', label: 'Current Value (KES)', pdfWeight: 9 },
+  { key: 'warranty_expiry', label: 'Warranty Expiry', pdfWeight: 9 },
+  { key: 'last_maintenance', label: 'Last Maintenance', pdfWeight: 9 },
+  { key: 'notes', label: 'Notes', pdfWeight: 18 },
+];
+// Matches the export's previous fixed column set, so anyone who hasn't opened the picker yet
+// gets the same file they always got.
+const DEFAULT_EXPORT_COLUMN_KEYS = ['name', 'type', 'serial_number', 'status', 'location', 'manufacturer', 'department', 'assigned_to', 'purchase_date', 'warranty_expiry'];
+const EXPORT_COLUMNS_STORAGE_KEY = 'assets_export_columns_v1';
+
+// Native <input type="date"> needs exactly 'YYYY-MM-DD'. purchase_date/warranty_expiry/
+// last_maintenance come back from the API in that shape already, but this is a cheap defensive
+// slice in case anything upstream ever hands back a full timestamp instead.
+const toDateInputValue = (value?: string | null) => (value ? String(value).slice(0, 10) : '');
+
+interface AssetCoreFieldsValue {
+  category: string;
+  manufacturer: string;
+  model: string;
+  serial_number: string;
+  status: string;
+  condition: string;
+  purchase_date: string;
+  purchase_price: number;
+  current_value: number;
+  warranty_expiry: string | null;
+  last_maintenance: string | null;
+}
+
+// Category, manufacturer, model, serial number, status, condition, purchase/warranty dates and
+// values — these are real top-level asset columns (and are already selectable in the Manage
+// Assets export), but the add/edit forms had no inputs for any of them; they only showed up if
+// the asset's Type happened to define a Technical Specifications parameter with the exact
+// matching name. Shared between Add and Edit so both stay in sync, and defined outside
+// AssetManagement so it keeps a stable component identity (nesting a component definition inside
+// another component's render body makes React remount it, and the inputs, on every keystroke).
+const AssetCoreFields: React.FC<{
+  value: AssetCoreFieldsValue;
+  onChange: (patch: Partial<AssetCoreFieldsValue>) => void;
+  categoriesList: string[];
+  manufacturersList: string[];
+  statusesList: string[];
+  conditionsList: string[];
+}> = ({ value, onChange, categoriesList, manufacturersList, statusesList, conditionsList }) => {
+  const inputClass = "block w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent";
+  const labelClass = "block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300";
+  return (
+    <div className="mb-4">
+      <h4 className="mb-3 text-sm font-semibold text-primary">Core Details</h4>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div>
+          <label className={labelClass}>Serial Number <span className="text-primary">*</span></label>
+          <input type="text" className={inputClass} value={value.serial_number} onChange={e => onChange({ serial_number: e.target.value })} required />
+        </div>
+        <div>
+          <label className={labelClass}>Model</label>
+          <input type="text" className={inputClass} value={value.model} onChange={e => onChange({ model: e.target.value })} />
+        </div>
+        <div>
+          <label className={labelClass}>Category</label>
+          <select className={inputClass} value={value.category} onChange={e => onChange({ category: e.target.value })}>
+            {categoriesList.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className={labelClass}>Manufacturer</label>
+          <select className={inputClass} value={value.manufacturer} onChange={e => onChange({ manufacturer: e.target.value })}>
+            {manufacturersList.map(m => <option key={m} value={m}>{m}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className={labelClass}>Status</label>
+          <select className={inputClass} value={value.status} onChange={e => onChange({ status: e.target.value })}>
+            {statusesList.map(s => <option key={s} value={s}>{statusLabels[s] || s}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className={labelClass}>Condition</label>
+          <select className={inputClass} value={value.condition} onChange={e => onChange({ condition: e.target.value })}>
+            {conditionsList.map(c => <option key={c} value={c}>{conditionLabels[c] || c}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className={labelClass}>Purchase Date</label>
+          <input type="date" className={inputClass} value={toDateInputValue(value.purchase_date)} onChange={e => onChange({ purchase_date: e.target.value })} />
+        </div>
+        <div>
+          <label className={labelClass}>Purchase Price (KES)</label>
+          <input type="number" min="0" step="0.01" className={inputClass} value={value.purchase_price} onChange={e => onChange({ purchase_price: parseFloat(e.target.value) || 0 })} />
+        </div>
+        <div>
+          <label className={labelClass}>Current Value (KES)</label>
+          <input type="number" min="0" step="0.01" className={inputClass} value={value.current_value} onChange={e => onChange({ current_value: parseFloat(e.target.value) || 0 })} />
+        </div>
+        <div>
+          <label className={labelClass}>Warranty Expiry</label>
+          <input type="date" className={inputClass} value={toDateInputValue(value.warranty_expiry)} onChange={e => onChange({ warranty_expiry: e.target.value || null })} />
+        </div>
+        <div>
+          <label className={labelClass}>Last Maintenance</label>
+          <input type="date" className={inputClass} value={toDateInputValue(value.last_maintenance)} onChange={e => onChange({ last_maintenance: e.target.value || null })} />
+        </div>
+      </div>
+    </div>
+  );
 };
 
 const AssetManagement: React.FC = () => {
@@ -74,7 +198,7 @@ const AssetManagement: React.FC = () => {
     location: 'Turnkey Africa',
     assigned_to: null as string | null,
     department_id: '' as string,
-    warranty_expiry: '',
+    warranty_expiry: '' as string | null,
     last_maintenance: null as string | null,
     notes: '',
     custom_attributes: {} as Record<string, any>
@@ -172,6 +296,12 @@ const AssetManagement: React.FC = () => {
     const parsed = new Date(value);
     if (Number.isNaN(parsed.getTime())) return String(value);
     return parsed.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' });
+  };
+
+  const formatNumberOnly = (value?: number | string | null) => {
+    if (value === null || value === undefined || value === '') return '';
+    const n = Number(value);
+    return Number.isNaN(n) ? String(value) : n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
   const formatDateRange = (start?: string | null, end?: string | null) => {
@@ -398,6 +528,64 @@ const AssetManagement: React.FC = () => {
   // Export/Import helpers
   const [exportFormat, setExportFormat] = useState<'csv' | 'json' | 'txt' | 'excel' | 'pdf'>('csv');
 
+  const [selectedExportColumns, setSelectedExportColumns] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem(EXPORT_COLUMNS_STORAGE_KEY);
+      const parsed = saved ? JSON.parse(saved) : null;
+      if (Array.isArray(parsed)) {
+        const valid = parsed.filter((k): k is string => typeof k === 'string' && EXPORT_COLUMN_DEFS.some(c => c.key === k));
+        if (valid.length > 0) return valid;
+      }
+    } catch { /* ignore unreadable/corrupted storage and fall back to the default columns */ }
+    return DEFAULT_EXPORT_COLUMN_KEYS;
+  });
+  const [showColumnPicker, setShowColumnPicker] = useState(false);
+  const columnPickerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    try { localStorage.setItem(EXPORT_COLUMNS_STORAGE_KEY, JSON.stringify(selectedExportColumns)); } catch { /* storage unavailable (e.g. private browsing) — selection just won't persist */ }
+  }, [selectedExportColumns]);
+
+  useEffect(() => {
+    if (!showColumnPicker) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (columnPickerRef.current && !columnPickerRef.current.contains(event.target as Node)) {
+        setShowColumnPicker(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showColumnPicker]);
+
+  const toggleExportColumn = (key: string) => {
+    setSelectedExportColumns(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
+  };
+
+  const activeExportColumns = EXPORT_COLUMN_DEFS.filter(c => selectedExportColumns.includes(c.key));
+
+  const getExportColumnValue = (key: string, a: Asset): string => {
+    switch (key) {
+      case 'name': return a.name || '';
+      case 'type': return a.type || '';
+      case 'category': return (a as any).category || '';
+      case 'manufacturer': return (a as any).manufacturer || '';
+      case 'model': return (a as any).model || '';
+      case 'serial_number': return a.serial_number || '';
+      case 'status': return a.status || '';
+      case 'condition': return (a as any).condition || '';
+      case 'location': return a.location || '';
+      case 'department': return getDepartmentName(a.department_id);
+      case 'assigned_to': return getUserName(a.assigned_to);
+      case 'purchase_date': return formatDateOnly((a as any).purchase_date);
+      case 'purchase_price': return formatNumberOnly((a as any).purchase_price);
+      case 'current_value': return formatNumberOnly((a as any).current_value);
+      case 'warranty_expiry': return formatDateOnly((a as any).warranty_expiry);
+      case 'last_maintenance': return formatDateOnly((a as any).last_maintenance);
+      case 'notes': return (a as any).notes || '';
+      default: return '';
+    }
+  };
+
   // Logo is imported at top-level as Vite asset
 
   const downloadSampleCsv = () => {
@@ -418,13 +606,12 @@ const AssetManagement: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  const buildHtmlTable = (items: any[]) => {
-    const headers = ['name', 'type', 'serial_number', 'status', 'location', 'manufacturer', 'department', 'assigned_to', 'purchase_date', 'warranty_expiry'];
+  const buildHtmlTable = (items: any[], columns: ExportColumnDef[]) => {
     const escapeHtml = (s: any) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const thead = `<thead><tr>${headers.map(h => `<th style="text-align:left;border:1px solid #ccc;padding:6px;">${h}</th>`).join('')}</tr></thead>`;
-    const tbody = `<tbody>${items.map(a => `<tr>${[
-      a.name, a.type, a.serial_number, a.status, a.location || '', (a as any).manufacturer || '', getDepartmentName(a.department_id), getUserName(a.assigned_to), formatDateOnly((a as any).purchase_date), formatDateOnly((a as any).warranty_expiry)
-    ].map(v => `<td style="border:1px solid #ccc;padding:6px;">${escapeHtml(v)}</td>`).join('')}</tr>`).join('')
+    const thead = `<thead><tr>${columns.map(c => `<th style="text-align:left;border:1px solid #ccc;padding:6px;">${c.label}</th>`).join('')}</tr></thead>`;
+    const tbody = `<tbody>${items.map(a => `<tr>${
+      columns.map(c => `<td style="border:1px solid #ccc;padding:6px;">${escapeHtml(getExportColumnValue(c.key, a))}</td>`).join('')
+    }</tr>`).join('')
       }</tbody>`;
     return `<table style="border-collapse:collapse;font-family:Arial, sans-serif;font-size:12px;">${thead}${tbody}</table>`;
   };
@@ -439,24 +626,18 @@ const AssetManagement: React.FC = () => {
         setIsExporting(false);
         return;
       }
+      const columns = activeExportColumns;
+      if (columns.length === 0 && exportFormat !== 'json') {
+        addToast({ title: 'No Columns Selected', message: 'Choose at least one column to export.', type: 'warning' });
+        setIsExporting(false);
+        return;
+      }
       if (exportFormat === 'csv') {
-        const headers = ['name', 'type', 'serial_number', 'status', 'location', 'manufacturer', 'department', 'assigned_to', 'purchase_date', 'warranty_expiry'];
         const csvRows: string[] = [];
-        csvRows.push(headers.join(','));
+        csvRows.push(columns.map(c => c.label).join(','));
         for (const a of data) {
-          const row = [
-            a.name,
-            a.type,
-            a.serial_number,
-            a.status,
-            a.location || '',
-            (a as any).manufacturer || '',
-            getDepartmentName(a.department_id),
-            getUserName(a.assigned_to),
-            formatDateOnly((a as any).purchase_date),
-            formatDateOnly((a as any).warranty_expiry)
-          ].map(v => {
-            const s = String(v ?? '');
+          const row = columns.map(c => {
+            const s = String(getExportColumnValue(c.key, a) ?? '');
             return s.includes(',') || s.includes('"') ? '"' + s.replace(/"/g, '""') + '"' : s;
           }).join(',');
           csvRows.push(row);
@@ -481,7 +662,10 @@ const AssetManagement: React.FC = () => {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
       } else if (exportFormat === 'txt') {
-        const lines = data.map(a => `${a.name} \t${a.type} \t${a.serial_number} \t${a.status} \t${a.location || ''} `);
+        const lines = [columns.map(c => c.label).join('\t')];
+        for (const a of data) {
+          lines.push(columns.map(c => getExportColumnValue(c.key, a)).join('\t'));
+        }
         const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -492,7 +676,7 @@ const AssetManagement: React.FC = () => {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
       } else if (exportFormat === 'excel') {
-        const html = `< !DOCTYPE html > <html><head><meta charset="utf-8" /></head><body>${buildHtmlTable(data)}</body></html>`;
+        const html = `< !DOCTYPE html > <html><head><meta charset="utf-8" /></head><body>${buildHtmlTable(data, columns)}</body></html>`;
         const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -563,9 +747,9 @@ const AssetManagement: React.FC = () => {
         doc.setFontSize(10);
         doc.text(`Total assets: ${data.length} `, margin + 140, y);
         y += 14;
-        // Table with dynamic column sizing
-        const headers = ['Name', 'Type', 'Serial', 'Status', 'Location', 'Manufacturer', 'Dept', 'Assigned To', 'Purchase', 'Warranty'];
-        const weights = [16, 12, 12, 9, 15, 12, 8, 10, 8, 8];
+        // Table with dynamic column sizing, built from whichever columns were selected
+        const headers = columns.map(c => c.label);
+        const weights = columns.map(c => c.pdfWeight);
         const totalWeight = weights.reduce((a, b) => a + b, 0);
         const availableWidth = pageWidth - margin * 2;
         const colWidths = weights.map(w => Math.floor((w / totalWeight) * availableWidth));
@@ -612,18 +796,7 @@ const AssetManagement: React.FC = () => {
         drawRow(headers, true);
         // Data rows with pagination
         for (const a of data) {
-          const cells = [
-            a.name,
-            a.type,
-            a.serial_number || '',
-            a.status,
-            a.location || '',
-            (a as any).manufacturer || '',
-            getDepartmentName(a.department_id),
-            getUserName(a.assigned_to),
-            formatDateOnly((a as any).purchase_date),
-            formatDateOnly((a as any).warranty_expiry)
-          ];
+          const cells = columns.map(c => getExportColumnValue(c.key, a));
           const nextHeight = measureRowHeight(cells);
           if (y + nextHeight > pageHeight - margin) {
             doc.addPage();
@@ -770,11 +943,8 @@ const AssetManagement: React.FC = () => {
       const updatedAsset = await assetService.update(editingAsset.id, data);
       try { await auditService.write({ user_id: null, action: 'asset.update', entity_type: 'asset', entity_id: updatedAsset.id, details: { before: previous, after: updatedAsset } }); } catch { }
 
-      // Update the asset in the local state (this will be refreshed by loadAssets)
-      // const updatedAssets = assets.map(asset =>
-      //   asset.id === editingAsset.id ? updatedAsset : asset
-      // );
-      // setAssets(updatedAssets);
+      // Reflect the change in the listing immediately instead of waiting on a manual refresh
+      setAssets(prev => prev.map(asset => asset.id === updatedAsset.id ? updatedAsset : asset));
 
       // Department stats are automatically updated by database triggers
 
@@ -988,6 +1158,41 @@ const AssetManagement: React.FC = () => {
               <option value="txt">Text (.txt)</option>
               <option value="pdf">PDF</option>
             </select>
+            <div className="relative" ref={columnPickerRef}>
+              <button
+                type="button"
+                onClick={() => setShowColumnPicker(v => !v)}
+                disabled={exportFormat === 'json'}
+                title={exportFormat === 'json' ? 'JSON always exports every field' : 'Choose which columns to export'}
+                className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+              >
+                <ColumnsIcon className="w-4 h-4 mr-2" /> Columns ({activeExportColumns.length})
+              </button>
+              {showColumnPicker && (
+                <div className="absolute right-0 z-20 w-64 p-3 mt-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-xl rounded-xl">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Export Columns</span>
+                    <div className="flex gap-2">
+                      <button type="button" onClick={() => setSelectedExportColumns(EXPORT_COLUMN_DEFS.map(c => c.key))} className="text-xs font-medium text-secondary dark:text-accent hover:underline">All</button>
+                      <button type="button" onClick={() => setSelectedExportColumns(DEFAULT_EXPORT_COLUMN_KEYS)} className="text-xs font-medium text-secondary dark:text-accent hover:underline">Reset</button>
+                    </div>
+                  </div>
+                  <div className="space-y-1 overflow-y-auto max-h-64">
+                    {EXPORT_COLUMN_DEFS.map(col => (
+                      <label key={col.key} className="flex items-center gap-2 px-1 py-1 text-sm text-gray-700 dark:text-gray-200 rounded cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800">
+                        <input
+                          type="checkbox"
+                          checked={selectedExportColumns.includes(col.key)}
+                          onChange={() => toggleExportColumn(col.key)}
+                          className="rounded border-gray-300 dark:border-gray-600 text-primary focus:ring-primary"
+                        />
+                        {col.label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
             <button onClick={handleExport} className="px-4 py-2 text-sm font-medium text-primary bg-lightred rounded-full shadow-button hover:opacity-90 disabled:opacity-50" disabled={isExporting}>
               <DownloadIcon className="w-4 h-4 mr-2" /> {isExporting ? 'Exporting...' : 'Export'}
             </button>
@@ -1533,6 +1738,14 @@ const AssetManagement: React.FC = () => {
               />
             </div>
           </div>
+          <AssetCoreFields
+            value={newAsset}
+            onChange={patch => setNewAsset({ ...newAsset, ...patch })}
+            categoriesList={categoriesList}
+            manufacturersList={manufacturersList}
+            statusesList={statusesList}
+            conditionsList={conditionsList}
+          />
           {(() => {
             const selectedTypeConfig = assetTypesConfig.find(t => t.name === newAsset.type);
             if (!selectedTypeConfig?.parameters_schema?.length) return null;
@@ -1793,6 +2006,14 @@ const AssetManagement: React.FC = () => {
               />
             </div>
           </div>
+          <AssetCoreFields
+            value={editingAsset}
+            onChange={patch => setEditingAsset({ ...editingAsset, ...patch } as Asset)}
+            categoriesList={categoriesList}
+            manufacturersList={manufacturersList}
+            statusesList={statusesList}
+            conditionsList={conditionsList}
+          />
           {(() => {
             const selectedTypeConfig = assetTypesConfig.find(t => t.name === (editingAsset?.type));
             if (!selectedTypeConfig?.parameters_schema?.length) return null;
