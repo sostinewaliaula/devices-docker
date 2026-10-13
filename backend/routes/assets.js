@@ -15,6 +15,74 @@ const upload = multer({
 
 const router = express.Router();
 
+// Notifies the assignee (in-app + email) and the department's admins/managers that `asset` is
+// assigned to them. Shared by create (where the asset may already have an assignee the moment
+// it's added) and update (where the assignment changes later) — only the create route previously
+// skipped this, so a device assigned at creation time never notified anyone.
+async function notifyAssetAssigned(asset) {
+  try {
+    if (asset.assigned_to) {
+      await notificationService.createNotification(
+        asset.assigned_to,
+        null,
+        'info',
+        'Device Assigned',
+        `You have been assigned the asset ${asset.name} (SN: ${asset.serial_number}).`
+      );
+
+      if (asset.assigned_user_email) {
+        await emailService.sendBrandedNotificationEmail(
+          asset.assigned_user_email,
+          'Asset Assigned',
+          {
+            badge: 'INFO',
+            title: 'Asset Assigned',
+            greetingName: asset.assigned_user_name || '',
+            message: `You have been assigned the asset "${asset.name}" (SN: ${asset.serial_number}).`,
+            ctaText: 'View All Notifications',
+            ctaUrl: (process.env.FRONTEND_URL || 'http://localhost:5173') + '/notifications'
+          }
+        );
+      }
+    }
+
+    const deptId = asset.department_id;
+    if (deptId) {
+      const managersResult = await executeQuery(
+        `SELECT id, name, email FROM users WHERE department_id = ? AND role IN ('admin','manager') AND is_active = TRUE`,
+        [deptId]
+      );
+      if (managersResult.success) {
+        for (const mgr of managersResult.data) {
+          await notificationService.createNotification(
+            mgr.id,
+            null,
+            'info',
+            'Asset Assignment Update',
+            `Asset ${asset.name} has been assigned${asset.assigned_user_name ? ` to ${asset.assigned_user_name}` : ''}.`
+          );
+          if (mgr.email) {
+            await emailService.sendBrandedNotificationEmail(
+              mgr.email,
+              'Asset Assignment Update',
+              {
+                badge: 'INFO',
+                title: 'Asset Assignment Update',
+                greetingName: mgr.name || '',
+                message: `Asset "${asset.name}" has been assigned${asset.assigned_user_name ? ` to ${asset.assigned_user_name}` : ''}.`,
+                ctaText: 'Open Assets',
+                ctaUrl: (process.env.FRONTEND_URL || 'http://localhost:5173') + '/assets'
+              }
+            );
+          }
+        }
+      }
+    }
+  } catch (notifyErr) {
+    console.error('Failed to send asset assignment notifications:', notifyErr);
+  }
+}
+
 // Technical Specifications values come in through multipart/form-data (asset create/update both
 // use FormData so an image can ride along), so multer always hands them back as the plain JSON
 // string the frontend built with JSON.stringify(...) — never as an already-parsed object. Storing
@@ -752,6 +820,9 @@ router.post('/', upload.single('image'), [
       userAgent
     );
 
+    // Notify the assignee (and department admins/managers) if the asset was assigned right away
+    await notifyAssetAssigned(createdAsset);
+
     res.status(201).json({
       message: 'Asset created successfully',
       asset: createdAsset
@@ -1056,67 +1127,8 @@ router.put('/:id', upload.single('image'), [
     }
 
     // If assignment changed, notify assigned user and department managers
-    try {
-      if (assignmentChanged || departmentChanged) {
-        if (updatedAsset.assigned_to) {
-          await notificationService.createNotification(
-            updatedAsset.assigned_to,
-            'Device Assigned',
-            `You have been assigned the asset ${updatedAsset.name} (SN: ${updatedAsset.serial_number}).`,
-            'info'
-          );
-
-          if (updatedAsset.assigned_user_email) {
-            await emailService.sendBrandedNotificationEmail(
-              updatedAsset.assigned_user_email,
-              'Asset Assigned',
-              {
-                badge: 'INFO',
-                title: 'Asset Assigned',
-                greetingName: updatedAsset.assigned_user_name || '',
-                message: `You have been assigned the asset "${updatedAsset.name}" (SN: ${updatedAsset.serial_number}).`,
-                ctaText: 'View All Notifications',
-                ctaUrl: (process.env.FRONTEND_URL || 'http://localhost:5173') + '/notifications'
-              }
-            );
-          }
-        }
-
-        // Notify department managers
-        const deptId = updatedAsset.department_id;
-        if (deptId) {
-          const managersResult = await executeQuery(
-            `SELECT id, name, email FROM users WHERE department_id = ? AND role IN ('admin','manager') AND is_active = TRUE`,
-            [deptId]
-          );
-          if (managersResult.success) {
-            for (const mgr of managersResult.data) {
-              await notificationService.createNotification(
-                mgr.id,
-                'Asset Assignment Update',
-                `Asset ${updatedAsset.name} has been assigned${updatedAsset.assigned_user_name ? ` to ${updatedAsset.assigned_user_name}` : ''}.`,
-                'info'
-              );
-              if (mgr.email) {
-                await emailService.sendBrandedNotificationEmail(
-                  mgr.email,
-                  'Asset Assignment Update',
-                  {
-                    badge: 'INFO',
-                    title: 'Asset Assignment Update',
-                    greetingName: mgr.name || '',
-                    message: `Asset "${updatedAsset.name}" has been assigned${updatedAsset.assigned_user_name ? ` to ${updatedAsset.assigned_user_name}` : ''}.`,
-                    ctaText: 'Open Assets',
-                    ctaUrl: (process.env.FRONTEND_URL || 'http://localhost:5173') + '/assets'
-                  }
-                );
-              }
-            }
-          }
-        }
-      }
-    } catch (notifyErr) {
-      console.error('Failed to send asset assignment notifications:', notifyErr);
+    if (assignmentChanged || departmentChanged) {
+      await notifyAssetAssigned(updatedAsset);
     }
 
     // Log asset update
