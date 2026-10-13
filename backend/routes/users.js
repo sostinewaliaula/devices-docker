@@ -477,10 +477,10 @@ router.get('/:id', async (req, res) => {
 router.post('/', [
   authenticateToken,
   requireAdmin,
-  body('email').isEmail(),
-  body('password').isLength({ min: 6 }),
-  body('name').trim().isLength({ min: 2 }),
-  body('role').isIn(['admin', 'manager', 'user']),
+  body('email').isEmail().withMessage('Enter a valid email address'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  body('name').trim().isLength({ min: 2 }).withMessage('Name must be at least 2 characters'),
+  body('role').isIn(['admin', 'manager', 'user']).withMessage('Role must be admin, manager or user'),
   body('department_id').optional().custom((value) => {
     if (value === '' || value === null || value === undefined) return true;
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
@@ -594,13 +594,18 @@ router.post('/', [
 // Update user
 router.put('/:id', [
   requireAdmin,
-  body('name').optional().trim().isLength({ min: 2 }),
-  body('email').optional().isEmail(),
-  body('role').optional().isIn(['admin', 'manager', 'user']),
-  body('department_id').optional().isUUID(),
+  body('name').optional().trim().isLength({ min: 2 }).withMessage('Name must be at least 2 characters'),
+  body('email').optional().isEmail().withMessage('Enter a valid email address'),
+  body('role').optional().isIn(['admin', 'manager', 'user']).withMessage('Role must be admin, manager or user'),
+  // .optional() alone only skips an absent field, not an explicit null — and the edit form sends
+  // department_id: null to unassign a user's department, which made that save always 400.
+  body('department_id').optional({ nullable: true }).custom((value) => {
+    if (value === '' || value === null || value === undefined) return true;
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);
+  }).withMessage('Department ID must be a valid UUID'),
   body('phone').optional().trim(),
   body('position').optional().trim(),
-  body('is_active').optional().isBoolean()
+  body('is_active').optional().isBoolean().withMessage('is_active must be true or false')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
