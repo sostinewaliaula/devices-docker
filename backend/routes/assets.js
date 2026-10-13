@@ -15,6 +15,25 @@ const upload = multer({
 
 const router = express.Router();
 
+// Technical Specifications values come in through multipart/form-data (asset create/update both
+// use FormData so an image can ride along), so multer always hands them back as the plain JSON
+// string the frontend built with JSON.stringify(...) — never as an already-parsed object. Storing
+// that string with another JSON.stringify() on top double-encodes it: the DB ends up holding the
+// JSON-quoted text of the fields instead of the fields themselves, so every "Technical
+// Specifications" value shows as missing once something reads the column expecting real keys.
+// Parsing here first keeps custom_attributes encoded exactly once no matter how it arrived.
+function normalizeCustomAttributes(raw) {
+  if (raw === undefined) return undefined;
+  if (raw === null || raw === '') return null;
+  if (typeof raw === 'object') return JSON.stringify(raw);
+  try {
+    const parsed = JSON.parse(raw);
+    return JSON.stringify(parsed && typeof parsed === 'object' ? parsed : {});
+  } catch {
+    return null;
+  }
+}
+
 // Get all assets
 router.get('/', async (req, res) => {
   try {
@@ -687,7 +706,7 @@ router.post('/', upload.single('image'), [
         formatDateForDB(purchase_date), purchase_price, current_value, status, condition,
         location || null, assigned_to || null, finalDepartmentId || null, formatDateForDB(warranty_expiry),
         formatDateForDB(last_maintenance), notes || null, image_data, image_type,
-        custom_attributes ? JSON.stringify(custom_attributes) : null
+        normalizeCustomAttributes(custom_attributes) ?? null
       ]
     );
 
@@ -928,11 +947,12 @@ router.put('/:id', upload.single('image'), [
       params.push(req.file.mimetype);
     }
     if (custom_attributes !== undefined) {
-      if (custom_attributes === null) {
+      const normalized = normalizeCustomAttributes(custom_attributes);
+      if (normalized === null) {
           updates.push('custom_attributes = NULL');
       } else {
           updates.push('custom_attributes = ?');
-          params.push(JSON.stringify(custom_attributes));
+          params.push(normalized);
       }
     }
 

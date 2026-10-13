@@ -49,6 +49,13 @@ if (DB_CLIENT === 'postgres') {
     timeout: 60000,
     reconnect: true,
     charset: 'utf8mb4',
+    // Plain DATE columns (purchase_date, warranty_expiry, last_maintenance, ...) must come back
+    // as plain 'YYYY-MM-DD' strings. Left to mysql2's default, a DATE is turned into a JS Date at
+    // local midnight and then serialized to JSON as UTC, which shifts the calendar date by a day
+    // for any server/timezone combination not sitting exactly on a UTC offset of 0 (e.g. a
+    // 2025-11-16 purchase_date comes back as "2025-11-15T21:00:00.000Z" in EAT, UTC+3). DATETIME/
+    // TIMESTAMP columns are unaffected and keep coming back as Date objects.
+    dateStrings: ['DATE'],
     // Fix for Windows MariaDB authentication issues
     authPlugins: {
       mysql_clear_password: () => () => Buffer.from((baseConfig.password || '') + '\0')
