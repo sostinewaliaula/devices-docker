@@ -568,23 +568,21 @@ const AssetDetails: React.FC = () => {
     setIsUpdating(true);
 
     const data = new FormData();
+    // These can be explicitly cleared back to "none" (unassigning a user, removing a
+    // department, blanking a date) — they must still be sent as '' even when the value is
+    // null, or the backend never learns the field should be cleared. The old code's outer
+    // `value !== null` guard skipped the whole field in that case, so picking "Select User"
+    // to unassign an asset silently left the previous assignment in place.
+    const clearableFields = ['assigned_to', 'department_id', 'purchase_date', 'warranty_expiry', 'last_maintenance'];
     Object.entries(editingAsset).forEach(([key, value]) => {
+      if (clearableFields.includes(key)) {
+        data.append(key, value ? String(value) : '');
+        return;
+      }
       if (value !== null && value !== undefined) {
-        // Handle specific fields for FormData
-        if (key === 'purchase_date' && !value) {
-          data.append(key, '');
-        } else if (key === 'department_id' && !value) {
-          data.append(key, '');
-        } else if (key === 'assigned_to' && !value) {
-          data.append(key, '');
-        } else if (key === 'warranty_expiry' && !value) {
-          data.append(key, '');
-        } else if (key === 'last_maintenance' && !value) {
-          data.append(key, '');
-        } else if (key === 'custom_attributes') {
+        if (key === 'custom_attributes') {
           data.append(key, JSON.stringify(value || {}));
-        }
-        else {
+        } else {
           data.append(key, String(value));
         }
       }

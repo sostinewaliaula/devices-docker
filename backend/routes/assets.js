@@ -857,9 +857,15 @@ router.put('/:id', upload.single('image'), [
     const {
       name, type, category, manufacturer, model, serial_number,
       purchase_date, purchase_price, current_value, status, condition,
-      location, assigned_to, department_id, warranty_expiry, notes,
+      location, warranty_expiry, notes,
       assignment_notes, return_notes, return_condition, custom_attributes
     } = req.body;
+    // The edit form sends '' to explicitly clear a field back to "none" (unassign a user, remove
+    // a department). Both columns are nullable UUID foreign keys, so '' must become null here —
+    // otherwise it gets written in literally and either violates the FK constraint or, worse,
+    // silently sticks as a value that matches no real user/department.
+    let assigned_to = req.body.assigned_to === '' ? null : req.body.assigned_to;
+    let department_id = req.body.department_id === '' ? null : req.body.department_id;
 
     // Convert date strings to proper format for database
     const formatDateForDB = (dateString) => {
