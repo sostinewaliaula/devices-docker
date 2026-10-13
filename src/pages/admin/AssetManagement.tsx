@@ -163,6 +163,17 @@ const AssetManagement: React.FC = () => {
     return parsed.toLocaleString();
   };
 
+  // purchase_date/warranty_expiry are plain dates (no time component). Format in UTC so the
+  // calendar date shown doesn't shift depending on the viewer's timezone (a date-only ISO string
+  // like "2025-11-16" is parsed as UTC midnight, so reading it with *local* getters can show the
+  // wrong day west of UTC).
+  const formatDateOnly = (value?: string | null) => {
+    if (!value) return '';
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return String(value);
+    return parsed.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' });
+  };
+
   const formatDateRange = (start?: string | null, end?: string | null) => {
     const startLabel = start ? formatDateTime(start) : 'Unknown start';
     const endLabel = end ? formatDateTime(end) : 'Present';
@@ -408,11 +419,11 @@ const AssetManagement: React.FC = () => {
   };
 
   const buildHtmlTable = (items: any[]) => {
-    const headers = ['name', 'type', 'serial_number', 'status', 'location', 'manufacturer', 'department_id', 'assigned_to', 'purchase_date', 'warranty_expiry'];
+    const headers = ['name', 'type', 'serial_number', 'status', 'location', 'manufacturer', 'department', 'assigned_to', 'purchase_date', 'warranty_expiry'];
     const escapeHtml = (s: any) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     const thead = `<thead><tr>${headers.map(h => `<th style="text-align:left;border:1px solid #ccc;padding:6px;">${h}</th>`).join('')}</tr></thead>`;
     const tbody = `<tbody>${items.map(a => `<tr>${[
-      a.name, a.type, a.serial_number, a.status, a.location || '', (a as any).manufacturer || '', a.department_id || '', a.assigned_to || '', (a as any).purchase_date || '', (a as any).warranty_expiry || ''
+      a.name, a.type, a.serial_number, a.status, a.location || '', (a as any).manufacturer || '', getDepartmentName(a.department_id), getUserName(a.assigned_to), formatDateOnly((a as any).purchase_date), formatDateOnly((a as any).warranty_expiry)
     ].map(v => `<td style="border:1px solid #ccc;padding:6px;">${escapeHtml(v)}</td>`).join('')}</tr>`).join('')
       }</tbody>`;
     return `<table style="border-collapse:collapse;font-family:Arial, sans-serif;font-size:12px;">${thead}${tbody}</table>`;
@@ -429,7 +440,7 @@ const AssetManagement: React.FC = () => {
         return;
       }
       if (exportFormat === 'csv') {
-        const headers = ['name', 'type', 'serial_number', 'status', 'location', 'manufacturer', 'department_id', 'assigned_to', 'purchase_date', 'warranty_expiry'];
+        const headers = ['name', 'type', 'serial_number', 'status', 'location', 'manufacturer', 'department', 'assigned_to', 'purchase_date', 'warranty_expiry'];
         const csvRows: string[] = [];
         csvRows.push(headers.join(','));
         for (const a of data) {
@@ -440,10 +451,10 @@ const AssetManagement: React.FC = () => {
             a.status,
             a.location || '',
             (a as any).manufacturer || '',
-            a.department_id || '',
-            a.assigned_to || '',
-            (a as any).purchase_date || '',
-            (a as any).warranty_expiry || ''
+            getDepartmentName(a.department_id),
+            getUserName(a.assigned_to),
+            formatDateOnly((a as any).purchase_date),
+            formatDateOnly((a as any).warranty_expiry)
           ].map(v => {
             const s = String(v ?? '');
             return s.includes(',') || s.includes('"') ? '"' + s.replace(/"/g, '""') + '"' : s;
@@ -600,9 +611,6 @@ const AssetManagement: React.FC = () => {
         }
         drawRow(headers, true);
         // Data rows with pagination
-        // lookup helpers for names
-        const deptMap = new Map<string, string>(departments.map(d => [d.id, d.name]));
-        const userMap = new Map<string, string>(users.map(u => [u.id, u.name]));
         for (const a of data) {
           const cells = [
             a.name,
@@ -611,10 +619,10 @@ const AssetManagement: React.FC = () => {
             a.status,
             a.location || '',
             (a as any).manufacturer || '',
-            (a as any).department_id ? (deptMap.get((a as any).department_id) || (a as any).department_id) : '',
-            (a as any).assigned_to ? (userMap.get((a as any).assigned_to) || (a as any).assigned_to) : '',
-            (a as any).purchase_date || '',
-            (a as any).warranty_expiry || ''
+            getDepartmentName(a.department_id),
+            getUserName(a.assigned_to),
+            formatDateOnly((a as any).purchase_date),
+            formatDateOnly((a as any).warranty_expiry)
           ];
           const nextHeight = measureRowHeight(cells);
           if (y + nextHeight > pageHeight - margin) {
