@@ -16,6 +16,20 @@ interface CreateUserData {
   password: string;
 }
 
+// Surfaces the backend's actual reason for a failed request (e.g. "A user with this email
+// already exists", or the specific express-validator message like "Password must be at least 6
+// characters") instead of axios's generic error.message ("Request failed with status code 400"),
+// which told the admin nothing about what to fix and just invited retrying the same bad input.
+const getApiErrorMessage = (error: any, fallback: string): string => {
+  const data = error?.response?.data;
+  if (data?.message) return data.message;
+  if (Array.isArray(data?.details) && data.details.length > 0) {
+    return data.details.map((d: any) => d.msg || d.message).filter(Boolean).join(' ');
+  }
+  if (data?.error) return data.error;
+  return error?.message || fallback;
+};
+
 const UserManagement: React.FC = () => {
   const { addNotification, addToast } = useNotifications();
   const [users, setUsers] = useState<User[]>([]);
@@ -153,7 +167,7 @@ const UserManagement: React.FC = () => {
     } catch (error: any) {
       addToast({
         title: 'Error',
-        message: error.response?.data?.error || 'Failed to create position.',
+        message: getApiErrorMessage(error, 'Failed to create position.'),
         type: 'error'
       });
     } finally {
@@ -193,7 +207,7 @@ const UserManagement: React.FC = () => {
     } catch (error: any) {
       addToast({
         title: 'Error',
-        message: error.response?.data?.error || 'Failed to create parent department.',
+        message: getApiErrorMessage(error, 'Failed to create parent department.'),
         type: 'error'
       });
     } finally {
@@ -241,7 +255,7 @@ const UserManagement: React.FC = () => {
     } catch (error: any) {
       addToast({
         title: 'Error',
-        message: error.response?.data?.error || 'Failed to create sub-department.',
+        message: getApiErrorMessage(error, 'Failed to create sub-department.'),
         type: 'error'
       });
     } finally {
@@ -324,7 +338,7 @@ const UserManagement: React.FC = () => {
       });
       addToast({ title: 'Success', message: 'User created.', type: 'success' });
     } catch (error: any) {
-      addToast({ title: 'Error', message: error.message || 'Failed to create user. Please try again.', type: 'error' });
+      addToast({ title: 'Error', message: getApiErrorMessage(error, 'Failed to create user. Please try again.'), type: 'error' });
     }
   };
   const handleEditUser = async (e: React.FormEvent) => {
@@ -366,7 +380,7 @@ const UserManagement: React.FC = () => {
       });
       addToast({ title: 'Success', message: 'User updated.', type: 'success' });
     } catch (error: any) {
-      addToast({ title: 'Error', message: error.message || 'Failed to update user.', type: 'error' });
+      addToast({ title: 'Error', message: getApiErrorMessage(error, 'Failed to update user.'), type: 'error' });
     }
   };
 
@@ -387,7 +401,7 @@ const UserManagement: React.FC = () => {
     } catch (error: any) {
       addToast({
         title: 'Error',
-        message: error.response?.data?.message || 'Failed to update user status.',
+        message: getApiErrorMessage(error, 'Failed to update user status.'),
         type: 'error'
       });
     }
@@ -407,7 +421,7 @@ const UserManagement: React.FC = () => {
       setEditingUser(null);
     } catch (error: any) {
       console.error('Error deleting user:', error);
-      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to delete user. Please try again.';
+      const errorMessage = getApiErrorMessage(error, 'Failed to delete user. Please try again.');
       addToast({ title: 'Error', message: errorMessage, type: 'error' });
       // Don't close modal on error so user can try again
     }
@@ -458,7 +472,7 @@ const UserManagement: React.FC = () => {
     } catch (error: any) {
       addToast({
         title: 'Error',
-        message: error.message || 'Failed to change password. Please try again.',
+        message: getApiErrorMessage(error, 'Failed to change password. Please try again.'),
         type: 'error'
       });
       addToast({
